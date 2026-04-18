@@ -1,0 +1,406 @@
+# Demo E-Commerce Endpoints
+
+Demo API จำลองเป็น e-commerce workflow ครบถ้วน เหมาะสำหรับทดสอบ transaction flows ด้วย realistic scenarios
+
+## Overview
+
+Demo routes มี 2 language support: **thai (th)** และ **english (en)**
+
+ระบุ language ผ่าน:
+- Query param: `?lang=th` หรือ `?lang=en`
+- Header: `Accept-Language: th` หรือ `Accept-Language: en`
+- Default: Auto-detect หรือ English
+
+## Endpoints
+
+### 1. GET /demo/context - Initialize Demo
+
+เริ่มต้นการเดินทาง e-commerce workflow ขอ demo context
+
+**Request:**
+```bash
+curl "http://localhost:3001/demo/context?search=mouse&lang=th"
+```
+
+**Parameters:**
+- `search` (optional): Search term - default: "mouse"
+- `lang` (optional): Language - "th" or "en"
+
+**Response (200 OK):**
+```json
+{
+  "language": "th",
+  "message": "เตรียมข้อมูลเริ่มต้นของเดโมแล้ว",
+  "shopperId": "shopper-a1b2c3d4-e5f6-7890-abcd",
+  "cartId": "cart-x9y8z7-w6v5-u4t3-s2r1",
+  "searchTerm": "mouse",
+  "recommendedProductId": "sku-101",
+  "couponCode": "WELCOME10",
+  "nextEndpoints": {
+    "dashboard": "/demo/dashboard",
+    "search": "/demo/search",
+    "productDetails": "/demo/product/details",
+    "addToCart": "/demo/cart/add",
+    "checkout": "/demo/checkout",
+    "orderStatus": "/demo/order/status"
+  }
+}
+```
+
+---
+
+### 2. GET /demo/dashboard - Fetch Dashboard
+
+ข้อมูล dashboard, featured products, categories, metrics
+
+**Request:**
+```bash
+curl "http://localhost:3001/demo/dashboard?lang=en"
+```
+
+**Response (200 OK):**
+```json
+{
+  "language": "en",
+  "message": "demo dashboard loaded",
+  "featured": [
+    {
+      "id": "sku-100",
+      "name": "Laptop Sleeve",
+      "category": "accessories",
+      "price": 29.99
+    },
+    {
+      "id": "sku-101",
+      "name": "Wireless Mouse",
+      "category": "electronics",
+      "price": 24.5
+    },
+    {
+      "id": "sku-102",
+      "name": "Mechanical Keyboard",
+      "category": "electronics",
+      "price": 89.0
+    }
+  ],
+  "categories": ["accessories", "electronics", "lifecycle", "stationery"],
+  "metrics": {
+    "productCount": 5,
+    "activeCartCount": 0
+  }
+}
+```
+
+---
+
+### 3. GET /demo/search - Product Search
+
+ค้นหาสินค้าจากชื่อหรือ category
+
+**Request:**
+```bash
+curl "http://localhost:3001/demo/search?q=keyboard&lang=th"
+```
+
+**Parameters:**
+- `q` (optional): Search query
+- `lang` (optional): Language
+
+**Response (200 OK):**
+```json
+{
+  "language": "th",
+  "message": "ค้นหาข้อมูลเดโมเรียบร้อยแล้ว",
+  "query": "keyboard",
+  "count": 1,
+  "results": [
+    {
+      "id": "sku-102",
+      "name": "Mechanical Keyboard",
+      "category": "electronics",
+      "price": 89.0
+    }
+  ]
+}
+```
+
+---
+
+### 4. GET /demo/product/details - Product Details
+
+ดูรายละเอียดสินค้าแบบ full + stock + rating
+
+**Request:**
+```bash
+curl "http://localhost:3001/demo/product/details?productId=sku-101&lang=th"
+```
+
+**Parameters:**
+- `productId` (required): Product SKU
+- `lang` (optional): Language
+
+**Response (200 OK):**
+```json
+{
+  "language": "th",
+  "message": "โหลดรายละเอียดสินค้าแล้ว",
+  "product": {
+    "id": "sku-101",
+    "name": "Wireless Mouse",
+    "category": "electronics",
+    "price": 24.5,
+    "stockStatus": "in_stock",
+    "rating": 4.6,
+    "description": "Wireless Mouse demo description for transaction flow testing"
+  }
+}
+```
+
+**Error (400 Bad Request) - Missing productId:**
+```json
+{
+  "error": "missing_required_parameter",
+  "required": ["productId"]
+}
+```
+
+**Error (404 Not Found) - Product not found:**
+```json
+{
+  "error": "product_not_found",
+  "productId": "sku-unknown"
+}
+```
+
+---
+
+### 5. POST /demo/cart/add - Add Item to Cart
+
+เพิ่มสินค้าเข้าตะกร้า
+
+**Request:**
+```bash
+curl -X POST http://localhost:3001/demo/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cartId": "cart-abc123",
+    "productId": "sku-101",
+    "quantity": 2
+  }'
+```
+
+**Request Body:**
+- `cartId` (optional): Cart ID - auto-generate if not provided
+- `productId` (required): Product SKU
+- `quantity` (optional): Quantity - default: 1
+
+**Response (200 OK):**
+```json
+{
+  "language": "en",
+  "message": "item added to cart",
+  "cartId": "cart-abc123",
+  "itemCount": 2,
+  "total": 49.0,
+  "items": [
+    {
+      "productId": "sku-101",
+      "name": "Wireless Mouse",
+      "price": 24.5,
+      "quantity": 2,
+      "lineTotal": 49.0
+    }
+  ]
+}
+```
+
+**Error (400 Bad Request) - Invalid quantity:**
+```json
+{
+  "error": "invalid_quantity",
+  "message": "quantity must be a positive integer"
+}
+```
+
+**Error (404 Not Found) - Product not found:**
+```json
+{
+  "error": "product_not_found",
+  "productId": "sku-unknown"
+}
+```
+
+---
+
+### 6. POST /demo/checkout - Checkout Process
+
+จบ order นี้จากตะกร้า
+
+**Request:**
+```bash
+curl -X POST http://localhost:3001/demo/checkout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cartId": "cart-abc123",
+    "billingAddress": {
+      "street": "123 Main St",
+      "city": "Bangkok",
+      "zipCode": "10110"
+    },
+    "couponCode": "WELCOME10"
+  }'
+```
+
+**Request Body:**
+- `cartId` (required): Cart ID
+- `billingAddress` (optional): Address object
+- `couponCode` (optional): Coupon code
+
+**Response (200 OK):**
+```json
+{
+  "language": "en",
+  "message": "checkout completed",
+  "orderId": "order-x1y2z3-a4b5-c6d7-e8f9",
+  "total": 49.0,
+  "items": [
+    {
+      "productId": "sku-101",
+      "name": "Wireless Mouse",
+      "price": 24.5,
+      "quantity": 2,
+      "lineTotal": 49.0
+    }
+  ],
+  "timestamp": 1776398960000,
+  "nextEndpoint": "/demo/order/status"
+}
+```
+
+**Error (400 Bad Request) - Empty cart:**
+```json
+{
+  "error": "empty_cart",
+  "message": "Add at least one item before checkout"
+}
+```
+
+**Error (400 Bad Request) - Missing cartId:**
+```json
+{
+  "error": "missing_required_parameter",
+  "required": ["cartId"]
+}
+```
+
+---
+
+### 7. GET /demo/order/status - Check Order Status
+
+ตรวจสอบสถานะคำสั่งซื้อ
+
+**Request:**
+```bash
+curl "http://localhost:3001/demo/order/status?orderId=order-x1y2z3&lang=th"
+```
+
+**Parameters:**
+- `orderId` (required): Order ID from checkout response
+- `lang` (optional): Language
+
+**Response (200 OK):**
+```json
+{
+  "language": "th",
+  "message": "โหลดสถานะคำสั่งซื้อแล้ว",
+  "orderId": "order-x1y2z3-a4b5-c6d7-e8f9",
+  "status": "confirmed",
+  "items": [
+    {
+      "productId": "sku-101",
+      "name": "Wireless Mouse",
+      "price": 24.5,
+      "quantity": 2,
+      "lineTotal": 49.0
+    }
+  ],
+  "total": 49.0,
+  "createdAt": "2026-04-17T04:09:25.000Z",
+  "estimatedDelivery": "2026-04-19T04:09:25.000Z"
+}
+```
+
+**Error (404 Not Found) - Order not found:**
+```json
+{
+  "error": "order_not_found",
+  "orderId": "order-unknown"
+}
+```
+
+---
+
+## Demo Products (Inventory)
+
+```json
+[
+  { "id": "sku-100", "name": "Laptop Sleeve", "category": "accessories", "price": 29.99 },
+  { "id": "sku-101", "name": "Wireless Mouse", "category": "electronics", "price": 24.5 },
+  { "id": "sku-102", "name": "Mechanical Keyboard", "category": "electronics", "price": 89.0 },
+  { "id": "sku-103", "name": "Coffee Mug", "category": "lifestyle", "price": 12.75 },
+  { "id": "sku-104", "name": "Notebook Pack", "category": "stationery", "price": 14.25 }
+]
+```
+
+---
+
+## Complete Workflow Example
+
+```bash
+# 1. Initialize
+CONTEXT=$(curl -s "http://localhost:3001/demo/context?lang=th")
+CART_ID=$(echo $CONTEXT | jq -r '.cartId')
+
+# 2. Search
+curl -s "http://localhost:3001/demo/search?q=mouse&lang=th"
+
+# 3. Add to cart
+curl -s -X POST http://localhost:3001/demo/cart/add \
+  -H "Content-Type: application/json" \
+  -d "{\"cartId\":\"$CART_ID\", \"productId\":\"sku-101\", \"quantity\":2}"
+
+# 4. Checkout
+CHECKOUT=$(curl -s -X POST http://localhost:3001/demo/checkout \
+  -H "Content-Type: application/json" \
+  -d "{\"cartId\":\"$CART_ID\"}")
+ORDER_ID=$(echo $CHECKOUT | jq -r '.orderId')
+
+# 5. Check order status
+curl -s "http://localhost:3001/demo/order/status?orderId=$ORDER_ID&lang=th"
+```
+
+---
+
+## Language Support
+
+All demo endpoints support Thai (th) and English (en):
+
+| Endpoint | Thai Message | English Message |
+|----------|--------------|-----------------|
+| /demo/context | เตรียมข้อมูลเริ่มต้นของเดโมแล้ว | demo context prepared |
+| /demo/dashboard | โหลดหน้าแดชบอร์ดเดโมแล้ว | demo dashboard loaded |
+| /demo/search | ค้นหาข้อมูลเดโมเรียบร้อยแล้ว | demo search completed |
+| /demo/product/details | โหลดรายละเอียดสินค้าแล้ว | product details loaded |
+| /demo/cart/add | เพิ่มสินค้าเข้าตะกร้าแล้ว | item added to cart |
+| /demo/checkout | ทำรายการสั่งซื้อเรียบร้อยแล้ว | checkout completed |
+| /demo/order/status | โหลดสถานะคำสั่งซื้อแล้ว | order status loaded |
+
+---
+
+## Notes
+
+- ✓ In-memory cart storage (resets on server restart)
+- ✓ No real payment processing
+- ✓ No real database
+- ✓ Perfect for testing transaction flows locally
+- ✓ Suitable for JMeter performance testing scenarios

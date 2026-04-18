@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Demo Test Types</title>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2 { color: #1f2937; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
+      justify-content: space-between; gap: 16px; padding: 14px 24px; background: #1f2937;
+      color: #f9fafb; border-bottom: 1px solid #111827; z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
+    .topbar a:last-child { margin-right: 0; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/">Main</a>
+    <a href="/demo.html">Demo Home</a>
+    <a href="/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/demo-jmeter.html">JMeter Guide</a>
+    <a href="/demo-test-types.html">Test Types</a>
+    <a href="/status">/status</a>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>Test Types And Thread Groups</h1>
+<div class="note">
+  หน้านี้ใช้เลือกว่าควร test แบบไหน และควรใช้ thread group อะไร
+</div>
+
+<h2>Thread Group Selection</h2>
+<table>
+<tr><th>Thread Group</th><th>Best For</th><th>Use When</th></tr>
+<tr><td><code>Normal</code></td><td>baseline, debug, simple SLA</td><td>เริ่มต้น, functional load, transaction เบื้องต้น</td></tr>
+<tr><td><code>Concurrency</code></td><td>stress, saturation, active sessions</td><td>อยากคุมจำนวน concurrent users</td></tr>
+<tr><td><code>Stepping</code></td><td>spike, threshold</td><td>อยากเห็นว่า fail ที่ step ไหน</td></tr>
+<tr><td><code>Arrival</code></td><td>steady traffic, open workload</td><td>อยากคุม request rate ต่อวินาที</td></tr>
+</table>
+
+<h2>Test Type Structures</h2>
+<h3>Load Test</h3>
+<pre>Thread Group or Concurrency Thread Group or Arrival Thread Group
+└─ transaction flow or target endpoint</pre>
+
+<h3>Spike Test</h3>
+<pre>Stepping Thread Group or Concurrency Thread Group
+└─ target endpoint or transaction flow</pre>
+
+<h3>Endurance / Soak Test</h3>
+<pre>Thread Group or Concurrency Thread Group or Arrival Thread Group
+└─ target endpoint or demo flow</pre>
+
+<h3>Stress Test</h3>
+<pre>Concurrency Thread Group
+└─ target endpoint or transaction flow</pre>
+
+<h2>Quick Guidance</h2>
+<ul>
+  <li>ถ้ายังใหม่ ให้เริ่มจาก <code>Normal Thread Group</code></li>
+  <li>ถ้าจะหา limit ของ concurrent users ให้ใช้ <code>Concurrency</code></li>
+  <li>ถ้าจะหา break point แบบเป็นขั้น ให้ใช้ <code>Stepping</code></li>
+  <li>ถ้าจะคุม request rate ต่อวินาที ให้ใช้ <code>Arrival</code></li>
+</ul>
+
+<script>
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl = document.getElementById("runtime-meta");
+  async function refreshRuntimeStatus() {
+    try {
+      const response = await fetch("/status", { cache: "no-store" });
+      if (!response.ok) throw new Error("Status endpoint returned non-200");
+      const data = await response.json();
+      statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent = `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
+    } catch (error) {
+      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      metaEl.textContent = "Open this page through Node/Express to enable live status.";
+    }
+  }
+  refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Assignment for Beginners</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2, h3 { color: #1f2937; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .task { border: 1px solid #d1d5db; padding: 18px; margin: 16px 0; background: #ffffff; }
+    .task h3 { margin-top: 0; }
+    .task strong { display: block; margin-bottom: 8px; }
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 24px;
+      background: #1f2937;
+      color: #f9fafb;
+      border-bottom: 1px solid #111827;
+      z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
+    .topbar a:last-child { margin-right: 0; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/">Main</a>
+    <a href="/demo.html">Demo Flow</a>
+    <a href="/assignment.html">Assignment</a>
+    <a href="/glossary.html">Glossary</a>
+    <a href="/status">/status</a>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>Assignment for Beginners</h1>
+
+<div class="note">
+  หน้านี้เป็นชุดโจทย์สำหรับผู้เริ่มต้น เพื่อให้ลองใช้งาน API ทีละส่วนและเห็นคำตอบทันที
+  เหมาะสำหรับฝึกเขียน request, อ่าน response, และเข้าใจวัตถุประสงค์ของแต่ละ endpoint
+</div>
+
+<h2>How to use</h2>
+<ul>
+  <li>อ่านโจทย์ในแต่ละส่วนก่อน</li>
+  <li>ลองเรียก endpoint ด้วย browser, Postman, หรือ curl</li>
+  <li>อ่านเฉลยด้านล่างแต่ละ task เพื่อยืนยันคำตอบ</li>
+</ul>
+
+<div class="note">
+  <strong>Pre-requisite สำหรับการสร้าง JMeter test plan</strong>
+  <ul>
+    <li><strong>Thread Group</strong>: กำหนดจำนวน users/threads, ramp-up time, loop count และ duration ของเทสต์</li>
+    <li><strong>HTTP Request</strong>: สร้าง sampler สำหรับแต่ละ endpoint เช่น <code>/fast</code>, <code>/slow</code>, <code>/status</code></li>
+    <li><strong>Assertions</strong>: เพิ่มคำตรวจสอบเพื่อเช็ก response code, response body หรือค่า JSON ที่คาดหวัง</li>
+    <li><strong>Config Elements</strong>: ตั้งค่า host, port, headers, และ request body ให้ reuse ได้ง่าย</li>
+    <li><strong>Timers</strong>: ใช้คิดเวลาระหว่าง request เช่น Constant Timer หรือ Random Timer เพื่อจำลอง user pacing</li>
+    <li><strong>PreProcessors / PostProcessors</strong>: ใช้จัดการค่า dynamic, extract token หรือปรับ request ก่อน/หลังส่ง</li>
+    <li><strong>Listeners</strong>: เก็บผลลัพธ์ด้วย Aggregate Report, Summary Report, หรือ View Results Tree เพื่อดู latency, throughput, error rate</li>
+    <li><strong>Test data</strong>: เตรียมข้อมูลให้ครอบคลุมทั้ง validation success, validation error, auth valid และ auth invalid</li>
+  </ul>
+</div>
+
+<div class="note">
+  <strong>Guidelines for variable storage in JMeter components (ภาพรวม)</strong>
+  <ul>
+    <li><strong>User Defined Variables</strong>: เก็บค่าคงที่ที่ใช้ซ้ำ เช่น base URL (<code>http://localhost:3001</code>), default headers, หรือ static tokens</li>
+    <li><strong>CSV Data Set Config</strong>: เก็บ test data จากไฟล์ CSV เช่น ชื่อผู้ใช้, รหัสผ่าน, หรือ input data สำหรับแต่ละ iteration</li>
+    <li><strong>HTTP Header Manager</strong>: เก็บ headers ที่ใช้ในทุก request เช่น <code>Content-Type: application/json</code> หรือ <code>Authorization: Bearer ${token}</code></li>
+    <li><strong>HTTP Request Defaults</strong>: ตั้งค่า default สำหรับ server name, port, protocol, และ path ที่ใช้ร่วมกัน</li>
+    <li><strong>Thread Group</strong>: เก็บค่า <code>thread number</code>, <code>ramp-up time</code>, <code>loop count</code>, และ <code>duration</code> เป็นตัวแปรหลักของการรันทดสอบ โดยแนะนำให้ใช้ <strong>User Defined Variables</strong> เพื่อปรับค่าได้ง่าย เช่น <code>${__P(threads,10)}</code> ซึ่งหมายถึง "อ่านค่า property ชื่อ threads ถ้าไม่มีให้ใช้ค่าเริ่มต้น 10" และตัวอย่างเช่น <code>${__P(threads,${threads})}</code> ซึ่งตัวแปรแรกเรียกจาก CLI/command-line (<code>-Jthreads=20</code>) และตัวแปรที่สองเรียกจากค่าที่กำหนดไว้ใน User Defined Variables</li>
+    <li><strong>HTTP Cookie Manager</strong>: จัดการ cookies อัตโนมัติสำหรับ sessions ที่ต้องการ</li>
+    <li><strong>JSON Extractor (PostProcessor)</strong>: ดึงค่าจาก JSON response และเก็บเป็น variables เช่น token จาก login response</li>
+    <li><strong>Regular Expression Extractor</strong>: ดึงค่าจาก response ด้วย regex สำหรับ non-JSON data</li>
+    <li><strong>BeanShell/JSR223 PreProcessor</strong>: คำนวณหรือ generate dynamic values ก่อนส่ง request</li>
+  </ul>
+</div>
+
+<div class="note">
+  <strong>Guidelines สำหรับการรัน JMeter</strong>
+  <ul>
+    <li><strong>GUI mode</strong>: ใช้เมื่อออกแบบ test plan, ตั้งค่า sampler, และตรวจสอบ logic ภายใน test plan. เปิด JMeter GUI แล้วโหลดไฟล์ <code>.jmx</code> เพื่อแก้ไขและรันแบบ interactive</li>
+    <li><strong>Non-GUI mode</strong>: ใช้เมื่อรัน load test จริงในเครื่อง server หรือ CI, เพราะกินทรัพยากรน้อยกว่าและเสถียรกว่า. ใช้คำสั่งเช่น <code>jmeter -n -t testplan.jmx -l results.jtl -Jthreads=20</code></li>
+    <li><strong>Report</strong>: สร้างรายงาน HTML โดยรัน test แล้ว extract JTL เป็น HTML ต่อเนื่อง เช่น <code>jmeter -n -t testplan.jmx -l results.jtl -Jthreads=20 && jmeter -g results.jtl -o report-folder</code></li>
+    <li><strong>Save results</strong>: เก็บไฟล์ <code>.jtl</code> สำหรับการวิเคราะห์ภายหลัง และใช้ <code>Aggregate Report</code> หรือ <code>Summary Report</code> ใน GUI เพื่อดูค่าเฉลี่ย, p95, และ error %</li>
+    <li><strong>Difference</strong>: ใช้ GUI สำหรับ design/debug และ Non-GUI สำหรับรัน performance test ที่ต้องการความแม่นยำและสร้างรายงาน</li>
+  </ul>
+</div>
+
+<div class="note">
+  <strong>Guidelines ก่อนรันแต่ละ test type</strong>
+  <ul>
+    <li><strong>/fast</strong>: ตรวจสอบ baseline response และ latency ก่อนทดสอบขั้นถัดไป</li>
+    <li><strong>/slow</strong>: ดูว่า delay ของ API ส่งผลต่อความพร้อมของ server อย่างไร</li>
+    <li><strong>Authentication</strong>: เช็กทั้ง token, header, และ response code ว่าตรงตาม expectation</li>
+    <li><strong>/status</strong>: ใช้ดู uptime, PID, activeRequests เพื่อยืนยันว่า service ยังทำงานอยู่</li>
+    <li><strong>/metrics</strong>: ดู counter/histogram และค่า latency ที่บอกว่าระบบรองรับ load ได้ตามเป้าหรือไม่</li>
+    <li><strong>/submit-one, /submit-two</strong>: เช็ก validation error และ error response เมื่อส่ง input ไม่ครบ</li>
+    <li><strong>Run order</strong>: เริ่มจาก baseline ก่อน แล้วค่อยเพิ่มระดับความซับซ้อน เช่น delay -> auth -> error -> metrics</li>
+  </ul>
+</div>
+
+<div class="task">
+  <h3>Task 1: เรียกแบสลายน์ endpoint</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>GET /fast</code> แล้วตรวจสอบว่า response มีข้อความว่าอะไร</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ใช้ browser, curl หรือ Postman เปิด URL <code>http://localhost:3001/fast</code></li>
+    <li>สำหรับ test baseline ให้เริ่มด้วย 1 thread หรือ 1 request เดียว</li>
+    <li>ดู response ว่าเป็น JSON และมี field <code>message</code></li>
+    <li>ตรวจสอบว่า message คือ <code>fast response</code></li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Response ที่ถูกต้องจะเป็น JSON:</p>
+  <pre>{
+  "message": "fast response"
+}</pre>
+  <p>ถ้าได้ response นี้ แปลว่า server ทำงานและ endpoint baseline ตอบได้ตามปกติ</p>
+</div>
+
+<div class="task">
+  <h3>Task 2: ทดสอบ delay endpoint</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>GET /slow</code> แล้วสังเกตเวลาที่ใช้กับ request และข้อความใน response</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ใช้ curl หรือ Postman เรียก <code>http://localhost:3001/slow</code></li>
+    <li>เริ่มด้วย 1-2 threads หรือ 1-2 concurrent requests เพื่อดู delay ที่ชัดเจน</li>
+    <li>จดเวลาตั้งแต่ส่ง request จนได้ response</li>
+    <li>ดูว่า response message ระบุ delay เช่น <code>slow response (200ms)</code></li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Response ที่ได้จะเป็น JSON ประมาณนี้:</p>
+  <pre>{
+  "message": "slow response (200ms)"
+}</pre>
+  <p>ค่าตัวเลขหลัง slow response จะมาจากการตั้งค่า <code>config.workloads.slowDelayMs</code> ในระบบ</p>
+</div>
+
+<div class="task">
+  <h3>Task 3: ตรวจสอบ auth flow แบบเก่า</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>GET /prep</code> เพื่อดู token และ authorization header ที่ระบบให้ จากนั้นลองเรียก <code>GET /protected</code> โดยส่ง header <code>Authorization: Bearer lab-token</code></p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>เปิด <code>GET http://localhost:3001/prep</code> และดูว่ามี field <code>token</code> และ <code>authorizationHeader</code></li>
+    <li>ใช้ค่า <code>lab-token</code> ใน header <code>Authorization: Bearer lab-token</code> เมื่อเรียก <code>/protected</code></li>
+    <li>ทดสอบ 1 request เป็นหลัก แต่ถ้าต้องการดู concurrent behavior ให้ลอง 2-3 threads พร้อมกัน</li>
+    <li>ตรวจสอบ response ว่าได้ข้อความอนุญาตเข้าถึง resource</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Response จาก <code>/prep</code> จะมี field <code>token</code> และ <code>authorizationHeader</code> ซึ่งค่า token ปกติคือ <code>lab-token</code></p>
+  <p>เมื่อเรียก <code>/protected</code> พร้อม header ต่อไปนี้:</p>
+  <pre>Authorization: Bearer lab-token</pre>
+  <p>Response ที่ถูกต้องจะเป็น:</p>
+  <pre>{
+  "message": "protected resource access granted",
+  "authenticated": true,
+  "tokenSource": "authorization"
+}</pre>
+</div>
+
+<div class="task">
+  <h3>Task 4: ลอง auth แบบ JWT</h3>
+  <strong>โจทย์</strong>
+  <p>ใช้ <code>POST /auth/login</code> โดยส่ง JSON body:</p>
+  <pre>{
+  "username": "demo",
+  "password": "password"
+}</pre>
+  <p>แล้วนำ token ที่ได้ไปเรียก <code>POST /auth/verify</code> พร้อม header <code>Authorization: Bearer &lt;token&gt;</code></p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ส่ง POST ไปที่ <code>http://localhost:3001/auth/login</code> พร้อม body ที่กำหนด</li>
+    <li>คัดลอกค่า <code>token</code> จาก response</li>
+    <li>ส่ง POST อีกครั้งไปที่ <code>http://localhost:3001/auth/verify</code> พร้อม header <code>Authorization: Bearer &lt;token&gt;</code></li>
+    <li>ทดสอบด้วย 1-2 concurrent requests เพื่อตรวจสอบว่า token ยัง valid เมื่อใช้งานพร้อมกัน</li>
+    <li>ตรวจสอบ response ว่า <code>valid: true</code> และข้อมูล decoded ตรงตาม user</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Response จาก <code>/auth/login</code> จะเป็น JSON ที่มี field <code>token</code> เช่น:</p>
+  <pre>{
+  "message": "login successful",
+  "authenticated": true,
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}</pre>
+  <p>เมื่อใช้ token นี้เรียก <code>POST /auth/verify</code> จะได้ response ประมาณ:</p>
+  <pre>{
+  "message": "token is valid",
+  "valid": true,
+  "decoded": {
+    "userId": "user-123",
+    "username": "demo",
+    "iat": "...",
+    "exp": "..."
+  }
+}</pre>
+</div>
+
+<div class="task">
+  <h3>Task 5: ทดสอบ validation error</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>POST /submit-one</code> โดยไม่ส่ง body หรือส่ง body ว่าง ๆ จากนั้นสังเกตว่าระบบตอบอย่างไร</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ใช้ curl หรือ Postman ส่ง POST ไปที่ <code>http://localhost:3001/submit-one</code> โดยไม่ใส่ body</li>
+    <li>ใช้ 1-3 concurrent requests เพื่อยืนยันว่าการ validate ทำงานกับหลาย request ได้</li>
+    <li>ดูว่า response เป็น HTTP 400 หรือมี JSON error</li>
+    <li>ลองส่ง body ถูกต้อง เช่น <code>{ "name": "test" }</code> แล้วเปรียบเทียบผล</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Response จะเป็น HTTP 400 พร้อม JSON:</p>
+  <pre>{
+  "error": "missing_required_parameter",
+  "required": ["name"]
+}</pre>
+  <p>ถ้าส่ง body ที่ถูกต้อง เช่น <code>{ "name": "test" }</code> จะได้ response:</p>
+  <pre>{
+  "message": "received one required parameter",
+  "data": { "name": "test" }
+}</pre>
+</div>
+
+<div class="task">
+  <h3>Task 6: ลอง I/O flow และ cleanup</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>GET /io?mode=write</code> และ <code>GET /io?mode=read</code> จากนั้นเรียก <code>POST /cleanup</code> เพื่อลบไฟล์ชั่วคราว</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>เรียก <code>GET http://localhost:3001/io?mode=write</code> เพื่อสร้างไฟล์ชั่วคราว</li>
+    <li>เรียก <code>GET http://localhost:3001/io?mode=read</code> เพื่ออ่านข้อมูลจากไฟล์</li>
+    <li>สำหรับ I/O flow ให้ลอง 1-2 concurrent requests เพื่อดูพฤติกรรมแบบเรียงลำดับ</li>
+    <li>เรียก <code>POST http://localhost:3001/cleanup</code> เพื่อเคลียร์ไฟล์ทั้งหมด</li>
+    <li>ตรวจสอบ response แต่ละขั้นตอนว่าแสดง <code>durationMs</code> และสถานะการ cleanup</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p><code>/io?mode=write</code> และ <code>/io?mode=read</code> จะตอบ JSON ที่มี <code>durationMs</code> และ <code>mode</code></p>
+  <p>หลังนั้น <code>POST /cleanup</code> จะตอบ JSON เช่น:</p>
+  <pre>{
+  "message": "cleanup completed",
+  "cleaned": ["io-test.dat"],
+  "cleanedCount": 1
+}</pre>
+</div>
+
+<div class="note">
+  ถ้าคุณทำครบทั้ง 6 ข้อแล้ว ให้ลองกลับไปอ่าน <a href="/demo.html">Demo Flow</a> เพื่อเรียนรู้ flow ที่ซับซ้อนขึ้น
+  และลองนำคำตอบที่ได้ไปออกแบบ JMeter test ของตัวเอง
+</div>
+
+<h2>Next-Level Exercises</h2>
+<div class="task">
+  <h3>Challenge 1: เปรียบเทียบ /fast กับ /slow</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>/fast</code> และ <code>/slow</code> แล้วจดเวลาที่ใช้สำหรับแต่ละ request เปรียบเทียบความแตกต่าง</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ใช้เครื่องมือวัดเวลาเช่น curl with time หรือ Postman เพื่อเรียกทั้งสอง endpoint</li>
+    <li>บันทึกค่า latency ของ <code>/fast</code> และ <code>/slow</code></li>
+    <li>เทียบผลลัพธ์ว่าต่างกันเท่าไร และตรวจสอบว่าค่า delay ตรงตาม <code>slowDelayMs</code></li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>คุณจะเห็นว่า <code>/slow</code> ใช้เวลามากกว่า <code>/fast</code> เสมอ โดยเวลาเพิ่มขึ้นตาม config ของ <code>slowDelayMs</code></p>
+</div>
+
+<div class="task">
+  <h3>Challenge 2: สร้าง error case ด้วย /submit-two</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>POST /submit-two</code> โดยส่ง body ที่ขาด field <code>type</code> เท่านั้น แล้วดู response</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ส่ง POST ไปที่ <code>http://localhost:3001/submit-two</code> พร้อม body เช่น <code>{ "name": "test" }</code></li>
+    <li>ลอง 1-3 concurrent requests เพื่อดูว่า validation error สม่ำเสมอ</li>
+    <li>ดู response code ว่าเป็น 400 และ response body ว่าแสดง error รายการที่ขาด</li>
+    <li>ลองส่ง body ครบทั้ง <code>name</code> และ <code>type</code> เพื่อเปรียบเทียบผลลัพธ์</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Response จะเป็น HTTP 400 และ JSON จะมี:</p>
+  <pre>{
+  "error": "missing_required_parameters",
+  "required": ["name", "type"]
+}</pre>
+</div>
+
+<div class="task">
+  <h3>Challenge 3: ทดสอบ token invalid</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>POST /auth/verify</code> โดยส่ง header <code>Authorization: Bearer invalid-token</code> แล้วสังเกต response</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ส่ง POST ไปที่ <code>http://localhost:3001/auth/verify</code> โดยกำหนด header <code>Authorization: Bearer invalid-token</code></li>
+    <li>ทดลอง 1-2 requests เพื่อดูว่าการ invalid token ถูกตรวจสอบทุกครั้ง</li>
+    <li>ตรวจสอบ response code ว่าเป็น 403 และ response body ว่าแสดง error invalid token</li>
+    <li>ลองเปรียบเทียบกับ token ที่ได้จาก <code>/auth/login</code> เพื่อดูความแตกต่าง</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Response จะเป็น HTTP 403 พร้อม JSON:</p>
+  <pre>{
+  "error": "invalid_token",
+  "message": "Token is not valid"
+}</pre>
+</div>
+
+<div class="task">
+  <h3>Challenge 4: เมตริกพื้นฐาน</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>GET /metrics</code> แล้วค้นหาตัวแปร <code>http_request_duration_seconds_count</code> หรือ metric อื่นที่เกี่ยวกับ HTTP request</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>เปิด <code>GET http://localhost:3001/metrics</code> ใน browser หรือ curl</li>
+    <li>ค้นหาสตริง <code>http_request_duration_seconds_count</code> หรือชื่อ metric ที่คล้ายกัน</li>
+    <li>ดูลักษณะว่าเป็น Prometheus counter/histogram และใช้สำหรับวัด request duration อย่างไร</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>คุณจะพบข้อความประเภท Prometheus ที่ประกอบด้วย metrics count และ histogram สำหรับ request duration เพื่อใช้ดูการ perform ของ API</p>
+</div>
+
+<h2>Intermediate Assignment</h2>
+<div class="task">
+  <h3>Intermediate 1: วิเคราะห์ /status ในเชิง runtime</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>GET /status</code> แล้วดูว่า <code>activeRequests</code>, <code>uptimeSec</code>, และ <code>pid</code> มีค่าอย่างไรเมื่อเรียกซ้ำหลายครั้ง</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>เรียก <code>GET http://localhost:3001/status</code> หลายครั้งในช่วงเวลาที่ต่างกัน</li>
+    <li>ลองทำซ้ำ 2-3 requests ในแต่ละรอบ เพื่อดูความคงที่ของค่า</li>
+    <li>จดค่าของ <code>pid</code>, <code>uptimeSec</code> และ <code>activeRequests</code></li>
+    <li>สังเกตว่า <code>pid</code> ไม่เปลี่ยน, <code>uptimeSec</code> เพิ่มขึ้น และ <code>activeRequests</code> อาจเปลี่ยนตามโหลด</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>คุณจะเห็นว่า <code>pid</code> คงที่ตลอด session, <code>uptimeSec</code> เพิ่มขึ้นตามเวลา และ <code>activeRequests</code> จะเปลี่ยนตามจำนวนคำขอที่ระบบกำลังประมวลผล</p>
+</div>
+
+<div class="task">
+  <h3>Intermediate 2: เปรียบเทียบ /fast และ /slow โดยใช้ /status</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>GET /fast</code> และ <code>GET /slow</code> พร้อมกัน แล้วเรียก <code>GET /status</code> เพื่อดูค่า <code>activeRequests</code> และการตอบสนองของ server</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>เปิดคำสั่งสองแท็บหรือสอง terminal: เรียก <code>/fast</code> และ <code>/slow</code> พร้อมกัน</li>
+    <li>เริ่มด้วย 1-3 concurrent requests สำหรับแต่ละ endpoint</li>
+    <li>เรียก <code>GET /status</code> ขณะนั้นและบันทึกค่า <code>activeRequests</code> กับ <code>uptimeSec</code></li>
+    <li>สังเกตว่าระบบยังตอบได้แม้ <code>/slow</code> ใช้เวลานานขึ้น</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>ในขณะที่ /slow กำลังทำงาน, <code>activeRequests</code> อาจเพิ่มขึ้นและ <code>uptimeSec</code> ยังคงนับต่อไป คำสั่งนี้ช่วยให้เข้าใจว่าระบบยังทำงานอยู่ระหว่าง latency สูง</p>
+</div>
+
+<div class="task">
+  <h3>Intermediate 3: ตรวจสอบ error case ด้วย request rate</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>POST /submit-two</code> โดยส่ง body ที่ขาด field <code>type</code> แล้วดู error response พร้อมสังเกตค่า response code และเมสเสจ</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ส่งหลายคำขอไปยัง <code>/submit-two</code> โดยขาด <code>type</code></li>
+    <li>เริ่มด้วย 5-10 concurrent invalid requests เพื่อสร้าง error rate เบื้องต้น</li>
+    <li>เช็ก response code ว่าเป็น 400 ทุกครั้งและ body แสดง field ที่ขาด</li>
+    <li>ถ้าทำได้ ลองส่งซ้ำหลายครั้งเพื่อตรวจสอบว่า error behavior สม่ำเสมอ</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>คุณจะได้ HTTP 400 และ JSON error พร้อม field <code>missing_required_parameters</code> ซึ่งแสดงว่าระบบตรวจจับ validation error ได้ถูกต้อง แม้ load เพิ่มขึ้น</p>
+</div>
+
+<div class="task">
+  <h3>Intermediate 4: หา histogram metric จาก /metrics</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>GET /metrics</code> แล้วหา metric ที่เป็น counter หรือ histogramสำหรับ response duration เช่น <code>http_request_duration_seconds_bucket</code></p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>เรียก <code>GET http://localhost:3001/metrics</code> แล้วค้นหาชื่อ metric ที่มีคำว่า <code>bucket</code> หรือ <code>count</code></li>
+    <li>ถ้าอยากเพิ่มข้อมูลให้ metrics ให้รัน 5-10 requests ก่อนแล้วดึง /metrics อีกครั้ง</li>
+    <li>สังเกตว่า histogram bucket มีค่า latency เป็นช่วง เช่น <code>le="0.1"</code>, <code>le="0.5"</code></li>
+    <li>เช็กว่า metrics นี้สามารถใช้คำนวณ percentile ได้</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>ถ้าพบ <code>http_request_duration_seconds_bucket</code> แปลว่า metrics นี้เก็บ histogram latency และสามารถใช้วิเคราะห์ percentile ได้</p>
+</div>
+
+<h2>Advanced Assignment</h2>
+<div class="task">
+  <h3>Advanced 1: วัด SLA และเปรียบเทียบกับผลจริง</h3>
+  <strong>โจทย์</strong>
+  <p>กำหนด SLA เช่น <code>p95 &lt; 200ms</code>, <code>Error rate &lt; 1%</code> แล้วเรียก <code>GET /metrics</code> หรือทดสอบหลายครั้งเพื่อดูว่าระบบผ่าน SLA หรือไม่</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>สร้าง load ประมาณ 10-20 requests หรือ 2-5 concurrent threads เพื่อให้เห็น metric ได้ชัด</li>
+    <li>เรียก <code>GET /metrics</code> ก่อนและหลังรัน request หลายครั้ง</li>
+    <li>หา metric ที่แสดง histogram และ error count</li>
+    <li>เปรียบเทียบค่า percentile กับ SLA ที่กำหนด เช่น คำนวณ p95 จาก bucket</li>
+    <li>ดูว่าค่า error rate ต่ำกว่า 1% หรือไม่</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>ดูค่า percentile จาก metric histogram และ error count ถ้า <code>p95</code> สูงกว่าค่า SLA หรือ Error rate เกิน 1% แปลว่าต้องปรับ tuning หรือแก้ bottleneck</p>
+</div>
+
+<div class="task">
+  <h3>Advanced 2: ทดสอบ recovery หลังโหลดสูง</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>/slow</code> ซ้ำหลายครั้งเพื่อเพิ่ม load แล้วจดค่า <code>activeRequests</code> พร้อมดูว่า <code>/status</code> กลับมาปกติเมื่อหยุดร้องขอหรือไม่</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ส่งคำขอซ้ำ ๆ 10-20 requests ไปที่ <code>/slow</code> หรือใช้ 3-5 concurrent threads</li>
+    <li>ตรวจสอบ <code>/status</code> ระหว่างโหลดสูงเพื่อดูค่า <code>activeRequests</code></li>
+    <li>หยุดส่ง request แล้วเรียก <code>/status</code> อีกครั้งเพื่อดูว่า <code>activeRequests</code> ลดลงและ server ยัง responsive</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>คุณควรเห็นว่าหลังหยุด /slow, <code>activeRequests</code> ลดลง และ server ยังตอบกลับ /status ได้ตามปกติ แสดงว่าระบบ recovery ได้</p>
+</div>
+
+<div class="task">
+  <h3>Advanced 3: เช็ก token expiration / invalidation</h3>
+  <strong>โจทย์</strong>
+  <p>ใช้ <code>POST /auth/login</code> รับ token แล้วเรียก <code>POST /auth/verify</code> พร้อม token เดิมหลังรอเวลาสั้น ๆ เพื่อดูการ validate token</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ส่ง POST ไปที่ <code>/auth/login</code> เพื่อรับ token</li>
+    <li>ใช้ token เดิมเรียก <code>/auth/verify</code> พร้อม header <code>Authorization: Bearer &lt;token&gt;</code></li>
+    <li>หากต้องการทดสอบ expiration ให้รอ 10-30 วินาทีแล้วลองเรียกอีกครั้ง</li>
+    <li>ถ้าต้องการดู concurrency ให้ทดลอง 2-3 verify requests พร้อมกัน</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>ถ้า token ยังถูกต้อง คุณจะได้ <code>valid: true</code> แต่ถ้าระบบตั้งค่า token expiration ไว้ใกล้เคียง อาจพบ <code>invalid_token</code> เมื่อหมดอายุ</p>
+</div>
+
+<div class="task">
+  <h3>Advanced 4: สร้างและวิเคราะห์ error spike</h3>
+  <strong>โจทย์</strong>
+  <p>เรียก <code>POST /submit-two</code> หรือ <code>/error</code> หลายครั้งเพื่อทำให้ error rate สูงขึ้น จากนั้นดูว่า /metrics และ /status ว่า error rate และ activeRequests เปลี่ยนอย่างไร</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>เรียก <code>POST /submit-two</code> หรือ <code>/error</code> 10-20 ครั้งหรือใช้ 5-10 concurrent invalid requests</li>
+    <li>เรียก <code>GET /metrics</code> เพื่อตรวจสอบ error count และ metric ที่เกี่ยวข้อง</li>
+    <li>เรียก <code>GET /status</code> เพื่อตรวจสอบว่าระบบยังตอบได้และ <code>activeRequests</code> เปลี่ยนอย่างไร</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>คุณควรเห็น error count เพิ่มขึ้นใน metrics และถ้า error rate สูงเกิน SLA อาจทำให้ service reliability ลดลง แม้ uptime ยังสูง</p>
+</div>
+
+<h2>Performance Testing Assignments</h2>
+<div class="task">
+  <h3>Load Testing: ทดสอบโหลดปกติ</h3>
+  <strong>โจทย์</strong>
+  <p>สร้าง JMeter test plan เพื่อเรียก <code>GET /fast</code> และ <code>GET /slow</code> ภายใต้โหลดปกติ (expected load) แล้ววิเคราะห์ throughput, latency, และ error rate</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>สร้าง Thread Group ใน JMeter ด้วย 10-20 threads, ramp-up 30 วินาที, loop count 5-10 ครั้ง</li>
+    <li>เพิ่ม HTTP Request samplers สำหรับ <code>/fast</code> และ <code>/slow</code></li>
+    <li>เพิ่ม Response Assertion เพื่อเช็ก response code 200 และ message ที่ถูกต้อง</li>
+    <li>เพิ่ม Aggregate Report listener เพื่อดู average response time, throughput, และ error %</li>
+    <li>รัน test แล้วเรียก <code>GET /status</code> และ <code>GET /metrics</code> เพื่อดู activeRequests และ histogram metrics</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Load testing ควรแสดง throughput สม่ำเสมอ, latency ต่ำกว่า SLA (เช่น p95 &lt; 500ms), และ error rate &lt; 1%. ถ้า throughput ลดลงหรือ latency เพิ่มขึ้น แสดงว่ามี bottleneck</p>
+</div>
+
+<div class="task">
+  <h3>Stress Testing: ทดสอบขีดจำกัด</h3>
+  <strong>โจทย์</strong>
+  <p>เพิ่มโหลดอย่างต่อเนื่องจนถึงจุดที่ระบบเริ่มล้มเหลว (breaking point) โดยเรียก <code>GET /slow</code> และ <code>POST /submit-one</code> แล้วสังเกตเมื่อ error rate เพิ่มขึ้นหรือ response time ช้าลง</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>เริ่มด้วย Thread Group 20-50 threads, ramp-up 60 วินาที, duration 5-10 นาที</li>
+    <li>เพิ่ม HTTP Request สำหรับ <code>/slow</code> และ <code>/submit-one</code> พร้อม body ที่ถูกต้อง</li>
+    <li>ใช้ Constant Timer 1-2 วินาทีระหว่าง requests เพื่อจำลอง user pacing</li>
+    <li>เพิ่ม listeners เช่น View Results Tree และ Summary Report เพื่อดู error trends</li>
+    <li>รัน test แล้ว monitor <code>/status</code> ทุก 30 วินาทีเพื่อดู activeRequests และ uptime</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Stress testing จะพบ breaking point เมื่อ error rate &gt; 5%, response time &gt; 2-3 วินาที, หรือ server ไม่ตอบสนอง. จุดนี้แสดง maximum capacity ของระบบ</p>
+</div>
+
+<div class="task">
+  <h3>Spike Testing: ทดสอบโหลดแบบกระตุก</h3>
+  <strong>โจทย์</strong>
+  <p>จำลองการเพิ่มโหลดแบบฉับพลัน (spike) โดยเรียก <code>GET /fast</code> และ <code>GET /slow</code> พร้อมกันจำนวนมากในช่วงสั้น ๆ แล้วดูว่าระบบ recovery ได้หรือไม่</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>สร้าง Thread Group ด้วย 50-100 threads, ramp-up 10 วินาที (เร็วมาก), loop count 1-2 ครั้ง</li>
+    <li>เพิ่ม HTTP Request สำหรับ <code>/fast</code> และ <code>/slow</code></li>
+    <li>ใช้ Ultimate Thread Group หรือ Step-Up Thread Group เพื่อสร้าง spike pattern</li>
+    <li>เพิ่ม listeners เพื่อดู response time และ error rate ในช่วง spike</li>
+    <li>หลังรัน spike แล้วเรียก <code>/status</code> และ <code>/metrics</code> เพื่อดู recovery และ error metrics</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Spike testing ควรแสดง latency เพิ่มขึ้นชั่วคราวในช่วง spike แต่ระบบควร recovery หลังโหลดลดลง. ถ้า error rate สูงหรือ server crash แสดงว่าต้องปรับ auto-scaling หรือ resource allocation</p>
+</div>
+
+<div class="task">
+  <h3>Endurance Testing: ทดสอบระยะยาว</h3>
+  <strong>โจทย์</strong>
+  <p>รัน test ต่อเนื่องเป็นเวลานาน (hours) ภายใต้โหลดปกติเพื่อตรวจสอบ memory leaks, resource exhaustion, หรือ degradation ใน performance</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ตั้ง Thread Group 5-15 threads, ramp-up 30 วินาที, duration 30-60 นาที หรือยาวกว่านั้น</li>
+    <li>เพิ่ม HTTP Request สำหรับ <code>/fast</code>, <code>/slow</code>, และ <code>/status</code> (เพื่อ monitor ด้วย)</li>
+    <li>เพิ่ม Response Assertion และ listeners เพื่อ track performance trends</li>
+    <li>รัน test แล้ว monitor <code>/status</code> และ <code>/metrics</code> เป็นระยะเพื่อดู uptime, activeRequests, และ memory usage</li>
+    <li>สังเกตว่ามี degradation ใน response time หรือ error rate เมื่อเวลาผ่านไป</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Endurance testing จะเปิดเผย issues เช่น memory leaks ถ้า response time เพิ่มขึ้นหรือ error rate สูงขึ้นเมื่อเวลาผ่านไป. ระบบที่ดีควร maintain performance สม่ำเสมอตลอด duration</p>
+</div>
+
+<div class="task">
+  <h3>Volume Testing: ทดสอบปริมาณข้อมูลขนาดใหญ่</h3>
+  <strong>โจทย์</strong>
+  <p>ทดสอบระบบด้วยปริมาณข้อมูลขนาดใหญ่ เช่น ส่ง request ที่มี body ขนาดใหญ่ หรือเรียก endpoints ที่เกี่ยวข้องกับการประมวลผลข้อมูลจำนวนมาก แล้วดูว่า latency และ throughput เปลี่ยนแปลงอย่างไร</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>สร้าง Thread Group 5-10 threads, ramp-up 20 วินาที, loop count 3-5 ครั้ง</li>
+    <li>เพิ่ม HTTP Request สำหรับ <code>POST /submit-one</code> หรือ <code>/submit-two</code> พร้อมส่ง body ขนาดใหญ่ (เช่น JSON กับ array ขนาด 1000 elements หรือ string ยาว)</li>
+    <li>ใช้ CSV Data Set Config เพื่อ feed ข้อมูลขนาดใหญ่จากไฟล์</li>
+    <li>เพิ่ม listeners เพื่อดู response time และ error rate เมื่อ deal กับ large payloads</li>
+    <li>รัน test แล้ว monitor <code>/status</code> เพื่อดู activeRequests และ <code>/metrics</code> เพื่อดู memory หรือ CPU metrics ถ้ามี</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Volume testing จะแสดงว่าละระบบ handle large data ได้ดีหรือไม่. ถ้า response time เพิ่มขึ้นอย่างมากหรือ error rate สูง แสดงว่าต้อง optimize data processing หรือ increase resource limits</p>
+</div>
+
+<div class="task">
+  <h3>Scalability Testing: ทดสอบการขยายตัว</h3>
+  <strong>โจทย์</strong>
+  <p>ทดสอบว่าประสิทธิภาพของระบบเปลี่ยนแปลงอย่างไรเมื่อเพิ่มจำนวน users หรือ resources อย่างค่อยเป็นค่อยไป แล้วหาจุดที่ performance ไม่ scale ตาม</p>
+  <strong>วิธีทำ</strong>
+  <ul>
+    <li>ใช้ Step-Up Thread Group หรือ Ultimate Thread Group เพื่อเพิ่ม threads ทีละขั้น (เช่น เริ่ม 5 threads, เพิ่มเป็น 10, 20, 50)</li>
+    <li>ตั้ง duration 2-5 นาทีต่อขั้นเพื่อให้ระบบ stabilize</li>
+    <li>เพิ่ม HTTP Request สำหรับ <code>/fast</code> และ <code>/slow</code> รวมถึง <code>/status</code> เพื่อ monitor</li>
+    <li>เพิ่ม Aggregate Report เพื่อดู throughput และ response time ที่แต่ละ level</li>
+    <li>วิเคราะห์ว่า throughput เพิ่มตามจำนวน threads หรือไม่ และหาจุดที่ performance plateau หรือลดลง</li>
+  </ul>
+  <strong>เฉลย</strong>
+  <p>Scalability testing จะบอกว่าละระบบ scale ได้ดีหรือไม่. ถ้า throughput ไม่เพิ่มตาม users แสดงว่ามี bottleneck ใน architecture หรือ resources ไม่เพียงพอ</p>
+</div>
+
+<script type="module">
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl = document.getElementById("runtime-meta");
+
+  async function refreshRuntimeStatus() {
+    try {
+      const response = await fetch("/status", { cache: "no-store" });
+
+      if (!response.ok) {
+        throw new Error("Status endpoint returned non-200");
+      }
+
+      const data = await response.json();
+      statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent =
+        `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
+    } catch (error) {
+      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      metaEl.textContent = error.message;
+    }
+  }
+
+  await refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 10000);
+</script>
+
+</body>
+</html>

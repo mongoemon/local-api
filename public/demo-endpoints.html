@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Demo Endpoints</title>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2 { color: #1f2937; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
+      justify-content: space-between; gap: 16px; padding: 14px 24px; background: #1f2937;
+      color: #f9fafb; border-bottom: 1px solid #111827; z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
+    .topbar a:last-child { margin-right: 0; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/">Main</a>
+    <a href="/demo.html">Demo Home</a>
+    <a href="/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/demo-jmeter.html">JMeter Guide</a>
+    <a href="/demo-test-types.html">Test Types</a>
+    <a href="/status">/status</a>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>Demo Endpoints</h1>
+<div class="note">
+  หน้านี้อธิบายแต่ละเส้นก่อน เพื่อให้เข้าใจก่อนค่อยไปทำ JMeter
+</div>
+
+<h2>Recommended Transaction Order</h2>
+<ol>
+  <li><code>GET /demo/context?search=mouse</code></li>
+  <li><code>GET /demo/dashboard</code></li>
+  <li><code>GET /demo/search?q=${demoSearchTerm}</code></li>
+  <li><code>GET /demo/product/details?productId=${demoProductId}</code></li>
+  <li><code>POST /demo/cart/add</code></li>
+  <li><code>POST /demo/checkout</code></li>
+  <li><code>GET /demo/order/status?orderId=${demoOrderId}</code></li>
+</ol>
+
+<h2>Endpoint Table</h2>
+<table>
+<tr><th>Endpoint</th><th>Method</th><th>What To Send</th><th>Expected Message</th></tr>
+<tr><td><code>/demo/context?search=mouse</code></td><td><code>GET</code></td><td>query <code>search</code> optional, header <code>Accept-Language</code> optional</td><td><code>demo context prepared</code> or Thai message</td></tr>
+<tr><td><code>/demo/dashboard</code></td><td><code>GET</code></td><td>header <code>Accept-Language</code> optional</td><td><code>demo dashboard loaded</code> or Thai message</td></tr>
+<tr><td><code>/demo/search?q=mouse</code></td><td><code>GET</code></td><td>query <code>q</code>, header <code>Accept-Language</code> optional</td><td><code>demo search completed</code> or Thai message</td></tr>
+<tr><td><code>/demo/product/details?productId=sku-101</code></td><td><code>GET</code></td><td>query <code>productId</code>, header <code>Accept-Language</code> optional</td><td><code>product details loaded</code> or Thai message</td></tr>
+<tr><td><code>/demo/cart/add</code></td><td><code>POST</code></td><td>JSON body + <code>Content-Type: application/json</code> + optional <code>Accept-Language</code></td><td><code>item added to cart</code> or Thai message</td></tr>
+<tr><td><code>/demo/checkout</code></td><td><code>POST</code></td><td>JSON body + <code>Content-Type: application/json</code> + optional <code>Accept-Language</code></td><td><code>checkout completed</code> or Thai message</td></tr>
+<tr><td><code>/demo/order/status?orderId=...</code></td><td><code>GET</code></td><td>query <code>orderId</code>, header <code>Accept-Language</code> optional</td><td><code>order status loaded</code> or Thai message</td></tr>
+</table>
+
+<h2>Language Support For Demo</h2>
+<div class="note">
+  ทุก demo endpoint รองรับ <code>Accept-Language</code> แบบง่ายเพื่อให้คุณลองใส่ใน <code>HTTP Header Manager</code> หรือ defaults ได้
+</div>
+
+<table>
+<tr><th>Header</th><th>Supported Value</th><th>What Happens</th></tr>
+<tr><td><code>Accept-Language</code></td><td><code>en</code></td><td>response จะใช้ข้อความภาษาอังกฤษและคืน <code>"language": "en"</code></td></tr>
+<tr><td><code>Accept-Language</code></td><td><code>th</code></td><td>response จะใช้ข้อความภาษาไทยและคืน <code>"language": "th"</code></td></tr>
+</table>
+
+<pre>Example header
+Accept-Language: en
+
+or
+
+Accept-Language: th</pre>
+
+<h2>Request Examples</h2>
+<pre>{
+  "cartId": "${demoCartId}",
+  "productId": "${demoProductId}",
+  "quantity": 1
+}</pre>
+
+<pre>{
+  "cartId": "${demoCartId}",
+  "customerId": "${demoShopperId}"
+}</pre>
+
+<h2>Static Copy Paste Values</h2>
+<div class="note">
+  ถ้าต้องการ proof of concept แบบเร็ว ให้ใช้ค่าคงที่ด้านล่างนี้ได้เลยโดยไม่ต้องพึ่ง extractor ก่อน
+</div>
+
+<table>
+<tr><th>Use Case</th><th>Copy Paste Value</th></tr>
+<tr><td><code>GET /demo/context</code></td><td><code>/demo/context?search=mouse</code></td></tr>
+<tr><td><code>GET /demo/search</code></td><td><code>/demo/search?q=mouse</code></td></tr>
+<tr><td><code>GET /demo/product/details</code></td><td><code>/demo/product/details?productId=sku-101</code></td></tr>
+<tr><td><code>POST /demo/cart/add</code></td><td><code>{ "cartId": "demo-cart", "productId": "sku-101", "quantity": 1 }</code></td></tr>
+<tr><td><code>POST /demo/checkout</code></td><td><code>{ "cartId": "demo-cart", "customerId": "demo-user-01" }</code></td></tr>
+<tr><td><code>GET /demo/order/status</code></td><td>ใช้ค่า <code>orderId</code> จาก response ของ checkout</td></tr>
+</table>
+
+<h2>Proof Of Concept Static Flow</h2>
+<pre>1. GET /demo/dashboard
+2. GET /demo/search?q=mouse
+3. GET /demo/product/details?productId=sku-101
+4. POST /demo/cart/add
+{
+  "cartId": "demo-cart",
+  "productId": "sku-101",
+  "quantity": 1
+}
+5. POST /demo/checkout
+{
+  "cartId": "demo-cart",
+  "customerId": "demo-user-01"
+}
+6. Copy orderId from checkout response
+7. GET /demo/order/status?orderId=<copied-order-id></pre>
+
+<h2>Suggested Variable Structure</h2>
+<div class="note">
+  ถ้าจะทำ JMeter ให้เป็นระเบียบ ควรตั้งชื่อตัวแปรให้สื่อว่าเอามาจากไหนและจะถูกใช้ต่อที่ไหน
+</div>
+
+<table>
+<tr><th>Variable Name</th><th>Source</th><th>Use It In</th><th>Why</th></tr>
+<tr><td><code>demoSearchTerm</code></td><td><code>/demo/context -> $.searchTerm</code></td><td><code>GET /demo/search?q=${demoSearchTerm}</code></td><td>ทำให้ search step ไม่ต้อง hardcode query</td></tr>
+<tr><td><code>demoProductId</code></td><td><code>/demo/context -> $.recommendedProductId</code></td><td><code>GET /demo/product/details</code>, <code>POST /demo/cart/add</code></td><td>ใช้ product เดียวกันทั้ง details และ add to cart</td></tr>
+<tr><td><code>demoCartId</code></td><td><code>/demo/context -> $.cartId</code></td><td><code>POST /demo/cart/add</code>, <code>POST /demo/checkout</code></td><td>ให้ add และ checkout อยู่ใน cart เดียวกัน</td></tr>
+<tr><td><code>demoShopperId</code></td><td><code>/demo/context -> $.shopperId</code></td><td><code>POST /demo/checkout</code></td><td>ใช้แทน customer id ของ session นั้น</td></tr>
+<tr><td><code>demoOrderId</code></td><td><code>/demo/checkout -> $.orderId</code></td><td><code>GET /demo/order/status?orderId=${demoOrderId}</code></td><td>ใช้เชื่อมจาก checkout ไป order lookup</td></tr>
+<tr><td><code>demoQuantity</code></td><td>static หรือ <code>JSR223 PreProcessor</code></td><td><code>POST /demo/cart/add</code></td><td>ใช้เปลี่ยนจำนวนสินค้าง่ายโดยไม่ต้องแก้ body ตรง ๆ</td></tr>
+</table>
+
+<h2>Recommended Structure For Variables</h2>
+<pre>Context variables
+- demoSearchTerm
+- demoProductId
+- demoCartId
+- demoShopperId
+
+Transaction variables
+- demoOrderId
+
+Optional helper variables
+- demoQuantity
+- demoCouponCode
+- demoAuthToken</pre>
+
+<h2>User Defined Variables You Can Add First</h2>
+<div class="note">
+  ถ้าจะสร้าง <code>User Defined Variables</code> ใน JMeter ตั้งแต่ต้น ให้ใช้ค่านี้ได้เลย
+  แล้วค่อยให้ <code>JSON Extractor</code> หรือ <code>PreProcessor</code> มา override ภายหลังเมื่อ flow เริ่มซับซ้อนขึ้น
+</div>
+
+<table>
+<tr><th>Variable</th><th>Suggested Value</th><th>Use It In</th><th>Notes</th></tr>
+<tr><td><code>baseUrl</code></td><td><code>http://localhost:3001</code></td><td>ใช้เป็น base ของทุก request</td><td>เหมาะถ้าคุณชอบรวม protocol/host ไว้ที่เดียว</td></tr>
+<tr><td><code>demoSearchTerm</code></td><td><code>mouse</code></td><td><code>GET /demo/search?q=${demoSearchTerm}</code></td><td>ตรงกับ product demo ในระบบนี้</td></tr>
+<tr><td><code>demoProductId</code></td><td><code>sku-101</code></td><td><code>GET /demo/product/details</code>, <code>POST /demo/cart/add</code></td><td>เป็นสินค้าที่มีอยู่จริงใน demo flow</td></tr>
+<tr><td><code>demoCartId</code></td><td><code>demo-cart</code></td><td><code>POST /demo/cart/add</code>, <code>POST /demo/checkout</code></td><td>ใช้เป็น fallback ตอนยังไม่ extract จาก <code>/demo/context</code></td></tr>
+<tr><td><code>demoShopperId</code></td><td><code>demo-user-01</code></td><td><code>POST /demo/checkout</code></td><td>ใช้เป็น customer id แบบคงที่ได้</td></tr>
+<tr><td><code>demoQuantity</code></td><td><code>1</code></td><td><code>POST /demo/cart/add</code></td><td>เริ่มจาก 1 เพื่อให้ flow ผ่านง่ายสุด</td></tr>
+<tr><td><code>demoCouponCode</code></td><td><code>WELCOME10</code></td><td>ใช้กับ pre-processor หรือ body เสริมในอนาคต</td><td>ตอนนี้ระบบคืนค่านี้จาก <code>/demo/context</code></td></tr>
+<tr><td><code>demoAuthToken</code></td><td><code>lab-token</code></td><td><code>GET /protected</code></td><td>ตรงกับ token default ของระบบนี้</td></tr>
+<tr><td><code>demoOrderId</code></td><td><code>NOT_SET</code></td><td><code>GET /demo/order/status</code></td><td>ไม่ควร hardcode ใช้จริง ควรให้ <code>/demo/checkout</code> สร้างให้</td></tr>
+<tr><td><code>demoLanguage</code></td><td><code>en</code></td><td>demo endpoints ทั้งหมดผ่าน <code>Accept-Language</code></td><td>เริ่มจาก <code>en</code> แล้วค่อยเปลี่ยนเป็น <code>th</code></td></tr>
+</table>
+
+<h2>Suggested Override Order</h2>
+<table>
+<tr><th>Variable</th><th>Start With</th><th>Override With</th><th>Recommended Rule</th></tr>
+<tr><td><code>demoSearchTerm</code></td><td><code>mouse</code></td><td><code>/demo/context -> $.searchTerm</code></td><td>ใช้ static ได้ก่อน แล้วค่อยให้ context ทับ</td></tr>
+<tr><td><code>demoProductId</code></td><td><code>sku-101</code></td><td><code>/demo/context -> $.recommendedProductId</code></td><td>ถ้าไม่มี extractor ก็ยังยิง details/add cart ได้</td></tr>
+<tr><td><code>demoCartId</code></td><td><code>demo-cart</code></td><td><code>/demo/context -> $.cartId</code></td><td>เริ่มจาก static เพื่อ POC, ใช้ extracted value เมื่อทำ session flow</td></tr>
+<tr><td><code>demoShopperId</code></td><td><code>demo-user-01</code></td><td><code>/demo/context -> $.shopperId</code></td><td>ช่วยให้ checkout ผ่านได้ตั้งแต่รอบแรก</td></tr>
+<tr><td><code>demoQuantity</code></td><td><code>1</code></td><td><code>JSR223 PreProcessor</code> หรือ CSV</td><td>ใช้ static ก่อน แล้วค่อย random ภายหลัง</td></tr>
+<tr><td><code>demoOrderId</code></td><td><code>NOT_SET</code></td><td><code>/demo/checkout -> $.orderId</code></td><td>ควรเรียก order status เฉพาะเมื่อ extractor ดึงค่าได้จริง</td></tr>
+<tr><td><code>demoLanguage</code></td><td><code>en</code></td><td><code>User Defined Variables</code> หรือ CSV</td><td>เปลี่ยนภาษาได้ทั้ง flow โดยแก้จุดเดียว</td></tr>
+</table>
+
+<h2>Copy Ready User Defined Variables Block</h2>
+<pre>protocol=http
+host=localhost
+port=3001
+baseUrl=http://localhost:3001
+acceptHeader=application/json
+contentType=application/json
+demoLanguage=en
+demoSearchTerm=mouse
+demoProductId=sku-101
+demoCartId=demo-cart
+demoShopperId=demo-user-01
+demoQuantity=1
+demoCouponCode=WELCOME10
+demoAuthToken=lab-token
+demoOrderId=NOT_SET</pre>
+
+<h2>Suggested HTTP Header Defaults</h2>
+<table>
+<tr><th>Header</th><th>Suggested Value</th><th>Put It Where</th><th>Reason</th></tr>
+<tr><td><code>Accept</code></td><td><code>${acceptHeader}</code></td><td>Test Plan หรือ Thread Group</td><td>ใช้ได้กับเกือบทุก endpoint ในระบบนี้</td></tr>
+<tr><td><code>Accept-Language</code></td><td><code>${demoLanguage}</code></td><td>Test Plan หรือ Thread Group</td><td>เปลี่ยนภาษา demo ทั้ง flow ได้จากจุดเดียว</td></tr>
+<tr><td><code>Content-Type</code></td><td><code>${contentType}</code></td><td>เฉพาะ POST ที่มี JSON body</td><td>ลดการตั้งค่าผิดบน GET request</td></tr>
+<tr><td><code>x-access-token</code></td><td><code>${demoAuthToken}</code></td><td>เฉพาะ <code>/protected</code></td><td>แยก auth concern ออกจาก flow หลัก</td></tr>
+</table>
+
+<h2>Header Structure Rule</h2>
+<pre>Global / reusable
+- Accept: ${acceptHeader}
+- Accept-Language: ${demoLanguage}
+
+POST only
+- Content-Type: ${contentType}
+
+Auth only
+- x-access-token: ${demoAuthToken}
+or
+- Authorization: Bearer ${demoAuthToken}</pre>
+
+<h2>Recommended Request Templates With Variables</h2>
+<pre>GET /demo/search?q=${demoSearchTerm}
+GET /demo/product/details?productId=${demoProductId}
+
+POST /demo/cart/add
+{
+  "cartId": "${demoCartId}",
+  "productId": "${demoProductId}",
+  "quantity": ${demoQuantity}
+}
+
+POST /demo/checkout
+{
+  "cartId": "${demoCartId}",
+  "customerId": "${demoShopperId}"
+}
+
+GET /protected
+Header: x-access-token: ${demoAuthToken}
+</pre>
+
+<h2>Static Vs Variable Usage</h2>
+<table>
+<tr><th>When To Use</th><th>Recommended Style</th></tr>
+<tr><td>แค่จะพิสูจน์ว่า endpoint ทำงาน</td><td>ใช้ static value ตรง ๆ เช่น <code>demo-cart</code>, <code>sku-101</code>, <code>demo-user-01</code></td></tr>
+<tr><td>จะสอน extractor และ request chaining</td><td>ใช้ variable เช่น <code>${demoCartId}</code>, <code>${demoProductId}</code>, <code>${demoOrderId}</code></td></tr>
+<tr><td>จะทำ transaction flow ให้เหมือน session จริง</td><td>ใช้ variable ทั้ง flow และเก็บจาก <code>/demo/context</code> กับ <code>/demo/checkout</code></td></tr>
+</table>
+
+<h2>What To Learn Here</h2>
+<ul>
+  <li>เส้นไหนต้องส่ง query</li>
+  <li>เส้นไหนต้องส่ง JSON body</li>
+  <li>เส้นไหนต้องใช้ค่าจาก response ก่อนหน้า</li>
+  <li>เมื่อไรควรใช้ค่าคงที่ และเมื่อไรควรใช้ตัวแปร</li>
+</ul>
+
+<script>
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl = document.getElementById("runtime-meta");
+  async function refreshRuntimeStatus() {
+    try {
+      const response = await fetch("/status", { cache: "no-store" });
+      if (!response.ok) throw new Error("Status endpoint returned non-200");
+      const data = await response.json();
+      statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent = `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
+    } catch (error) {
+      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      metaEl.textContent = "Open this page through Node/Express to enable live status.";
+    }
+  }
+  refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 5000);
+</script>
+</body>
+</html>

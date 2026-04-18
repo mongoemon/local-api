@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Demo JMeter Guide</title>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2, h3 { color: #1f2937; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
+      justify-content: space-between; gap: 16px; padding: 14px 24px; background: #1f2937;
+      color: #f9fafb; border-bottom: 1px solid #111827; z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
+    .topbar a:last-child { margin-right: 0; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/">Main</a>
+    <a href="/demo.html">Demo Home</a>
+    <a href="/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/demo-jmeter.html">JMeter Guide</a>
+    <a href="/demo-test-types.html">Test Types</a>
+    <a href="/status">/status</a>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>JMeter Guide</h1>
+<div class="note">
+  หลังจากเข้าใจ endpoint แล้ว ค่อยสร้าง JMeter ตามหน้านี้
+</div>
+
+<h2>Recommended Structure</h2>
+<pre>Test Plan
+├─ HTTP Request Defaults
+├─ HTTP Header Manager
+├─ Thread Group
+│  ├─ Transaction Controller - Demo Commerce Flow
+│  │  ├─ HTTP Request - demo context
+│  │  │  └─ JSON Extractor
+│  │  ├─ HTTP Request - demo dashboard
+│  │  ├─ HTTP Request - demo search
+│  │  ├─ HTTP Request - product details
+│  │  ├─ HTTP Request - add to cart
+│  │  ├─ HTTP Request - checkout
+│  │  │  └─ JSON Extractor
+│  │  └─ HTTP Request - order status
+│  ├─ Summary Report
+│  └─ Aggregate Report
+└─ View Results Tree</pre>
+
+<h2>Build Order</h2>
+<ol>
+  <li>เพิ่ม <code>HTTP Request Defaults</code> แล้วตั้ง host/port</li>
+  <li>เพิ่ม <code>User Defined Variables</code> สำหรับค่า default ที่จะ reuse ทั้ง test plan</li>
+  <li>เพิ่ม <code>Thread Group</code></li>
+  <li>เพิ่ม <code>Transaction Controller</code> และเปิด <code>Generate parent sample</code></li>
+  <li>เพิ่ม HTTP requests ตามลำดับ flow</li>
+  <li>เพิ่ม <code>HTTP Header Manager</code> สำหรับ POST</li>
+  <li>เพิ่ม <code>JSON Extractor</code> ใต้ <code>/demo/context</code> และ <code>/demo/checkout</code></li>
+  <li>เพิ่ม <code>View Results Tree</code> เพื่อ debug</li>
+  <li>เพิ่ม <code>Summary Report</code> หรือ <code>Aggregate Report</code></li>
+</ol>
+
+<h2>Important Controllers</h2>
+<table>
+<tr><th>Controller</th><th>Use For</th><th>Example</th></tr>
+<tr><td><code>Transaction Controller</code></td><td>วัดเวลารวมของ flow</td><td>Browse Flow, Add And Checkout</td></tr>
+<tr><td><code>Throughput Controller</code></td><td>คุมว่าส่วนของ flow จะเกิดกี่ %</td><td>ให้ cart flow เกิด 40%</td></tr>
+<tr><td><code>If Controller</code></td><td>รันต่อเมื่อมี variable ที่ต้องใช้จริง</td><td>รัน order status เมื่อมี <code>${demoOrderId}</code></td></tr>
+</table>
+
+<h2>Extractor And Variable Flow</h2>
+<ul>
+  <li><code>/demo/context</code> -> extract <code>demoCartId</code>, <code>demoShopperId</code>, <code>demoProductId</code>, <code>demoSearchTerm</code></li>
+  <li><code>/demo/checkout</code> -> extract <code>demoOrderId</code></li>
+  <li><code>If Controller</code> -> เช็ก <code>${demoOrderId}</code> ก่อนยิง <code>/demo/order/status</code></li>
+</ul>
+
+<h2>Suggested User Defined Variables</h2>
+<div class="note">
+  ถ้าจะตั้ง <code>User Defined Variables</code> ไว้ก่อนเพื่อให้ flow เริ่มได้ทันที ให้ใช้ค่าด้านล่างนี้
+  แล้วค่อยปล่อยให้ extractor มา override ใน request ที่เกี่ยวข้อง
+</div>
+
+<table>
+<tr><th>Variable</th><th>Suggested Value</th><th>Why This Fits The Demo</th></tr>
+<tr><td><code>demoSearchTerm</code></td><td><code>mouse</code></td><td>ค้นหาแล้วเจอ <code>sku-101</code> ในระบบนี้</td></tr>
+<tr><td><code>demoProductId</code></td><td><code>sku-101</code></td><td>ใช้ได้ทั้ง product details และ add to cart</td></tr>
+<tr><td><code>demoCartId</code></td><td><code>demo-cart</code></td><td>ใช้เป็น fallback สำหรับ POC รอบแรก</td></tr>
+<tr><td><code>demoShopperId</code></td><td><code>demo-user-01</code></td><td>ใช้เป็น customer id แบบคงที่</td></tr>
+<tr><td><code>demoQuantity</code></td><td><code>1</code></td><td>เริ่มต้นง่ายสุดและตรงกับ flow ตัวอย่าง</td></tr>
+<tr><td><code>demoAuthToken</code></td><td><code>lab-token</code></td><td>ตรงกับ token default ของ <code>/protected</code></td></tr>
+<tr><td><code>demoOrderId</code></td><td><code>NOT_SET</code></td><td>ใช้คู่กับ <code>If Controller</code> เพื่อกันการยิง order status ก่อน checkout</td></tr>
+<tr><td><code>demoLanguage</code></td><td><code>en</code></td><td>ใช้กับ header <code>Accept-Language</code> ของ demo endpoints ทั้ง flow</td></tr>
+</table>
+
+<h2>Where To Put These Variables</h2>
+<pre>Test Plan
+└─ User Defined Variables
+   ├─ protocol = http
+   ├─ host = localhost
+   ├─ port = 3001
+   ├─ demoSearchTerm = mouse
+   ├─ demoProductId = sku-101
+   ├─ demoCartId = demo-cart
+   ├─ demoShopperId = demo-user-01
+   ├─ demoQuantity = 1
+   ├─ demoAuthToken = lab-token
+   ├─ contentType = application/json
+   ├─ acceptHeader = application/json
+   ├─ demoLanguage = en
+   └─ demoOrderId = NOT_SET</pre>
+
+<h2>Recommended Test Plan Defaults</h2>
+<table>
+<tr><th>Component</th><th>What To Put There</th><th>Why</th></tr>
+<tr><td><code>HTTP Request Defaults</code></td><td><code>Protocol=${protocol}</code>, <code>Server=${host}</code>, <code>Port=${port}</code></td><td>เปลี่ยน environment ได้จากจุดเดียว</td></tr>
+<tr><td><code>User Defined Variables</code></td><td>ค่าที่ใช้ซ้ำหลาย request เช่น <code>demoSearchTerm</code>, <code>demoProductId</code>, <code>demoCartId</code></td><td>ทำให้ path, query, body ไม่ hardcode</td></tr>
+<tr><td><code>HTTP Header Manager</code> ระดับ Test Plan หรือ Thread Group</td><td><code>Accept=${acceptHeader}</code></td><td>ใช้ได้กับทุก request</td></tr>
+<tr><td><code>HTTP Header Manager</code> ระดับ Test Plan หรือ Thread Group</td><td><code>Accept-Language=${demoLanguage}</code></td><td>เปลี่ยนภาษา demo ทั้ง flow จากจุดเดียว</td></tr>
+<tr><td><code>HTTP Header Manager</code> ระดับ POST sampler</td><td><code>Content-Type=${contentType}</code></td><td>ควรผูกเฉพาะ request ที่มี JSON body</td></tr>
+</table>
+
+<h2>Recommended HTTP Header Structure</h2>
+<div class="note">
+  อย่าใส่ทุก header ไว้ระดับบนสุดถ้าไม่ได้ใช้กับทุก request จริง
+  ให้แยก header ตามขอบเขตการใช้งาน จะดูแลง่ายกว่า
+</div>
+
+<table>
+<tr><th>Header</th><th>Suggested Value</th><th>Where To Put It</th><th>Use Case</th></tr>
+<tr><td><code>Accept</code></td><td><code>${acceptHeader}</code> หรือ <code>application/json</code></td><td>Test Plan หรือ Thread Group</td><td>ใช้กับ request ส่วนใหญ่ในระบบนี้</td></tr>
+<tr><td><code>Accept-Language</code></td><td><code>${demoLanguage}</code> หรือ <code>en</code>/<code>th</code></td><td>Test Plan หรือ Thread Group</td><td>ใช้สลับภาษา demo ทั้ง flow</td></tr>
+<tr><td><code>Content-Type</code></td><td><code>${contentType}</code> หรือ <code>application/json</code></td><td>เฉพาะ <code>POST /demo/cart/add</code>, <code>POST /demo/checkout</code>, <code>POST /submit-one</code>, <code>POST /submit-two</code></td><td>หลีกเลี่ยงการใส่ผิดกับ GET ทั้งหมด</td></tr>
+<tr><td><code>x-access-token</code></td><td><code>${demoAuthToken}</code></td><td>เฉพาะ sampler <code>/protected</code></td><td>ใช้ทดสอบ auth flow</td></tr>
+<tr><td><code>Authorization</code></td><td><code>Bearer ${demoAuthToken}</code></td><td>เฉพาะ sampler <code>/protected</code></td><td>ใช้แทน <code>x-access-token</code> ได้</td></tr>
+</table>
+
+<h2>Copy Ready Test Plan Defaults</h2>
+<pre>protocol=http
+host=localhost
+port=3001
+acceptHeader=application/json
+contentType=application/json
+demoLanguage=en
+demoSearchTerm=mouse
+demoProductId=sku-101
+demoCartId=demo-cart
+demoShopperId=demo-user-01
+demoQuantity=1
+demoAuthToken=lab-token
+demoOrderId=NOT_SET</pre>
+
+<h2>Practical Rule Of Thumb</h2>
+<ul>
+  <li>ค่า endpoint infrastructure เช่น protocol, host, port ให้เก็บใน defaults เสมอ</li>
+  <li>ค่าทางธุรกิจที่ใช้ซ้ำ เช่น search term, product id, cart id ให้เก็บใน variables</li>
+  <li>header ที่ใช้ทุก request เช่น <code>Accept</code> ให้ไว้ระดับบน</li>
+  <li>header อย่าง <code>Accept-Language</code> เหมาะมากกับการวางไว้ระดับบนถ้าจะให้ทั้ง flow ใช้ภาษาเดียวกัน</li>
+  <li>header ที่ใช้เฉพาะบาง request เช่น <code>Content-Type</code> หรือ token ให้ไว้ใกล้ sampler นั้น</li>
+  <li>ค่าอย่าง <code>demoOrderId</code> ให้เริ่มด้วย placeholder เช่น <code>NOT_SET</code> แล้วให้ extractor มาแทนภายหลัง</li>
+</ul>
+
+<h2>Language Header Proof Of Concept</h2>
+<pre>User Defined Variables
+demoLanguage=th
+
+HTTP Header Manager
+Accept-Language: ${demoLanguage}
+
+Expected result
+- demo endpoints return "language": "th"
+- message fields are returned in Thai
+
+Change to
+demoLanguage=en
+
+Expected result
+- demo endpoints return "language": "en"
+- message fields are returned in English</pre>
+
+<h2>Override Strategy</h2>
+<table>
+<tr><th>Variable</th><th>Initial Value</th><th>Later Override</th></tr>
+<tr><td><code>demoSearchTerm</code></td><td><code>mouse</code></td><td><code>/demo/context -> $.searchTerm</code></td></tr>
+<tr><td><code>demoProductId</code></td><td><code>sku-101</code></td><td><code>/demo/context -> $.recommendedProductId</code></td></tr>
+<tr><td><code>demoCartId</code></td><td><code>demo-cart</code></td><td><code>/demo/context -> $.cartId</code></td></tr>
+<tr><td><code>demoShopperId</code></td><td><code>demo-user-01</code></td><td><code>/demo/context -> $.shopperId</code></td></tr>
+<tr><td><code>demoOrderId</code></td><td><code>NOT_SET</code></td><td><code>/demo/checkout -> $.orderId</code></td></tr>
+</table>
+
+<h2>Copy Ready Variables Block</h2>
+<pre>demoSearchTerm=mouse
+demoProductId=sku-101
+demoCartId=demo-cart
+demoShopperId=demo-user-01
+demoQuantity=1
+demoAuthToken=lab-token
+demoOrderId=NOT_SET</pre>
+
+<h2>Throughput + Transaction Example</h2>
+<pre>Thread Group
+├─ Transaction Controller - Browse Flow
+├─ Throughput Controller - Cart Flow (40%)
+│  └─ Transaction Controller - Add And Checkout
+└─ If Controller - if demoOrderId exists
+   └─ HTTP Request - order status</pre>
+
+<h2>What To Measure</h2>
+<ul>
+  <li>เวลารวมของ parent sample</li>
+  <li>sample count ของแต่ละ flow</li>
+  <li>error rate ของแต่ละ step</li>
+</ul>
+
+<script>
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl = document.getElementById("runtime-meta");
+  async function refreshRuntimeStatus() {
+    try {
+      const response = await fetch("/status", { cache: "no-store" });
+      if (!response.ok) throw new Error("Status endpoint returned non-200");
+      const data = await response.json();
+      statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent = `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
+    } catch (error) {
+      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      metaEl.textContent = "Open this page through Node/Express to enable live status.";
+    }
+  }
+  refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 5000);
+</script>
+</body>
+</html>
