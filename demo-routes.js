@@ -9,9 +9,6 @@ const demoProducts = [
   { id: "sku-104", name: "Notebook Pack", category: "stationery", price: 14.25 }
 ];
 
-const demoCarts = new Map();
-const demoOrders = new Map();
-
 const demoMessages = {
   en: {
     contextPrepared: "demo context prepared",
@@ -65,19 +62,6 @@ function getDemoText(req) {
   return demoMessages[getDemoLanguage(req)];
 }
 
-function getOrCreateCart(cartId) {
-  const normalizedCartId = typeof cartId === "string" && cartId.trim() ? cartId.trim() : "demo-cart";
-
-  if (!demoCarts.has(normalizedCartId)) {
-    demoCarts.set(normalizedCartId, {
-      cartId: normalizedCartId,
-      items: []
-    });
-  }
-
-  return demoCarts.get(normalizedCartId);
-}
-
 function buildCartSummary(cart) {
   const itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
   const total = cart.items.reduce((sum, item) => sum + item.lineTotal, 0);
@@ -92,6 +76,16 @@ function buildCartSummary(cart) {
 
 export function createDemoRouter() {
   const router = express.Router();
+  const demoCarts = new Map();
+  const demoOrders = new Map();
+
+  function getOrCreateCart(cartId) {
+    const normalizedCartId = typeof cartId === "string" && cartId.trim() ? cartId.trim() : "demo-cart";
+    if (!demoCarts.has(normalizedCartId)) {
+      demoCarts.set(normalizedCartId, { cartId: normalizedCartId, items: [] });
+    }
+    return demoCarts.get(normalizedCartId);
+  }
 
   router.get("/context", (req, res) => {
     const text = getDemoText(req);

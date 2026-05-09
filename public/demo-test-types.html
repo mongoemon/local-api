@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Demo Test Types</title>
+  <title>Test Types And Thread Groups</title>
   <style>
     body { font-family: Arial; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
-    h1, h2 { color: #1f2937; }
+    h1, h2, h3 { color: #1f2937; }
     table { border-collapse: collapse; width: 100%; margin-top: 20px; }
     th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
     th { background: #f3f4f6; }
     code { background: #f3f4f6; padding: 2px 6px; }
     pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
     .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .step { border: 1px solid #d1d5db; padding: 16px; margin: 12px 0; background: #ffffff; }
+    .step h3 { margin-top: 0; }
     .topbar {
       position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
       justify-content: space-between; gap: 16px; padding: 14px 24px; background: #1f2937;
@@ -33,6 +35,9 @@
     <a href="/demo-endpoints.html">Demo Endpoints</a>
     <a href="/demo-jmeter.html">JMeter Guide</a>
     <a href="/demo-test-types.html">Test Types</a>
+    <a href="/tools.html">Tools</a>
+    <a href="/assignment.html">Assignment</a>
+    <a href="/glossary.html">Glossary</a>
     <a href="/status">/status</a>
   </div>
   <div class="topbar-status">
@@ -43,41 +48,321 @@
 
 <h1>Test Types And Thread Groups</h1>
 <div class="note">
-  หน้านี้ใช้เลือกว่าควร test แบบไหน และควรใช้ thread group อะไร
+  หน้านี้สอนวิธีเลือก test type, จับคู่กับ thread group, ตั้งค่าให้ถูก, และอ่านผลให้ตรงกับ SLA ที่ลูกค้าต้องการ
 </div>
 
-<h2>Thread Group Selection</h2>
+<h2>Step 1: เลือก Test Type ให้ตรงกับ SLA</h2>
+<div class="note">
+  ก่อนรัน test ต้องรู้ก่อนว่า SLA พูดถึงอะไร เพราะ test type แต่ละแบบตอบคำถามต่างกัน
+</div>
+
 <table>
-<tr><th>Thread Group</th><th>Best For</th><th>Use When</th></tr>
-<tr><td><code>Normal</code></td><td>baseline, debug, simple SLA</td><td>เริ่มต้น, functional load, transaction เบื้องต้น</td></tr>
-<tr><td><code>Concurrency</code></td><td>stress, saturation, active sessions</td><td>อยากคุมจำนวน concurrent users</td></tr>
-<tr><td><code>Stepping</code></td><td>spike, threshold</td><td>อยากเห็นว่า fail ที่ step ไหน</td></tr>
-<tr><td><code>Arrival</code></td><td>steady traffic, open workload</td><td>อยากคุม request rate ต่อวินาที</td></tr>
+  <tr><th>Test Type</th><th>ใช้เมื่อ SLA พูดถึง</th><th>คำถามที่ตอบได้</th><th>ตัวอย่างเกณฑ์</th></tr>
+  <tr>
+    <td><code>Load Test</code></td>
+    <td>traffic ปกติ, expected users, baseline performance</td>
+    <td>ระบบผ่าน SLA ภายใต้ load จริงหรือไม่</td>
+    <td>p95 &lt; 800ms ที่ 20 users</td>
+  </tr>
+  <tr>
+    <td><code>Stress Test</code></td>
+    <td>capacity, breaking point, graceful degradation</td>
+    <td>ระบบเริ่ม degrade หรือ fail ที่ level ไหน</td>
+    <td>ยังตอบได้จนถึง 80 concurrent users</td>
+  </tr>
+  <tr>
+    <td><code>Spike Test</code></td>
+    <td>traffic surge, flash sale, peak event, recovery time</td>
+    <td>ระบบรับ load พุ่งเร็ว และ recover กลับภายในกี่วินาที</td>
+    <td>traffic 3x ภายใน 1 นาที, recover ใน 2 นาที</td>
+  </tr>
+  <tr>
+    <td><code>Endurance Test</code></td>
+    <td>stability, continuous operation, memory drift</td>
+    <td>SLA ยังนิ่งหรือ drift เมื่อรันหลายชั่วโมง</td>
+    <td>p95 &lt; 900ms ตลอด 8 ชั่วโมง</td>
+  </tr>
 </table>
 
-<h2>Test Type Structures</h2>
+<h2>Step 2: เลือก Thread Group ให้เหมาะกับ Test Type</h2>
+
+<table>
+  <tr><th>Thread Group</th><th>เหมาะกับ Test Type</th><th>ควบคุมอะไร</th><th>เลือกเมื่อ</th></tr>
+  <tr>
+    <td><code>Normal</code></td>
+    <td>Load, Endurance</td>
+    <td>จำนวน threads, ramp-up, loop count</td>
+    <td>เริ่มต้น, functional check, baseline, load ธรรมดา</td>
+  </tr>
+  <tr>
+    <td><code>Concurrency</code></td>
+    <td>Stress, Spike, Load</td>
+    <td>จำนวน concurrent users ที่ active พร้อมกัน</td>
+    <td>อยากรู้ว่าระบบรองรับกี่ sessions พร้อมกัน</td>
+  </tr>
+  <tr>
+    <td><code>Stepping</code></td>
+    <td>Stress, Spike</td>
+    <td>เพิ่ม threads เป็นขั้น ๆ ทีละช่วง</td>
+    <td>อยากหา breaking point หรือดู degradation เป็น step</td>
+  </tr>
+  <tr>
+    <td><code>Arrival Rate</code></td>
+    <td>Load, Endurance</td>
+    <td>request rate ต่อวินาที (RPS/TPS)</td>
+    <td>อยากคุม throughput rate ไม่ใช่ user count</td>
+  </tr>
+</table>
+
+<h2>Step 3: JMeter Thread Group Configuration Cheat Sheet</h2>
+<div class="note">
+  ค่าด้านล่างนี้เป็นจุดเริ่มต้น ปรับได้ตามโหลดที่ลูกค้าระบุ
+</div>
+
+<h3>Normal Thread Group — Load Test</h3>
+<pre>Thread Group
+  Number of Threads (users):  10–20
+  Ramp-Up Period (seconds):   30
+  Loop Count:                 20
+  Duration (seconds):         — (ใช้ loop count แทน)
+
+ใช้กับ: baseline, functional load, load test พื้นฐาน</pre>
+
+<h3>Concurrency Thread Group — Stress Test</h3>
+<pre>Concurrency Thread Group (requires bzm plugin)
+  Target Concurrency:   เริ่ม 10, เพิ่มถึง 80+
+  Ramp-Up Time (sec):   60
+  Ramp-Up Steps:        5
+  Hold Target Rate:     120 วินาที
+
+ใช้กับ: stress test, หา saturation point, เช็ก active sessions</pre>
+
+<h3>Stepping Thread Group — Spike / Threshold</h3>
+<pre>Stepping Thread Group (requires plugin)
+  Start Threads Count:       5
+  Initial Delay (sec):       0
+  Start users count:         5
+  Start users period (sec):  30
+  End Threads Count:         100
+
+ใช้กับ: spike test, หา breaking point แบบ step-by-step</pre>
+
+<h3>Arrival Rate Thread Group — Steady Traffic</h3>
+<pre>Arrivals Thread Group (requires bzm plugin)
+  Target Rate (requests/sec): 50
+  Ramp-Up Time (sec):         30
+  Ramp-Up Steps:              3
+  Hold Target Rate (sec):     120
+
+ใช้กับ: คุม RPS, open workload simulation, endurance ที่ rate คงที่</pre>
+
+<h2>Step 4: Test Type Structures ใน JMeter</h2>
+
 <h3>Load Test</h3>
-<pre>Thread Group or Concurrency Thread Group or Arrival Thread Group
-└─ transaction flow or target endpoint</pre>
-
-<h3>Spike Test</h3>
-<pre>Stepping Thread Group or Concurrency Thread Group
-└─ target endpoint or transaction flow</pre>
-
-<h3>Endurance / Soak Test</h3>
-<pre>Thread Group or Concurrency Thread Group or Arrival Thread Group
-└─ target endpoint or demo flow</pre>
+<pre>Thread Group (Normal หรือ Concurrency หรือ Arrival)
+└─ Transaction Controller - Browse Flow
+   ├─ HTTP Request - demo context
+   ├─ HTTP Request - demo dashboard
+   ├─ HTTP Request - demo search
+   └─ HTTP Request - product details
+└─ Throughput Controller - Cart Flow (40%)
+   └─ Transaction Controller - Add And Checkout
+      ├─ HTTP Request - add to cart
+      └─ HTTP Request - checkout
+└─ If Controller - if demoOrderId exists
+   └─ HTTP Request - order status
+└─ Aggregate Report</pre>
 
 <h3>Stress Test</h3>
 <pre>Concurrency Thread Group
-└─ target endpoint or transaction flow</pre>
+└─ Transaction Controller หรือ endpoint หลัก
+   ├─ HTTP Request - target endpoint
+   └─ JSON Extractor (ถ้าต้องการ)
+└─ Summary Report
+└─ Aggregate Report</pre>
+
+<h3>Spike Test</h3>
+<pre>Stepping Thread Group หรือ Concurrency Thread Group
+└─ target endpoint หรือ full transaction flow
+└─ View Results Tree (เพื่อดู response ในช่วง spike)
+└─ Aggregate Report</pre>
+
+<h3>Endurance / Soak Test</h3>
+<pre>Normal Thread Group หรือ Arrival Rate Thread Group
+  — ตั้ง Duration หลายชั่วโมง แทนการใช้ Loop Count
+└─ target endpoint หรือ demo flow
+└─ Backend Listener (ส่ง metric ไป Grafana/InfluxDB ถ้ามี)
+└─ Aggregate Report</pre>
+
+<h2>Step 5: Test Matrix By Layer</h2>
+<div class="note">
+  ในการทดสอบจริง เราต้องวัดหลาย layer พร้อมกัน ไม่ใช่แค่ดู response time อย่างเดียว
+</div>
+
+<table>
+  <tr><th>Layer</th><th>สิ่งที่ต้องทดสอบ</th><th>เครื่องมือ</th><th>เหมาะกับ Test Type</th></tr>
+  <tr>
+    <td><strong>Application</strong></td>
+    <td>endpoint response time, error rate, transaction flow</td>
+    <td>JMeter Aggregate Report, Summary Report</td>
+    <td>Load, Stress, Spike, Endurance</td>
+  </tr>
+  <tr>
+    <td><strong>Runtime</strong></td>
+    <td>activeRequests, uptime, PID stability, Prometheus metrics</td>
+    <td><code>GET /status</code>, <code>GET /metrics</code></td>
+    <td>Load, Endurance — ดูระหว่างรัน</td>
+  </tr>
+  <tr>
+    <td><strong>Infrastructure</strong></td>
+    <td>CPU, memory, disk I/O, network</td>
+    <td><code>GET /cpu</code>, <code>GET /memory</code>, <code>GET /io</code>, OS tools</td>
+    <td>Stress, Endurance — ดูพร้อมกับ app layer</td>
+  </tr>
+  <tr>
+    <td><strong>Reliability</strong></td>
+    <td>recovery time, error pattern, graceful degradation</td>
+    <td>View Results Tree, Backend Listener</td>
+    <td>Spike, Stress</td>
+  </tr>
+</table>
+
+<h2>Step 6: Metrics Layers — อ่านจากที่ไหน</h2>
+
+<table>
+  <tr><th>Metric</th><th>อ่านจาก</th><th>ใช้วัดอะไร</th></tr>
+  <tr>
+    <td>Response time, p90/p95/p99</td>
+    <td>JMeter Aggregate Report</td>
+    <td>latency ของแต่ละ endpoint และ flow รวม</td>
+  </tr>
+  <tr>
+    <td>Error rate</td>
+    <td>JMeter Summary/Aggregate Report</td>
+    <td>% ของ request ที่ fail (4xx, 5xx, timeout, assertion fail)</td>
+  </tr>
+  <tr>
+    <td>Throughput (RPS/TPS)</td>
+    <td>JMeter Aggregate Report</td>
+    <td>จำนวน request ที่ระบบตอบสำเร็จต่อวินาที</td>
+  </tr>
+  <tr>
+    <td>Active requests</td>
+    <td><code>GET /status</code> → <code>activeRequests</code></td>
+    <td>จำนวน request ที่กำลัง process พร้อมกัน</td>
+  </tr>
+  <tr>
+    <td>Uptime, PID</td>
+    <td><code>GET /status</code></td>
+    <td>ยืนยันว่า server ไม่ crash และยังเป็น process เดิม</td>
+  </tr>
+  <tr>
+    <td>HTTP request histogram</td>
+    <td><code>GET /metrics</code></td>
+    <td>latency distribution แบบ Prometheus bucket</td>
+  </tr>
+  <tr>
+    <td>CPU / Memory</td>
+    <td><code>GET /cpu</code>, <code>GET /memory</code></td>
+    <td>ดู compute load ระหว่างทดสอบ</td>
+  </tr>
+</table>
+
+<h2>Step 7: Suggested Run Order สำหรับผู้เริ่มต้น</h2>
+
+<div class="step">
+  <h3>รอบที่ 1 — Baseline (1 user)</h3>
+  <p>ยืนยันว่า flow ทำงานถูกต้องก่อนเพิ่ม load ใด ๆ</p>
+  <ul>
+    <li>1 thread, 1 loop, ไม่มี ramp-up</li>
+    <li>เปิด View Results Tree เพื่อดู request/response จริง</li>
+    <li>ต้องได้ 200 ทุก step และ variable chain ถูกต้อง</li>
+    <li>ถ้า error ให้แก้ก่อน — ไม่รันรอบต่อไปจนกว่า baseline จะผ่าน</li>
+  </ul>
+</div>
+
+<div class="step">
+  <h3>รอบที่ 2 — Load Test (expected load)</h3>
+  <p>ทดสอบที่โหลดปกติตามที่ลูกค้าระบุ เพื่อยืนยัน SLA หลัก</p>
+  <ul>
+    <li>Normal Thread Group: 10–20 threads, ramp-up 30s, loop 20</li>
+    <li>เปิด Aggregate Report เพื่อดู p90/p95/p99</li>
+    <li>เปรียบกับ SLA: p95, error rate, traffic mix</li>
+    <li>ถ้าผ่าน → ไป stress test; ถ้าไม่ผ่าน → ดู bottleneck ก่อน</li>
+  </ul>
+</div>
+
+<div class="step">
+  <h3>รอบที่ 3 — Stress Test (push to limit)</h3>
+  <p>หาจุดที่ระบบเริ่ม degrade โดยเพิ่ม load เรื่อย ๆ</p>
+  <ul>
+    <li>Concurrency Thread Group: เพิ่มจาก 20 → 40 → 80 → 120 users</li>
+    <li>ดู error rate และ p95 ที่แต่ละ step</li>
+    <li>บันทึกจุดที่ error เริ่มขึ้น หรือ latency breach SLA</li>
+    <li>นั่นคือ breaking point / capacity threshold</li>
+  </ul>
+</div>
+
+<div class="step">
+  <h3>รอบที่ 4 — Spike Test (burst)</h3>
+  <p>จำลองการขึ้น load แบบฉับพลัน เพื่อดู recovery</p>
+  <ul>
+    <li>Stepping Thread Group: พุ่งจาก 5 → 100 threads ใน 30 วินาที</li>
+    <li>ดู error burst และ recovery time หลัง spike ลง</li>
+    <li>ถ้าลูกค้าระบุ "ต้อง recover ใน 2 นาที" ให้ดูที่ timestamp</li>
+  </ul>
+</div>
+
+<div class="step">
+  <h3>รอบที่ 5 — Endurance Test (long run)</h3>
+  <p>รันที่ expected load นาน ๆ เพื่อดู drift และ memory behavior</p>
+  <ul>
+    <li>Normal Thread Group: 10 threads, duration 1–8 ชั่วโมง</li>
+    <li>ดู p95 ต้นรอบ vs ท้ายรอบ — ถ้าเพิ่มขึ้นเรื่อย ๆ = leak</li>
+    <li>เปิด <code>GET /status</code> และ <code>GET /metrics</code> ดูค่า runtime ระหว่างรัน</li>
+  </ul>
+</div>
+
+<h2>Quick Reference: Test Type → Thread Group → SLA Metric</h2>
+
+<table>
+  <tr><th>Test Type</th><th>Recommended Thread Group</th><th>Primary Metric To Check</th><th>Pass Condition Example</th></tr>
+  <tr>
+    <td><code>Load</code></td>
+    <td>Normal หรือ Arrival Rate</td>
+    <td>p95, error rate, traffic mix</td>
+    <td>p95 &lt; 800ms, error &lt; 1%</td>
+  </tr>
+  <tr>
+    <td><code>Stress</code></td>
+    <td>Concurrency หรือ Stepping</td>
+    <td>จุดที่ error เริ่มขึ้น, p95 breach level</td>
+    <td>ระบบยัง stable ที่ 80 users</td>
+  </tr>
+  <tr>
+    <td><code>Spike</code></td>
+    <td>Stepping หรือ Concurrency</td>
+    <td>error burst size, recovery time</td>
+    <td>recover ใน 2 นาทีหลัง spike</td>
+  </tr>
+  <tr>
+    <td><code>Endurance</code></td>
+    <td>Normal หรือ Arrival Rate + Duration</td>
+    <td>p95 drift ต้นรอบ vs ท้ายรอบ</td>
+    <td>p95 &lt; 900ms ตลอด 8 ชั่วโมง</td>
+  </tr>
+</table>
 
 <h2>Quick Guidance</h2>
 <ul>
-  <li>ถ้ายังใหม่ ให้เริ่มจาก <code>Normal Thread Group</code></li>
-  <li>ถ้าจะหา limit ของ concurrent users ให้ใช้ <code>Concurrency</code></li>
-  <li>ถ้าจะหา break point แบบเป็นขั้น ให้ใช้ <code>Stepping</code></li>
-  <li>ถ้าจะคุม request rate ต่อวินาที ให้ใช้ <code>Arrival</code></li>
+  <li>เริ่มจาก <code>Normal Thread Group</code> เสมอ ถ้าเพิ่งเริ่มต้นหรือต้องการ baseline</li>
+  <li>ถ้าจะหา concurrent user limit ให้ใช้ <code>Concurrency Thread Group</code></li>
+  <li>ถ้าจะหา breaking point เป็นขั้น ให้ใช้ <code>Stepping Thread Group</code></li>
+  <li>ถ้าจะคุม request rate (RPS) ให้ใช้ <code>Arrival Rate Thread Group</code></li>
+  <li>ก่อนดู latency ให้ดู <code>Error %</code> ก่อนเสมอ — ถ้า error สูงอยู่ latency ไม่มีความหมาย</li>
+  <li>ดู <code>p95</code> ใน Aggregate Report เป็นหลัก ไม่ใช่ Average</li>
+  <li>ดู parent sample ของ <code>Transaction Controller</code> สำหรับ SLA แบบ user journey</li>
+  <li>เปิด <code>GET /status</code> ระหว่างรัน เพื่อดู <code>activeRequests</code> และยืนยัน server ไม่ crash</li>
 </ul>
 
 <script>

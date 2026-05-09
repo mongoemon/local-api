@@ -1,4 +1,4 @@
-function getNumberEnv(name, defaultValue) {
+export function getNumberEnv(name, defaultValue) {
   const value = process.env[name];
 
   if (value === undefined) {
@@ -9,7 +9,7 @@ function getNumberEnv(name, defaultValue) {
   return Number.isFinite(parsed) ? parsed : defaultValue;
 }
 
-function getBooleanEnv(name, defaultValue) {
+export function getBooleanEnv(name, defaultValue) {
   const value = process.env[name];
 
   if (value === undefined) {
@@ -24,7 +24,8 @@ export const config = {
     port: getNumberEnv("PORT", 3001)
   },
   auth: {
-    bearerToken: process.env.AUTH_BEARER_TOKEN || "lab-token"
+    bearerToken: process.env.AUTH_BEARER_TOKEN || "lab-token",
+    jwtSecret: process.env.JWT_SECRET || "local-api-jwt-secret"
   },
   rateLimit: {
     enabled: getBooleanEnv("RATE_LIMIT_ENABLED", false),

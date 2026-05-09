@@ -43,7 +43,11 @@
   <div class="topbar-links">
     <strong>Performance Testing Lab</strong>
     <a href="/">Main</a>
-    <a href="/demo.html">Demo Flow</a>
+    <a href="/demo.html">Demo Home</a>
+    <a href="/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/demo-jmeter.html">JMeter Guide</a>
+    <a href="/demo-test-types.html">Test Types</a>
+    <a href="/tools.html">Tools</a>
     <a href="/assignment.html">Assignment</a>
     <a href="/glossary.html">Glossary</a>
     <a href="/status">/status</a>
@@ -69,56 +73,8 @@
 </ul>
 
 <div class="note">
-  <strong>Pre-requisite สำหรับการสร้าง JMeter test plan</strong>
-  <ul>
-    <li><strong>Thread Group</strong>: กำหนดจำนวน users/threads, ramp-up time, loop count และ duration ของเทสต์</li>
-    <li><strong>HTTP Request</strong>: สร้าง sampler สำหรับแต่ละ endpoint เช่น <code>/fast</code>, <code>/slow</code>, <code>/status</code></li>
-    <li><strong>Assertions</strong>: เพิ่มคำตรวจสอบเพื่อเช็ก response code, response body หรือค่า JSON ที่คาดหวัง</li>
-    <li><strong>Config Elements</strong>: ตั้งค่า host, port, headers, และ request body ให้ reuse ได้ง่าย</li>
-    <li><strong>Timers</strong>: ใช้คิดเวลาระหว่าง request เช่น Constant Timer หรือ Random Timer เพื่อจำลอง user pacing</li>
-    <li><strong>PreProcessors / PostProcessors</strong>: ใช้จัดการค่า dynamic, extract token หรือปรับ request ก่อน/หลังส่ง</li>
-    <li><strong>Listeners</strong>: เก็บผลลัพธ์ด้วย Aggregate Report, Summary Report, หรือ View Results Tree เพื่อดู latency, throughput, error rate</li>
-    <li><strong>Test data</strong>: เตรียมข้อมูลให้ครอบคลุมทั้ง validation success, validation error, auth valid และ auth invalid</li>
-  </ul>
-</div>
-
-<div class="note">
-  <strong>Guidelines for variable storage in JMeter components (ภาพรวม)</strong>
-  <ul>
-    <li><strong>User Defined Variables</strong>: เก็บค่าคงที่ที่ใช้ซ้ำ เช่น base URL (<code>http://localhost:3001</code>), default headers, หรือ static tokens</li>
-    <li><strong>CSV Data Set Config</strong>: เก็บ test data จากไฟล์ CSV เช่น ชื่อผู้ใช้, รหัสผ่าน, หรือ input data สำหรับแต่ละ iteration</li>
-    <li><strong>HTTP Header Manager</strong>: เก็บ headers ที่ใช้ในทุก request เช่น <code>Content-Type: application/json</code> หรือ <code>Authorization: Bearer ${token}</code></li>
-    <li><strong>HTTP Request Defaults</strong>: ตั้งค่า default สำหรับ server name, port, protocol, และ path ที่ใช้ร่วมกัน</li>
-    <li><strong>Thread Group</strong>: เก็บค่า <code>thread number</code>, <code>ramp-up time</code>, <code>loop count</code>, และ <code>duration</code> เป็นตัวแปรหลักของการรันทดสอบ โดยแนะนำให้ใช้ <strong>User Defined Variables</strong> เพื่อปรับค่าได้ง่าย เช่น <code>${__P(threads,10)}</code> ซึ่งหมายถึง "อ่านค่า property ชื่อ threads ถ้าไม่มีให้ใช้ค่าเริ่มต้น 10" และตัวอย่างเช่น <code>${__P(threads,${threads})}</code> ซึ่งตัวแปรแรกเรียกจาก CLI/command-line (<code>-Jthreads=20</code>) และตัวแปรที่สองเรียกจากค่าที่กำหนดไว้ใน User Defined Variables</li>
-    <li><strong>HTTP Cookie Manager</strong>: จัดการ cookies อัตโนมัติสำหรับ sessions ที่ต้องการ</li>
-    <li><strong>JSON Extractor (PostProcessor)</strong>: ดึงค่าจาก JSON response และเก็บเป็น variables เช่น token จาก login response</li>
-    <li><strong>Regular Expression Extractor</strong>: ดึงค่าจาก response ด้วย regex สำหรับ non-JSON data</li>
-    <li><strong>BeanShell/JSR223 PreProcessor</strong>: คำนวณหรือ generate dynamic values ก่อนส่ง request</li>
-  </ul>
-</div>
-
-<div class="note">
-  <strong>Guidelines สำหรับการรัน JMeter</strong>
-  <ul>
-    <li><strong>GUI mode</strong>: ใช้เมื่อออกแบบ test plan, ตั้งค่า sampler, และตรวจสอบ logic ภายใน test plan. เปิด JMeter GUI แล้วโหลดไฟล์ <code>.jmx</code> เพื่อแก้ไขและรันแบบ interactive</li>
-    <li><strong>Non-GUI mode</strong>: ใช้เมื่อรัน load test จริงในเครื่อง server หรือ CI, เพราะกินทรัพยากรน้อยกว่าและเสถียรกว่า. ใช้คำสั่งเช่น <code>jmeter -n -t testplan.jmx -l results.jtl -Jthreads=20</code></li>
-    <li><strong>Report</strong>: สร้างรายงาน HTML โดยรัน test แล้ว extract JTL เป็น HTML ต่อเนื่อง เช่น <code>jmeter -n -t testplan.jmx -l results.jtl -Jthreads=20 && jmeter -g results.jtl -o report-folder</code></li>
-    <li><strong>Save results</strong>: เก็บไฟล์ <code>.jtl</code> สำหรับการวิเคราะห์ภายหลัง และใช้ <code>Aggregate Report</code> หรือ <code>Summary Report</code> ใน GUI เพื่อดูค่าเฉลี่ย, p95, และ error %</li>
-    <li><strong>Difference</strong>: ใช้ GUI สำหรับ design/debug และ Non-GUI สำหรับรัน performance test ที่ต้องการความแม่นยำและสร้างรายงาน</li>
-  </ul>
-</div>
-
-<div class="note">
-  <strong>Guidelines ก่อนรันแต่ละ test type</strong>
-  <ul>
-    <li><strong>/fast</strong>: ตรวจสอบ baseline response และ latency ก่อนทดสอบขั้นถัดไป</li>
-    <li><strong>/slow</strong>: ดูว่า delay ของ API ส่งผลต่อความพร้อมของ server อย่างไร</li>
-    <li><strong>Authentication</strong>: เช็กทั้ง token, header, และ response code ว่าตรงตาม expectation</li>
-    <li><strong>/status</strong>: ใช้ดู uptime, PID, activeRequests เพื่อยืนยันว่า service ยังทำงานอยู่</li>
-    <li><strong>/metrics</strong>: ดู counter/histogram และค่า latency ที่บอกว่าระบบรองรับ load ได้ตามเป้าหรือไม่</li>
-    <li><strong>/submit-one, /submit-two</strong>: เช็ก validation error และ error response เมื่อส่ง input ไม่ครบ</li>
-    <li><strong>Run order</strong>: เริ่มจาก baseline ก่อน แล้วค่อยเพิ่มระดับความซับซ้อน เช่น delay -> auth -> error -> metrics</li>
-  </ul>
+  ก่อนเริ่ม ให้ศึกษา <a href="/demo-jmeter.html">JMeter Guide</a> สำหรับการตั้งค่า Thread Group, Variables, และ Extractors
+  และ <a href="/demo-test-types.html">Test Types</a> สำหรับการเลือกประเภทการทดสอบและ run order
 </div>
 
 <div class="task">

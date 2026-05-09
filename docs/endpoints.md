@@ -173,6 +173,69 @@ error:
 { "error": "order_not_found", "orderId": "ord-unknown" }
 ```
 
+## JWT Authentication
+
+### `POST /auth/login`
+
+ใช้รับ JWT token ด้วย demo credentials
+
+```json
+{ "username": "demo", "password": "password" }
+```
+
+success:
+
+```json
+{
+  "message": "login successful",
+  "authenticated": true,
+  "token": "eyJhbGci...",
+  "tokenType": "Bearer",
+  "expiresIn": "24 hours",
+  "user": { "userId": "user-123", "username": "demo" }
+}
+```
+
+error:
+
+```json
+{ "error": "missing_credentials" }
+```
+
+```json
+{ "error": "invalid_credentials" }
+```
+
+### `POST /auth/verify`
+
+ส่ง header `Authorization: Bearer <token>` หรือ `x-access-token: <token>`
+
+success:
+
+```json
+{
+  "message": "token is valid",
+  "valid": true,
+  "decoded": { "userId": "user-123", "username": "demo", "iat": "...", "exp": "..." }
+}
+```
+
+error:
+
+```json
+{ "error": "missing_token" }
+```
+
+```json
+{ "error": "token_expired", "expiredAt": "..." }
+```
+
+```json
+{ "error": "invalid_token" }
+```
+
+ดูรายละเอียดเพิ่มเติม: [Authentication Guide](./authentication.md)
+
 ## Helpers For JMeter
 
 ### `GET /prep`
@@ -275,10 +338,10 @@ success:
 { "message": "busy response (3000ms)" }
 ```
 
-overload:
+overload (503 — plain text, not JSON):
 
-```json
-{ "error": "server_too_busy", "message": "Server too busy" }
+```
+Server too busy
 ```
 
 ### `GET /cpu`
@@ -314,15 +377,6 @@ overload:
 ```
 
 ## Runtime And Monitoring Endpoints
-
-### `GET /health`
-
-```json
-{
-  "status": "ok",
-  "running": true
-}
-```
 
 ### `GET /status`
 

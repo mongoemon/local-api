@@ -15,6 +15,8 @@
 ## Reference
 
 - [Configuration Reference](./configuration.md)
+- [Authentication Guide](./authentication.md)
+- [Testing Guide](./testing.md)
 - [Docker Guide](./docker.md)
 
 ## Recommended Order For New Users

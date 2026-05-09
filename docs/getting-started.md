@@ -16,6 +16,14 @@ npm install
 npm start
 ```
 
+รัน automated tests:
+
+```bash
+npm test              # รัน test ทั้งหมดครั้งเดียว
+npm run test:watch    # watch mode สำหรับ development
+npm run test:coverage # พร้อม coverage report
+```
+
 ค่า default:
 
 - App URL: `http://localhost:3001`

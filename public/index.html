@@ -1,38 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>Performance Testing Lab</title>
   <style>
-    body { font-family: Arial; margin: 0; padding: 88px 40px 40px; }
-    h1 { color: #2c3e50; }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2, h3 { color: #1f2937; }
     table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #f4f4f4; }
-    code { background: #eee; padding: 4px; }
-    .note { background: #f8f9fb; border-left: 4px solid #2c3e50; padding: 12px; margin: 20px 0; }
-    .endpoint-table td { text-align: left; vertical-align: top; }
-    pre { background: #f6f8fa; border: 1px solid #ddd; padding: 12px; overflow-x: auto; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .warn { background: #fefce8; border-left: 4px solid #ca8a04; padding: 12px; margin: 20px 0; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 20px; }
+    .card { border: 1px solid #d1d5db; padding: 18px; background: #fff; }
+    .card h3 { margin-top: 0; font-size: 1rem; }
+    .card a { color: #2563eb; text-decoration: none; font-weight: bold; }
+    .step { border: 1px solid #d1d5db; padding: 16px; margin: 12px 0; }
+    .step h3 { margin-top: 0; color: #2563eb; }
     .topbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 14px 24px;
-      background: #1f2937;
-      color: #f9fafb;
-      border-bottom: 1px solid #111827;
-      z-index: 1000;
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 14px 24px; background: #1f2937; color: #f9fafb;
+      border-bottom: 1px solid #111827; z-index: 1000;
     }
-    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
-    .topbar a:last-child { margin-right: 0; }
+    .topbar a { color: #93c5fd; text-decoration: none; }
     .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
     .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
-    .status-ok { color: #0a7a28; font-weight: bold; }
-    .status-bad { color: #b42318; font-weight: bold; }
     .status-ok-light { color: #86efac; font-weight: bold; }
     .status-bad-light { color: #fca5a5; font-weight: bold; }
   </style>
@@ -43,7 +37,11 @@
   <div class="topbar-links">
     <strong>Performance Testing Lab</strong>
     <a href="/">Main</a>
-    <a href="/demo.html">Demo Flow</a>
+    <a href="/demo.html">Demo</a>
+    <a href="/demo-endpoints.html">Endpoints</a>
+    <a href="/demo-jmeter.html">JMeter</a>
+    <a href="/demo-test-types.html">Test Types</a>
+    <a href="/tools.html">Tools</a>
     <a href="/assignment.html">Assignment</a>
     <a href="/glossary.html">Glossary</a>
     <a href="/status">/status</a>
@@ -54,937 +52,320 @@
   </div>
 </div>
 
-<h1>🚀 Performance Testing Lab</h1>
+<h1>Performance Testing Lab</h1>
+
+<p><b>Performance Testing Lab</b> คือ local API สำหรับเรียนรู้ load testing และ performance monitoring บนเครื่องตัวเองอย่างปลอดภัย</p>
 
 <div class="note">
-  <b>Demo Flow</b> ถ้าจะลอง transaction controller แบบ e-commerce ให้เปิด
-  <a href="/demo.html">/demo.html</a>
-  เพื่อเริ่มจากหน้า overview แล้วค่อยไปต่อที่
-  <a href="/demo-endpoints.html">Demo Endpoints</a>,
-  <a href="/demo-jmeter.html">JMeter Guide</a>,
-  และ <a href="/demo-test-types.html">Test Types</a>
-  <br>
-  <b>Assignment</b> ถ้าต้องการฝึกแบบมีโจทย์และเฉลย ให้เปิด
-  <a href="/assignment.html">/assignment.html</a>
+  <b>ยังใหม่อยู่?</b> เริ่มจากหน้านี้แล้วทำทีละขั้นตามลำดับ ไม่ต้องรีบ ทำทีละอย่างจะเข้าใจได้เร็วกว่า
 </div>
 
-<h2>📚 Step-by-Step Learning Guide</h2>
+<h2>🗺️ Learning Path (เริ่มจากนี้)</h2>
 
-<p><b>Performance Testing Lab</b> 🎯 คือ API ที่ช่วยให้คุณได้เรียนรู้ load testing และ monitoring บนเครื่อง local ด้วยความปลอดภัย</p>
-
-<p>ขั้นตอนการเรียนรู้อยู่ด้านล่าง เรียงจากง่ายไปยาก <b>ไม่ต้องกังวล ทำทีละขั้น</b> 👇</p>
-
-<h3>✅ Step 1: เข้าใจว่า API นี้ทำอะไร (5 นาที)</h3>
-<p>แต่ละ endpoint มีจุดประสงค์เฉพาะสำหรับทดสอบเรื่องต่าง ๆ เช่น:</p>
-<ul>
-  <li><b>/fast</b> → baseline สำหรับวัด latency ต่ำสุด</li>
-  <li><b>/slow</b> → จำลอง delay คงที่</li>
-  <li><b>/cpu, /memory</b> → ทดสอบ bottleneck ของระบบ</li>
-  <li><b>/auth/login, /auth/verify</b> → ทดสอบ JWT authentication</li>
-  <li><b>/demo/*</b> → จำลอง e-commerce transaction</li>
-</ul>
-<p>🔍 ดูรายละเอียดทั้งหมดใน <b>"Endpoint Purpose And SLA"</b> ด้านล่าง</p>
-
-<h3>✅ Step 2: ลองเรียก API ผ่าน Browser (5-10 นาที)</h3>
-<p>คลิกลิงค์ที่มีสีบลูเพื่อเรียก endpoint ทีละตัวและดู response:</p>
-
-<h3>✅ Step 3: อ่าน "Endpoint Purpose And SLA"</h3>
-<p>หลังจากลองเรียก endpoint แล้ว ให้อ่านตารางด้านล่างเพื่อรู้ว่า endpoint นี้ใช้ทดสอบอะไร</p>
-
-<h3>✅ Step 4: อ่าน "How to Trigger Scenarios"</h3>
-<p>หลังจากเข้าใจแต่ละ endpoint แล้ว ให้อ่านส่วนนี้เพื่อเลือก endpoint ที่เหมาะสมตามจุดประสงค์ของคุณ</p>
-
-<h3>✅ Step 5: ติดตั้ง JMeter และทำ Load Test</h3>
-<p>ติดตั้ง <a href="https://jmeter.apache.org/download_jmeter.cgi" target="_blank">Apache JMeter</a> แล้วอ่าน <b>"Thread Group Recommendation By Scenario"</b> เพื่อตั้งค่า JMeter ตามจำนวน users และ scenario ที่คุณต้องการ</p>
-
-<h3>🗂️ Sections ของหน้านี้ (อ่านตามลำดับ)</h3>
-<ol>
-  <li><b>Try These Simple Endpoints</b> → คลิกลิงค์เพื่อลองเรียก endpoint</li>
-  <li><b>Endpoint Purpose And SLA</b> → ตารางอธิบายแต่ละ endpoint ใช้ทดสอบอะไร</li>
-  <li><b>Expected Results</b> → ตารางแสดงผลลัพธ์ที่คาดหมายตามจำนวน users</li>
-  <li><b>How to Trigger Scenarios</b> → บอกว่าต้องการทดสอบอะไร จะเรียก endpoint ไหน</li>
-  <li><b>Response Meaning</b> → อธิบายความหมายของ response แต่ละตัว</li>
-  <li><b>JMeter Thread Group Mapping</b> → อธิบาย 3 ประเภท Thread Group ของ JMeter</li>
-  <li><b>Thread Group Recommendation By Scenario</b> → ตารางแนะนำค่า JMeter สำหรับแต่ละ scenario</li>
-  <li><b>JMeter Cheat Sheet</b> → quick reference สำหรับการตั้งค่า Thread Group</li>
-</ol>
-
-<h2>🔗 Try These Simple Endpoints (Step 2)</h2>
-<p><i>ลองคลิกแต่ละลิงค์เพื่อทดสอบให้เห็นว่า endpoint ตอบกลับมาอย่างไร</i></p>
-<ul>
-  <li><a href="/fast">/fast</a></li>
-  <li><a href="/slow">/slow</a></li>
-  <li><a href="/busy">/busy</a></li>
-  <li><a href="/cpu">/cpu</a></li>
-  <li><a href="/memory">/memory</a></li>
-  <li><a href="/prep">/prep</a></li>
-  <li><code>GET /protected</code></li>
-  <li><a href="/io?mode=read">/io?mode=read</a></li>
-  <li><a href="/io?mode=write">/io?mode=write</a></li>
-  <li><code>POST /cleanup</code></li>
-  <li><code>POST /submit-one</code></li>
-  <li><code>POST /submit-two</code></li>
-  <li><a href="/error">/error</a></li>
-  <li><a href="/status">/status</a></li>
-  <li><a href="/metrics">/metrics</a></li>
-  <li><code>POST /auth/login</code></li>
-  <li><code>POST /auth/verify</code></li>
-</ul>
-
-<div class="note">
-  <b>Gold standard</b> ในหน้านี้หมายถึง baseline เป้าหมายสำหรับระบบ API ภายใน lab นี้
-  ไม่ใช่ SLA กลางที่ใช้ได้กับทุก production system. ควรปรับตาม business criticality,
-  traffic profile และ infrastructure จริงของคุณ
+<div class="step">
+  <h3>Step 1 — เข้าใจ API นี้ทำอะไร (5 นาที)</h3>
+  <p>อ่านตาราง <a href="#endpoint-table">Endpoint Purpose</a> ด้านล่างเพื่อรู้ว่าแต่ละ endpoint ออกแบบมาทดสอบอะไร เช่น <code>/fast</code> ใช้วัด baseline latency, <code>/busy</code> ใช้ชน concurrency limit, <code>/demo/*</code> ใช้จำลอง e-commerce</p>
 </div>
 
-<h2>📘 Endpoint Purpose And SLA (Step 3)</h2>
-<table class="endpoint-table">
+<div class="step">
+  <h3>Step 2 — ลองเรียก endpoint ผ่าน browser (5–10 นาที)</h3>
+  <p>คลิกลิงค์ใน <a href="#try-endpoints">Try These Endpoints</a> ด้านล่างเพื่อดู response จริงจากแต่ละ endpoint ก่อนเริ่มทำ JMeter</p>
+</div>
+
+<div class="step">
+  <h3>Step 3 — เรียน demo transaction flow</h3>
+  <p>เปิด <a href="/demo.html">Demo Learning Path</a> แล้วลองเรียก e-commerce flow ตั้งแต่ context → search → add to cart → checkout → order status</p>
+</div>
+
+<div class="step">
+  <h3>Step 4 — สร้าง JMeter test plan</h3>
+  <p>เปิด <a href="/demo-jmeter.html">JMeter Guide</a> แล้วทำตามลำดับ: ตั้ง HTTP Request Defaults → สร้าง Thread Group → เพิ่ม Transaction Controller → ใส่ JSON Extractor</p>
+</div>
+
+<div class="step">
+  <h3>Step 5 — เลือก test type และ thread group</h3>
+  <p>เปิด <a href="/demo-test-types.html">Test Types</a> เพื่อเลือกว่าจะทดสอบแบบ load, stress, spike, หรือ endurance และควรใช้ thread group แบบไหน</p>
+</div>
+
+<div class="step">
+  <h3>Step 6 — ฝึกด้วยโจทย์จริง</h3>
+  <p>เปิด <a href="/assignment.html">Assignment</a> แล้วทำโจทย์ตั้งแต่ task พื้นฐานไปถึง performance testing จริง</p>
+</div>
+
+<h2>🔗 Quick Navigation</h2>
+<div class="card-grid">
+  <div class="card">
+    <h3>Demo Learning Path</h3>
+    <p>overview ของ flow และ e-commerce transaction</p>
+    <a href="/demo.html">Open →</a>
+  </div>
+  <div class="card">
+    <h3>Endpoints</h3>
+    <p>request format, body, variable structure</p>
+    <a href="/demo-endpoints.html">Open →</a>
+  </div>
+  <div class="card">
+    <h3>JMeter Guide</h3>
+    <p>structure, controller, extractor, headers</p>
+    <a href="/demo-jmeter.html">Open →</a>
+  </div>
+  <div class="card">
+    <h3>Test Types</h3>
+    <p>thread group config, test matrix, cheat sheet</p>
+    <a href="/demo-test-types.html">Open →</a>
+  </div>
+  <div class="card">
+    <h3>Assignment</h3>
+    <p>โจทย์พร้อมเฉลย ตั้งแต่ beginner ถึง advanced</p>
+    <a href="/assignment.html">Open →</a>
+  </div>
+  <div class="card">
+    <h3>Glossary</h3>
+    <p>คำศัพท์ performance testing พร้อมตัวอย่าง</p>
+    <a href="/glossary.html">Open →</a>
+  </div>
+</div>
+
+<h2 id="try-endpoints">🔗 Try These Endpoints (Step 2)</h2>
+<p>คลิกลิงค์เพื่อเรียก endpoint และดู response จริง — GET endpoints คลิกได้ทันที, POST ต้องใช้ Postman หรือ curl</p>
+<ul>
+  <li><a href="/fast">/fast</a> — baseline, ตอบทันที</li>
+  <li><a href="/slow">/slow</a> — หน่วง 200ms</li>
+  <li><a href="/busy">/busy</a> — หน่วง 3000ms, ใช้ชน concurrency limit</li>
+  <li><a href="/cpu">/cpu</a> — CPU workload</li>
+  <li><a href="/memory">/memory</a> — memory allocation</li>
+  <li><a href="/io?mode=read">/io?mode=read</a> — อ่านไฟล์จาก disk</li>
+  <li><a href="/io?mode=write">/io?mode=write</a> — เขียนไฟล์ไป disk</li>
+  <li><a href="/prep">/prep</a> — สร้าง token seed สำหรับ /protected</li>
+  <li><code>GET /protected</code> — ต้องส่ง token, ลองผ่าน Postman</li>
+  <li><a href="/error">/error</a> — จำลอง 500 error</li>
+  <li><a href="/status">/status</a> — runtime info</li>
+  <li><a href="/metrics">/metrics</a> — Prometheus metrics</li>
+  <li><code>POST /auth/login</code> — รับ JWT token (ใช้ Postman)</li>
+  <li><code>POST /auth/verify</code> — ตรวจสอบ JWT token</li>
+  <li><code>POST /submit-one</code> — ทดสอบ body validation (1 field)</li>
+  <li><code>POST /submit-two</code> — ทดสอบ body validation (2 fields)</li>
+  <li><code>POST /cleanup</code> — ล้างไฟล์ชั่วคราวจาก /io</li>
+</ul>
+
+<p><b>Demo endpoints:</b> <a href="/demo/context">/demo/context</a> · <a href="/demo/dashboard">/demo/dashboard</a> · <a href="/demo/search?q=mouse">/demo/search?q=mouse</a> · <a href="/demo/product/details?productId=sku-101">/demo/product/details?productId=sku-101</a></p>
+
+<div class="warn">
+  <b>Gold standard</b> ในหน้านี้หมายถึง baseline เป้าหมายสำหรับ API ใน lab นี้ ไม่ใช่ SLA กลางสำหรับทุก production system ปรับตาม business criticality และ infrastructure จริง
+</div>
+
+<h2 id="endpoint-table">📘 Endpoint Purpose And SLA (Step 3)</h2>
+<table>
 <tr>
   <th>Endpoint</th>
   <th>ใช้ทดสอบอะไร</th>
-  <th>Gold Standard / SLA ที่แนะนำ</th>
+  <th>Gold Standard / SLA แนะนำ</th>
 </tr>
 <tr>
   <td><code>/fast</code></td>
-  <td>ใช้เป็น baseline endpoint สำหรับวัด latency ต่ำสุดของระบบเมื่อแทบไม่มีงานหนักฝั่ง server</td>
-  <td>เหมาะใช้เป็น reference SLA: p95 &lt; 100 ms, error rate &lt; 1%, success rate &gt;= 99%</td>
+  <td>baseline endpoint — วัด latency ต่ำสุดของระบบเมื่อแทบไม่มีงานฝั่ง server</td>
+  <td>p95 &lt; 100 ms, error rate &lt; 1%</td>
 </tr>
 <tr>
   <td><code>/slow</code></td>
-  <td>ใช้จำลอง downstream latency หรือ service ที่ตอบช้าคงที่ เพื่อดูว่า client, timeout และ queueing behavior รับมือได้แค่ไหน</td>
-  <td>SLA ควรยอมรับ delay ตาม design ได้สม่ำเสมอ เช่น p95 &lt; 300 ms, error rate &lt; 1%; ถ้าเกินจาก 200 ms ที่ตั้งใจไว้มาก แปลว่ามี overhead เพิ่มจากระบบ</td>
+  <td>จำลอง downstream latency คงที่ — ดู timeout, queueing behavior, latency budget</td>
+  <td>p95 &lt; 300 ms (รวม delay ที่ตั้ง), error &lt; 1%</td>
 </tr>
 <tr>
   <td><code>/busy</code></td>
-  <td>ใช้ทำให้ request ค้างนานโดยตั้งใจ เพื่อให้จำนวน in-flight requests สูงพอที่จะชน concurrency limit และได้ <code>503 Server too busy</code></td>
-  <td>ไม่ได้มี SLA แบบ user-facing ปกติ แต่ใช้ยืนยันว่า backpressure ทำงานจริงเมื่อโหลดเกินขีดจำกัด</td>
+  <td>บังคับ in-flight requests สูงจนชน concurrency limit เพื่อดู 503 backpressure</td>
+  <td>ไม่มี user-facing SLA — ใช้ยืนยันว่า backpressure ทำงานจริง</td>
 </tr>
 <tr>
   <td><code>/cpu</code></td>
-  <td>ใช้ทดสอบ CPU saturation, event-loop blocking และผลกระทบเมื่อมี request ใช้ compute สูง</td>
-  <td>ไม่ควรใช้เป็น gold endpoint ฝั่ง user-facing โดยตรง แต่ใช้ดู capacity ceiling; SLA ที่ควรดูคือ p95 ไม่พุ่งจนกระทบ endpoint อื่น และ 5xx ไม่ควรเกิน 1-2%</td>
+  <td>CPU saturation และ event-loop blocking</td>
+  <td>p95 ไม่พุ่งจนกระทบ endpoint อื่น, 5xx &lt; 2%</td>
 </tr>
 <tr>
   <td><code>/memory</code></td>
-  <td>ใช้จำลอง allocation หนัก เพื่อดู memory pressure, GC pause และโอกาสเกิด OOM เมื่อมี concurrent requests</td>
-  <td>เกณฑ์สำคัญคือ process ต้องไม่โตต่อเนื่อง, ไม่ crash, และ error rate ควรต่ำกว่า 1%; ถ้า response time แกว่งมากแปลว่า GC เริ่มมีผลต่อ SLA</td>
+  <td>memory pressure, GC pause, โอกาสเกิด OOM</td>
+  <td>process ไม่โตต่อเนื่อง, error rate &lt; 1%</td>
 </tr>
 <tr>
   <td><code>/prep</code></td>
-  <td>ใช้เป็น endpoint เรียบง่ายสำหรับสร้างค่า seed เช่น <code>requestId</code>, <code>token</code>, <code>authorizationHeader</code>, <code>timestamp</code> เพื่อเอาไปใช้ต่อใน JMeter pre-processor หรือ JSON extractor</td>
-  <td>ควรตอบเร็วและสม่ำเสมอ; เหมาะสำหรับ setup step ก่อนยิง request หลัก ไม่ได้มีภาระหนัก</td>
+  <td>สร้าง seed สำหรับ JMeter pre-processor — <code>requestId</code>, <code>token</code>, <code>authorizationHeader</code></td>
+  <td>ตอบเร็ว สม่ำเสมอ ไม่มีภาระหนัก</td>
 </tr>
 <tr>
   <td><code>/protected</code></td>
-  <td>ใช้ทดสอบ endpoint ที่ต้องมี token โดยรับทั้ง header แบบ <code>Authorization: Bearer ...</code> และ <code>x-access-token</code></td>
-  <td>เหมาะสำหรับทดสอบ auth flow, header injection และ negative cases เช่น 401/403; default token คือ <code>lab-token</code></td>
+  <td>ทดสอบ auth header flow — รับ <code>Authorization: Bearer ...</code> และ <code>x-access-token</code></td>
+  <td>200 token ถูก, 401 ไม่มี token, 403 token ผิด</td>
 </tr>
 <tr>
   <td><code>/io?mode=read|write</code></td>
-  <td>ใช้จำลอง I/O bottleneck จริงด้วยการอ่านหรือเขียนไฟล์ลง disk ในโฟลเดอร์ <code>tmp</code></td>
-  <td>ใช้ดู read/write latency, throughput และผลกระทบของ storage; เหมาะสำหรับเทส disk-bound workload มากกว่า user-facing SLA ปกติ</td>
+  <td>I/O bottleneck จากการอ่าน/เขียนไฟล์จริงใน <code>tmp/</code></td>
+  <td>ดู durationMs ที่ response — ใช้ดู disk throughput</td>
 </tr>
 <tr>
   <td><code>POST /cleanup</code></td>
-  <td>ใช้ล้างข้อมูลชั่วคราวที่เกิดจากการทดสอบ เช่นไฟล์จาก <code>/io</code> เพื่อให้รอบถัดไปเริ่มจาก state ที่สะอาด</td>
-  <td>เหมาะสำหรับ teardown flow มากกว่า SLA ปกติ; ควรตอบ 200 แม้ไม่มีไฟล์ให้ลบ และคืนรายการสิ่งที่ล้างสำเร็จ</td>
+  <td>ล้างไฟล์ชั่วคราวหลัง /io — ใช้ใน tearDown Thread Group</td>
+  <td>ตอบ 200 เสมอ แม้ไม่มีไฟล์ให้ลบ</td>
 </tr>
 <tr>
   <td><code>POST /submit-one</code></td>
-  <td>ใช้ทดสอบ validation ของ request body กรณีที่ API ต้องรับ parameter บังคับ 1 ตัวคือ <code>name</code></td>
-  <td>ควรตอบ 200 เมื่อส่งค่าครบ และตอบ 400 เมื่อไม่ส่ง <code>name</code>; เหมาะสำหรับทดสอบ client-side request building</td>
+  <td>validation ของ request body — required 1 field: <code>name</code></td>
+  <td>200 ส่งครบ, 400 ส่งไม่ครบ</td>
 </tr>
 <tr>
   <td><code>POST /submit-two</code></td>
-  <td>ใช้ทดสอบ validation ของ request body กรณีที่ API ต้องรับ parameter บังคับ 2 ตัวคือ <code>name</code> และ <code>type</code></td>
-  <td>ควรตอบ 200 เมื่อส่งค่าครบ และตอบ 400 เมื่อขาด field ใด field หนึ่ง; เหมาะสำหรับ JMeter/Postman form testing</td>
+  <td>validation ของ request body — required 2 fields: <code>name</code> และ <code>type</code></td>
+  <td>200 ส่งครบ, 400 ขาด field</td>
 </tr>
 <tr>
   <td><code>/error</code></td>
-  <td>ใช้จำลอง server error แบบตั้งใจเพื่อให้เกิด HTTP 500</td>
-  <td>ใช้วัด error rate, retry behavior และ alerting; ไม่ใช่ gold endpoint สำหรับ SLA ปกติ</td>
+  <td>จำลอง HTTP 500 แบบตั้งใจ — ใช้ทดสอบ error handling, retry, alerting</td>
+  <td>ไม่ใช่ gold endpoint — ควรได้ 500 ทุก request</td>
 </tr>
 <tr>
   <td><code>/status</code></td>
-  <td>ใช้เช็กอย่างรวดเร็วว่า instance นี้ยังรันอยู่หรือไม่ พร้อมดู <code>pid</code>, <code>startedAt</code>, <code>uptime</code> และ <code>activeRequests</code></td>
-  <td>ควรตอบ 200 เสมอเมื่อ process ยังทำงาน; เหมาะสำหรับเช็กแบบ manual เวลาไม่แน่ใจว่า <code>index.js</code> ยังเปิดอยู่หรือไม่</td>
+  <td>runtime health check — <code>pid</code>, <code>startedAt</code>, <code>uptimeSec</code>, <code>activeRequests</code></td>
+  <td>ตอบ 200 ตลอดเมื่อ process ยังทำงาน</td>
 </tr>
 <tr>
   <td><code>/metrics</code></td>
-  <td>ใช้ให้ Prometheus หรือ monitoring agent มา scrape metric สำหรับดู throughput, latency และสถานะระบบ</td>
-  <td>ไม่จำเป็นต้องเร็วเท่า user endpoint แต่ต้องเสถียร; scrape ควรสำเร็จเกือบทั้งหมด และไม่ควรทำให้ request ปกติช้าลง</td>
+  <td>Prometheus scrape endpoint — throughput, latency, request counts</td>
+  <td>เสถียร ไม่ทำให้ request อื่นช้า</td>
 </tr>
 <tr>
   <td><code>POST /auth/login</code></td>
-  <td>ใช้สำหรับ JWT authentication - ส่ง username/password เพื่อรับ JWT token ที่ใช้ได้ 24 ชั่วโมง</td>
-  <td>ควรตอบ 200 เมื่อ credentials ถูก (username=demo, password=password) พร้อม token, ตอบ 401 เมื่อ credentials ผิด, error rate &lt; 1%</td>
+  <td>JWT authentication — ส่ง <code>username</code>/<code>password</code> รับ JWT token อายุ 24 ชั่วโมง</td>
+  <td>200 credentials ถูก, 401 ผิด, error &lt; 1%</td>
 </tr>
 <tr>
   <td><code>POST /auth/verify</code></td>
-  <td>ใช้สำหรับตรวจสอบความถูกต้องของ JWT token - ส่ง token ในHeader <code>Authorization: Bearer &lt;token&gt;</code> เพื่ออ่านข้อมูลผู้ใช้ที่อยู่ใน token</td>
-  <td>ควรตอบ 200 ถ้า token ถูกต้องและยังไม่หมดอายุ, ตอบ 401 ถ้า token หมดอายุ, ตอบ 403 ถ้า token ไม่ถูกต้อง, error rate &lt; 1%</td>
+  <td>ตรวจสอบ JWT token — ส่ง <code>Authorization: Bearer &lt;token&gt;</code></td>
+  <td>200 token valid, 401 หมดอายุ, 403 invalid</td>
 </tr>
 </table>
 
-<h2>🧪 JMeter Setup (Step 5a - Quick Start Config)</h2>
-<p>ใช้ <b>Apache JMeter</b> แล้วตั้งค่าตามนี้:</p>
-
-<pre>
-Threads: 100
-Ramp-up: 60 sec
-Duration: 300 sec
-URL: http://localhost:3001/fast
-</pre>
-
-<h2>📊 Expected Results</h2>
-
+<h2>📊 Expected Results At Load</h2>
 <table>
-<tr>
-  <th>Users</th>
-  <th>Response (ms)</th>
-  <th>p95</th>
-  <th>Error</th>
-  <th>Status</th>
-</tr>
-<tr>
-  <td>10</td>
-  <td>20</td>
-  <td>30</td>
-  <td>0%</td>
-  <td>✅ Normal</td>
-</tr>
-<tr>
-  <td>100</td>
-  <td>60</td>
-  <td>120</td>
-  <td>0%</td>
-  <td>⚠️ Load</td>
-</tr>
-<tr>
-  <td>300</td>
-  <td>400</td>
-  <td>900</td>
-  <td>10%</td>
-  <td>❌ Bottleneck</td>
-</tr>
-<tr>
-  <td>500</td>
-  <td>1200</td>
-  <td>3000</td>
-  <td>30%</td>
-  <td>💥 Crash</td>
-</tr>
+<tr><th>Users</th><th>Avg Response (ms)</th><th>p95 (ms)</th><th>Error Rate</th><th>Status</th></tr>
+<tr><td>10</td><td>20</td><td>30</td><td>0%</td><td>✅ Normal</td></tr>
+<tr><td>100</td><td>60</td><td>120</td><td>0%</td><td>⚠️ Load</td></tr>
+<tr><td>300</td><td>400</td><td>900</td><td>10%</td><td>❌ Bottleneck</td></tr>
+<tr><td>500</td><td>1200</td><td>3000</td><td>30%</td><td>💥 Crash zone</td></tr>
 </table>
 
-<h2>🔥 How to Trigger Scenarios (Step 4)</h2>
-
-<ul>
-  <li><code>/fast</code> → ใช้ตั้ง baseline SLA ของระบบ</li>
-  <li><code>/slow</code> → ใช้ทดสอบ timeout, retry และ latency budget</li>
-  <li><code>/busy</code> → ใช้บังคับให้ชน concurrency limit และเห็น 503 ชัดเจน</li>
-  <li><code>/cpu</code> → ใช้หา CPU bottleneck และดูผลต่อ concurrent traffic</li>
-  <li><code>/memory</code> → ใช้จับ memory pressure และอาการก่อน crash</li>
-  <li><code>/prep</code> → ใช้สร้างค่า requestId/token/authorizationHeader แบบง่ายเพื่อส่งต่อให้ request ถัดไป</li>
-  <li><code>/protected</code> → ใช้ทดสอบ request ที่ต้องแนบ token และดู 401/403/200 ตามกรณี</li>
-  <li><code>/io</code> → ใช้จับ I/O bottleneck จากการอ่านหรือเขียนไฟล์จริง</li>
-  <li><code>POST /cleanup</code> → ใช้ล้างข้อมูลชั่วคราวหลังจบรอบเทส</li>
-  <li><code>POST /submit-one</code> → ใช้ทดสอบ body validation แบบ required 1 field</li>
-  <li><code>POST /submit-two</code> → ใช้ทดสอบ body validation แบบ required 2 fields</li>
-  <li><code>/error</code> → ใช้ทดสอบ 5xx, alerting และ retry behavior</li>
-  <li><code>/status</code> → ใช้เช็กตรง ๆ ว่า process ยังรันอยู่ พร้อมดู uptime และ pid</li>
-  <li><code>/metrics</code> → ใช้ scrape metrics เพื่อเทียบผลกับ SLA และ capacity trend</li>
-  <li><code>POST /auth/login</code> → ใช้ login เพื่อรับ JWT token</li>
-  <li><code>POST /auth/verify</code> → ใช้ตรวจสอบว่า JWT token ยังใช้ได้</li>
-</ul>
-
-<h2>📏 SLA Interpretation</h2>
-<ul>
-  <li><b>Latency SLA</b>: ดู p95 หรือ p99 มากกว่าค่าเฉลี่ย เพราะสะท้อนประสบการณ์ของผู้ใช้จริงตอนระบบเริ่มแน่น</li>
-  <li><b>Error SLA</b>: ถ้า 5xx หรือ timeout เกิน 1% ใน endpoint หลัก ถือว่าระบบเริ่มไม่ผ่านเกณฑ์สำหรับงานทั่วไป</li>
-  <li><b>Availability SLA</b>: สำหรับ endpoint สำคัญเช่น <code>/status</code> ควรตั้งเป้า 99.9% ขึ้นไป</li>
-  <li><b>Isolation</b>: ถ้าโหลด <code>/cpu</code> หรือ <code>/memory</code> แล้วทำให้ <code>/fast</code> หลุด SLA แปลว่า workload ยังแยก resource ไม่ดีพอ</li>
-</ul>
-
-<h2>🧭 Test Guideline</h2>
-<table class="endpoint-table">
-<tr>
-  <th>เป้าหมาย</th>
-  <th>Endpoint</th>
-  <th>ค่าที่แนะนำ</th>
-  <th>คาดว่าจะเจอ</th>
-</tr>
+<h2>🔥 How To Trigger Each Scenario</h2>
+<table>
+<tr><th>เป้าหมาย</th><th>Endpoint</th><th>ค่าที่แนะนำ</th><th>คาดว่าจะเจอ</th></tr>
 <tr>
   <td>วัด baseline latency</td>
   <td><code>/fast</code></td>
-  <td>10-50 users, ramp-up 1-5 sec</td>
-  <td>ส่วนใหญ่ได้ 200, latency ต่ำ, error rate ใกล้ 0</td>
+  <td>10–50 users, ramp-up 1–5 sec</td>
+  <td>200 เกือบทั้งหมด, latency ต่ำ</td>
 </tr>
 <tr>
-  <td>ดูผลของ latency คงที่</td>
+  <td>ดูผล latency คงที่</td>
   <td><code>/slow</code></td>
-  <td>50-100 users, <code>SLOW_DELAY_MS=200-1000</code></td>
-  <td>ได้ 200 แต่ response time สูงขึ้นตาม delay ที่ตั้ง</td>
+  <td>50–100 users, <code>SLOW_DELAY_MS=200–1000</code></td>
+  <td>200 แต่ response time สูงตาม delay</td>
 </tr>
 <tr>
   <td>ชน concurrency limit</td>
   <td><code>/busy</code></td>
-  <td>100-300 users, ramp-up 0-1 sec, <code>MAX_CONCURRENT=20-50</code>, <code>BUSY_DELAY_MS=3000</code></td>
-  <td>บาง request ได้ 200, บาง request ได้ 503 <code>Server too busy</code></td>
+  <td>100–300 users, <code>MAX_CONCURRENT=20–50</code>, <code>BUSY_DELAY_MS=3000</code></td>
+  <td>บาง request ได้ 200, บางได้ 503</td>
 </tr>
 <tr>
   <td>ดู CPU bottleneck</td>
   <td><code>/cpu</code></td>
-  <td>20-100 users, <code>CPU_ITERATIONS=10000000-100000000</code></td>
-  <td>ยังได้ 200 แต่ latency สูง และ endpoint อื่นอาจช้าตาม</td>
+  <td>20–100 users, <code>CPU_ITERATIONS=10M–100M</code></td>
+  <td>200 แต่ latency สูง, endpoint อื่นช้าตาม</td>
 </tr>
 <tr>
   <td>ดู memory pressure</td>
   <td><code>/memory</code></td>
-  <td>20-100 users, <code>MEMORY_ARRAY_SIZE=1000000-5000000</code></td>
-  <td>response time แกว่ง, memory usage สูง, ถ้าหนักมากอาจ crash</td>
+  <td>20–100 users, <code>MEMORY_ARRAY_SIZE=1M–5M</code></td>
+  <td>response time แกว่ง, memory usage สูง</td>
 </tr>
 <tr>
-  <td>สร้าง pre-processor seed</td>
-  <td><code>/prep</code></td>
-  <td>1-20 users, no special config</td>
-  <td>ได้ <code>requestId</code>, <code>token</code>, <code>authorizationHeader</code> เพื่อนำไปใช้เรียก <code>/protected</code> ต่อได้ทันที</td>
-</tr>
-<tr>
-  <td>ทดสอบ token auth</td>
+  <td>ทดสอบ auth header</td>
   <td><code>/protected</code></td>
-  <td>1-50 users, ตั้ง header <code>Authorization: Bearer lab-token</code> หรือกำหนด <code>AUTH_BEARER_TOKEN</code></td>
-  <td>ส่ง token ถูกได้ 200, ไม่ส่งได้ 401, ส่งผิดได้ 403</td>
+  <td>1–50 users, header <code>Authorization: Bearer lab-token</code></td>
+  <td>token ถูก 200, ไม่มี 401, ผิด 403</td>
 </tr>
 <tr>
   <td>ดู I/O bottleneck</td>
-  <td><code>/io?mode=read</code> หรือ <code>/io?mode=write</code></td>
-  <td>20-100 users, <code>IO_FILE_SIZE_KB=1024-8192</code></td>
-  <td>duration สูงขึ้นตามขนาดไฟล์และชนิดของ I/O ที่ใช้</td>
+  <td><code>/io?mode=read|write</code></td>
+  <td>20–100 users, <code>IO_FILE_SIZE_KB=1024–8192</code></td>
+  <td>durationMs สูงตามขนาดไฟล์</td>
 </tr>
 <tr>
-  <td>ล้าง temp data หลังเทส</td>
+  <td>ทดสอบ body validation</td>
+  <td><code>POST /submit-one</code>, <code>/submit-two</code></td>
+  <td>ส่ง JSON body ถูก/ผิด</td>
+  <td>ส่งครบ 200, ขาด field 400</td>
+</tr>
+<tr>
+  <td>ทดสอบ 5xx path</td>
+  <td><code>/error</code></td>
+  <td>1–50 users</td>
+  <td>500 ทุก request</td>
+</tr>
+<tr>
+  <td>ล้าง temp data</td>
   <td><code>POST /cleanup</code></td>
-  <td>1 user, loop 1, ใช้ใน tearDown Thread Group</td>
-  <td>ได้ 200 และคืนรายการไฟล์ที่ถูกล้างใน <code>cleaned</code></td>
-</tr>
-<tr>
-  <td>ทดสอบ validation 1 field</td>
-  <td><code>POST /submit-one</code></td>
-  <td>ส่ง JSON <code>{ "name": "demo" }</code></td>
-  <td>ส่งครบได้ 200, ส่งไม่ครบได้ 400</td>
-</tr>
-<tr>
-  <td>ทดสอบ validation 2 fields</td>
-  <td><code>POST /submit-two</code></td>
-  <td>ส่ง JSON <code>{ "name": "demo", "type": "load-test" }</code></td>
-  <td>ส่งครบได้ 200, ขาด field ได้ 400</td>
-</tr>
-<tr>
-  <td>ทดสอบ 5xx</td>
-  <td><code>/error</code></td>
-  <td>1-50 users, ramp-up 0-2 sec</td>
-  <td>ได้ 500 ทุก request</td>
+  <td>1 user ใน tearDown Thread Group</td>
+  <td>200 พร้อม cleaned list</td>
 </tr>
 </table>
 
-<h2>💬 Response Meaning</h2>
+<h2>💬 Response Meanings</h2>
 <ul>
-  <li><code>/fast</code> → <code>{ "message": "fast response" }</code> หมายถึง endpoint baseline ตอบสำเร็จแบบไม่มี workload พิเศษ</li>
-  <li><code>/slow</code> → <code>slow response (Xms)</code> หมายถึง server หน่วงเวลาตาม <code>SLOW_DELAY_MS</code> ก่อนตอบ</li>
-  <li><code>/busy</code> → <code>busy response (Xms)</code> หมายถึง request ผ่านเข้าไปประมวลผลได้; ถ้าไม่ผ่านจะได้ <code>503 Server too busy</code></li>
-  <li><code>/cpu</code> → <code>result</code> คือผลรวมจาก loop, <code>iterations</code> คือจำนวนรอบที่ใช้สร้าง CPU load</li>
-  <li><code>/memory</code> → <code>size</code> คือจำนวน element ที่ server allocate สำเร็จใน request นั้น</li>
-  <li><code>/prep</code> → <code>token</code> และ <code>authorizationHeader</code> เป็น static credential สำหรับส่งต่อไป <code>/protected</code>, ส่วน <code>requestId</code> และ <code>timestamp</code> ใช้เป็น dynamic test data</li>
-  <li><code>/protected</code> → ถ้าไม่มี token จะได้ <code>missing_token</code>, ถ้า token ผิดจะได้ <code>invalid_token</code>, ถ้าถูกจะได้ <code>authenticated: true</code></li>
-  <li><code>/io</code> → <code>mode</code> บอกว่า read หรือ write, <code>fileSizeKb</code> คือขนาดไฟล์, <code>durationMs</code> คือเวลาที่ใช้กับ I/O operation</li>
-  <li><code>POST /cleanup</code> → <code>cleaned</code> คือรายการ resource ที่ลบได้จริง และ <code>cleanedCount</code> คือจำนวนที่ถูกล้าง</li>
-  <li><code>POST /submit-one</code> → <code>received one required parameter</code> แปลว่าส่ง <code>name</code> มาครบ; ถ้าไม่ครบจะได้ <code>missing_required_parameter</code></li>
-  <li><code>POST /submit-two</code> → <code>received two required parameters</code> แปลว่าส่ง <code>name</code> และ <code>type</code> ครบ; ถ้าขาดจะได้ <code>missing_required_parameters</code></li>
-  <li><code>/error</code> → <code>intentional server error</code> แปลว่า server ตั้งใจตอบ 500 เพื่อใช้ทดสอบ error path</li>
-  <li><code>/status</code> → ถ้าได้ <code>running: true</code> แปลว่า instance นี้ยังทำงานอยู่ และจะบอก <code>pid</code>, <code>startedAt</code>, <code>uptimeSec</code>, <code>activeRequests</code></li>
-  <li><code>/metrics</code> → เป็น Prometheus text format สำหรับ monitoring ไม่ใช่ JSON สำหรับผู้ใช้ทั่วไป</li>
-  <li><code>POST /auth/login</code> → <code>{ "token": "jwt-token" }</code> แปลว่า login สำเร็จ ได้ JWT token</li>
-  <li><code>POST /auth/verify</code> → ถ้าได้ <code>valid: true</code> แปลว่า token ยังใช้ได้ ถ้าได้ <code>token_expired</code> หรือ <code>invalid_token</code> แปลว่า token ติดปัญหา</li>
+  <li><code>/fast</code> → <code>{ "message": "fast response" }</code> — endpoint ไม่มี workload ตอบสำเร็จ</li>
+  <li><code>/slow</code> → <code>slow response (Xms)</code> — server หน่วงตาม <code>SLOW_DELAY_MS</code></li>
+  <li><code>/busy</code> → <code>busy response (Xms)</code> ถ้าผ่านได้; <code>503 Server too busy</code> (plain text) ถ้าชน limit</li>
+  <li><code>/cpu</code> → <code>result</code> คือผลรวม loop, <code>iterations</code> คือจำนวนรอบ</li>
+  <li><code>/memory</code> → <code>size</code> คือจำนวน element ที่ allocate สำเร็จ</li>
+  <li><code>/prep</code> → มี <code>token</code>, <code>authorizationHeader</code>, <code>requestId</code>, <code>timestamp</code></li>
+  <li><code>/protected</code> → <code>authenticated: true</code> ถ้า token ถูก; <code>missing_token</code> หรือ <code>invalid_token</code> ถ้าผิด</li>
+  <li><code>/io</code> → <code>mode</code>, <code>fileSizeKb</code>, <code>durationMs</code></li>
+  <li><code>POST /cleanup</code> → <code>cleaned</code> รายการที่ลบได้, <code>cleanedCount</code></li>
+  <li><code>POST /submit-one</code> → <code>received one required parameter</code> หรือ <code>missing_required_parameter</code></li>
+  <li><code>POST /submit-two</code> → <code>received two required parameters</code> หรือ <code>missing_required_parameters</code></li>
+  <li><code>/error</code> → <code>intentional server error</code> — ตั้งใจตอบ 500</li>
+  <li><code>/status</code> → <code>running: true</code>, <code>pid</code>, <code>startedAt</code>, <code>uptimeSec</code>, <code>activeRequests</code></li>
+  <li><code>/metrics</code> → Prometheus text format ไม่ใช่ JSON</li>
+  <li><code>POST /auth/login</code> → <code>token</code> (JWT string) เมื่อ credentials ถูก</li>
+  <li><code>POST /auth/verify</code> → <code>valid: true</code>, <code>decoded</code> เมื่อ token ถูก; <code>token_expired</code> หรือ <code>invalid_token</code></li>
 </ul>
 
-<h2>🧵 JMeter Thread Group Mapping (Step 5b - Choose Thread Group Type)</h2>
-
-<h3>Normal Thread Group</h3>
+<h2>📏 SLA Interpretation</h2>
 <ul>
-  <li>เหมาะกับ <code>Baseline</code>, <code>Baseline Health</code>, <code>Latency Test</code>, <code>Validation</code>, <code>Failure Path</code>, <code>Soak</code></li>
-  <li>ใช้กับ <code>/fast</code>, <code>/slow</code>, <code>/status</code>, <code>/error</code>, <code>POST /submit-one</code>, <code>POST /submit-two</code></li>
-  <li>เพิ่ม <code>/protected</code> เมื่ออยากเทส auth header แบบเบา ๆ</li>
-  <li>เหมาะเมื่ออยากได้ fixed load แบบตรงไปตรงมาเพื่อดู SLA, latency และ error rate</li>
-  <li>ค่าที่แนะนำ: Threads <code>20-50</code>, Ramp-Up <code>1-5 sec</code>, Loop Count <code>20-100</code>; ถ้าเป็น soak test ใช้ Duration <code>15-60 min</code></li>
+  <li><b>ดู p95 หรือ p99</b> มากกว่าค่าเฉลี่ย — percentile สะท้อนประสบการณ์ผู้ใช้จริงเมื่อระบบเริ่มแน่น</li>
+  <li><b>Error rate</b> — ถ้า 5xx หรือ timeout เกิน 1% ใน endpoint หลัก ถือว่าระบบเริ่มไม่ผ่านเกณฑ์</li>
+  <li><b>Availability</b> — สำหรับ <code>/status</code> ควรตั้งเป้า 99.9% ขึ้นไป</li>
+  <li><b>Isolation</b> — ถ้าโหลด <code>/cpu</code> แล้วทำให้ <code>/fast</code> หลุด SLA แปลว่า workload แยก resource ไม่ดีพอ</li>
 </ul>
 
-<h3>Concurrency Thread Group</h3>
-<ul>
-  <li>เหมาะกับ <code>Stress</code>, <code>CPU Stress</code>, <code>Memory Stress</code>, <code>IO Stress</code></li>
-  <li>ใช้กับ <code>/busy</code>, <code>/cpu</code>, <code>/memory</code>, <code>/io</code></li>
-  <li>เหมาะเมื่ออยากคุมจำนวน active users จริงเพื่อให้เห็น runtime limit, 503, blocking และ saturation</li>
-  <li>ค่าที่แนะนำ: Target Concurrency <code>50-300</code>, Ramp-Up Time <code>30-60 sec</code>, Ramp-Up Steps Count <code>5-10</code>, Hold Target Rate Time <code>30-180 sec</code></li>
-</ul>
-
-<h3>Stepping Thread Group</h3>
-<ul>
-  <li>เหมาะกับ <code>Spike</code>, <code>Rate Limit</code> และ stress test แบบไต่ระดับ</li>
-  <li>ใช้กับ <code>/busy</code> และ <code>/fast</code></li>
-  <li>เหมาะเมื่ออยากเห็นว่าที่ step ไหนระบบเริ่มได้ <code>429</code> หรือ <code>503</code></li>
-  <li>ค่าที่แนะนำ: Start Users Count <code>0</code>, Initial Delay <code>0 sec</code>, Start Users Count per Step <code>20-50</code>, Start Users Period <code>5-15 sec</code>, Stop Users Count <code>20-50</code>, Flight Time <code>30-120 sec</code></li>
-</ul>
-
-<h2>📌 Thread Group Recommendation By Scenario (Step 5c - Pick Your Scenario)</h2>
-<table class="endpoint-table">
-<tr>
-  <th>Scenario</th>
-  <th>Layer</th>
-  <th>Thread Group</th>
-  <th>ค่าที่แนะนำ</th>
-  <th>เหตุผล</th>
-</tr>
-<tr>
-  <td>Baseline</td>
-  <td>Application</td>
-  <td>Normal</td>
-  <td>Threads 20, Ramp-Up 2 sec, Loop 100</td>
-  <td>ใช้ fixed load เพื่อวัด SLA baseline</td>
-</tr>
-<tr>
-  <td>Latency Test</td>
-  <td>Application</td>
-  <td>Normal</td>
-  <td>Threads 50, Ramp-Up 2 sec, Loop 50</td>
-  <td>ดูผลของ delay คงที่ได้ตรงที่สุด</td>
-</tr>
-<tr>
-  <td>Validation</td>
-  <td>Application</td>
-  <td>Normal</td>
-  <td>Threads 20, Ramp-Up 1 sec, Loop 20</td>
-  <td>ใช้ดู 200/400 จาก request body</td>
-</tr>
-<tr>
-  <td>Token Auth</td>
-  <td>Application</td>
-  <td>Normal</td>
-  <td>Threads 20, Ramp-Up 1 sec, Loop 20</td>
-  <td>ใช้ดู 200/401/403 จาก auth header</td>
-</tr>
-<tr>
-  <td>Failure Path</td>
-  <td>Application</td>
-  <td>Normal</td>
-  <td>Threads 20, Ramp-Up 1 sec, Loop 20</td>
-  <td>ใช้วัด 500 rate แบบตรงไปตรงมา</td>
-</tr>
-<tr>
-  <td>Soak</td>
-  <td>Application</td>
-  <td>Normal</td>
-  <td>Threads 30-50, Ramp-Up 10 sec, Duration 15-60 min</td>
-  <td>เหมาะกับโหลดคงที่ระยะยาว</td>
-</tr>
-<tr>
-  <td>Stress</td>
-  <td>Runtime</td>
-  <td>Concurrency</td>
-  <td>Target 150, Ramp-Up 60 sec, Steps 10, Hold 60 sec</td>
-  <td>ต้องรักษา active users ให้สูงพอ</td>
-</tr>
-<tr>
-  <td>Spike</td>
-  <td>Runtime</td>
-  <td>Stepping</td>
-  <td>Step 50 users every 5 sec, Flight Time 30 sec</td>
-  <td>ใช้หา threshold ว่าระบบเริ่ม reject ตอน step ไหน</td>
-</tr>
-<tr>
-  <td>CPU Stress</td>
-  <td>Runtime</td>
-  <td>Concurrency</td>
-  <td>Target 50, Ramp-Up 30 sec, Steps 5, Hold 60 sec</td>
-  <td>ต้อง sustain load เพื่อให้เห็น blocking และ CPU saturation</td>
-</tr>
-<tr>
-  <td>Memory Stress</td>
-  <td>Runtime</td>
-  <td>Concurrency</td>
-  <td>Target 30, Ramp-Up 30 sec, Steps 5, Hold 60 sec</td>
-  <td>ต้อง sustain load เพื่อให้เห็น memory pressure</td>
-</tr>
-<tr>
-  <td>Rate Limit</td>
-  <td>Runtime</td>
-  <td>Stepping</td>
-  <td>Step 20-30 users every 5-10 sec, Flight Time 60 sec</td>
-  <td>ใช้ไล่ step เพื่อดูจุดที่เริ่มได้ 429</td>
-</tr>
-<tr>
-  <td>CPU Bottleneck</td>
-  <td>Infrastructure</td>
-  <td>Concurrency</td>
-  <td>Target 50, Ramp-Up 30 sec, Steps 5, Hold 60 sec</td>
-  <td>ต้องคุม concurrency คู่กับ CPU limit</td>
-</tr>
-<tr>
-  <td>Memory Bottleneck</td>
-  <td>Infrastructure</td>
-  <td>Concurrency</td>
-  <td>Target 30, Ramp-Up 30 sec, Steps 5, Hold 60 sec</td>
-  <td>ต้องคุม concurrency คู่กับ memory limit</td>
-</tr>
-<tr>
-  <td>IO Stress</td>
-  <td>Infrastructure</td>
-  <td>Concurrency</td>
-  <td>Target 30, Ramp-Up 30 sec, Steps 5, Hold 60 sec</td>
-  <td>ต้อง sustain concurrent read/write ให้เห็น I/O bottleneck</td>
-</tr>
-</table>
-
-<h2>🛠 JMeter Cheat Sheet (Step 5d - Detailed Reference)</h2>
-
-<h3>Normal Thread Group</h3>
-<table class="endpoint-table">
-<tr>
-  <th>Field</th>
-  <th>ค่าแนะนำ</th>
-  <th>ใช้เมื่อไร</th>
-</tr>
-<tr>
-  <td>Number of Threads (users)</td>
-  <td><code>20-50</code></td>
-  <td>baseline, latency, validation, health check</td>
-</tr>
-<tr>
-  <td>Ramp-Up Period (seconds)</td>
-  <td><code>1-5</code></td>
-  <td>ค่อย ๆ ปล่อยโหลดแบบไม่กระชากเกินไป</td>
-</tr>
-<tr>
-  <td>Loop Count</td>
-  <td><code>20-100</code></td>
-  <td>ใช้กับ test ระยะสั้นที่ต้องการจำนวน request คงที่</td>
-</tr>
-<tr>
-  <td>Duration</td>
-  <td><code>15-60 min</code> สำหรับ soak</td>
-  <td>ใช้เมื่ออยากรันนานแทนการกำหนด loop count</td>
-</tr>
-</table>
-
-<p><b>ตัวอย่าง:</b> ถ้าเทส <code>/fast</code> แบบ baseline ให้เริ่มจาก Threads <code>20</code>, Ramp-Up <code>2</code>, Loop Count <code>100</code></p>
-
-<h3>Concurrency Thread Group</h3>
-<table class="endpoint-table">
-<tr>
-  <th>Field</th>
-  <th>ค่าแนะนำ</th>
-  <th>ใช้เมื่อไร</th>
-</tr>
-<tr>
-  <td>Target Concurrency</td>
-  <td><code>50-300</code></td>
-  <td>stress, cpu, memory, io, runtime limit</td>
-</tr>
-<tr>
-  <td>Ramp-Up Time (sec)</td>
-  <td><code>30-60</code></td>
-  <td>ค่อย ๆ ไต่ไปยัง target concurrency</td>
-</tr>
-<tr>
-  <td>Ramp-Up Steps Count</td>
-  <td><code>5-10</code></td>
-  <td>ช่วยดูการเปลี่ยนแปลงเป็นช่วงระหว่าง ramp-up</td>
-</tr>
-<tr>
-  <td>Hold Target Rate Time (sec)</td>
-  <td><code>30-180</code></td>
-  <td>ใช้คง concurrency ไว้เพื่อดู saturation ชัด ๆ</td>
-</tr>
-<tr>
-  <td>Iterations Limit</td>
-  <td><code>blank</code> หรือสูงมาก</td>
-  <td>ไม่ให้ test จบเร็วเกินก่อนถึง target จริง</td>
-</tr>
-</table>
-
-<p><b>ตัวอย่าง:</b> ถ้าเทส <code>/busy</code> หา <code>503</code> ให้เริ่มจาก Target <code>150</code>, Ramp-Up <code>60</code>, Steps <code>10</code>, Hold <code>60</code></p>
-
-<h3>Stepping Thread Group</h3>
-<table class="endpoint-table">
-<tr>
-  <th>Field</th>
-  <th>ค่าแนะนำ</th>
-  <th>ใช้เมื่อไร</th>
-</tr>
-<tr>
-  <td>Start Users Count</td>
-  <td><code>0</code></td>
-  <td>เริ่มจากไม่มีโหลดก่อนแล้วค่อยไต่</td>
-</tr>
-<tr>
-  <td>Initial Delay, sec</td>
-  <td><code>0</code></td>
-  <td>เริ่ม test ทันทีเมื่อกด run</td>
-</tr>
-<tr>
-  <td>Start Users Count per Step</td>
-  <td><code>20-50</code></td>
-  <td>เพิ่มโหลดทีละก้อนเพื่อดู threshold</td>
-</tr>
-<tr>
-  <td>Start Users Period, sec</td>
-  <td><code>5-15</code></td>
-  <td>เว้นช่วงระหว่างแต่ละ step</td>
-</tr>
-<tr>
-  <td>Stop Users Count</td>
-  <td><code>20-50</code></td>
-  <td>ใช้ตอนลดโหลดกลับลง</td>
-</tr>
-<tr>
-  <td>Flight Time, sec</td>
-  <td><code>30-120</code></td>
-  <td>คงโหลดแต่ละช่วงไว้เพื่อดูว่า step ไหนเริ่มมี 429/503</td>
-</tr>
-</table>
-
-<p><b>ตัวอย่าง:</b> ถ้าเทส rate limit บน <code>/fast</code> ให้เริ่มจาก Step <code>20</code> users ทุก <code>5</code> sec และ Flight Time <code>60</code> sec</p>
-
-<h3>Sampler Setup</h3>
-<table class="endpoint-table">
-<tr>
-  <th>กรณี</th>
-  <th>Method</th>
-  <th>Path</th>
-  <th>Body / Params</th>
-</tr>
-<tr>
-  <td>Baseline</td>
-  <td><code>GET</code></td>
-  <td><code>/fast</code></td>
-  <td>ไม่ต้องส่ง body</td>
-</tr>
-<tr>
-  <td>Latency</td>
-  <td><code>GET</code></td>
-  <td><code>/slow</code></td>
-  <td>ไม่ต้องส่ง body</td>
-</tr>
-<tr>
-  <td>Concurrency</td>
-  <td><code>GET</code></td>
-  <td><code>/busy</code></td>
-  <td>ไม่ต้องส่ง body</td>
-</tr>
-<tr>
-  <td>CPU</td>
-  <td><code>GET</code></td>
-  <td><code>/cpu</code></td>
-  <td>ไม่ต้องส่ง body</td>
-</tr>
-<tr>
-  <td>Memory</td>
-  <td><code>GET</code></td>
-  <td><code>/memory</code></td>
-  <td>ไม่ต้องส่ง body</td>
-</tr>
-<tr>
-  <td>PreProcessor Seed</td>
-  <td><code>GET</code></td>
-  <td><code>/prep?prefix=test</code></td>
-  <td>ไม่ต้องส่ง body, extract <code>authorizationHeader</code> หรือ <code>token</code></td>
-</tr>
-<tr>
-  <td>Protected API</td>
-  <td><code>GET</code></td>
-  <td><code>/protected</code></td>
-  <td>Header: <code>Authorization: ${authorizationHeader}</code> หรือ <code>Authorization: Bearer ${token}</code></td>
-</tr>
-<tr>
-  <td>I/O Write</td>
-  <td><code>GET</code></td>
-  <td><code>/io?mode=write</code></td>
-  <td>ไม่ต้องส่ง body</td>
-</tr>
-<tr>
-  <td>I/O Read</td>
-  <td><code>GET</code></td>
-  <td><code>/io?mode=read</code></td>
-  <td>ไม่ต้องส่ง body</td>
-</tr>
-<tr>
-  <td>TearDown Cleanup</td>
-  <td><code>POST</code></td>
-  <td><code>/cleanup</code></td>
-  <td>ไม่ต้องส่ง body</td>
-</tr>
-<tr>
-  <td>Validation 1 Field</td>
-  <td><code>POST</code></td>
-  <td><code>/submit-one</code></td>
-  <td>JSON: <code>{ "name": "demo" }</code></td>
-</tr>
-<tr>
-  <td>Validation 2 Fields</td>
-  <td><code>POST</code></td>
-  <td><code>/submit-two</code></td>
-  <td>JSON: <code>{ "name": "demo", "type": "load-test" }</code></td>
-</tr>
-<tr>
-  <td>Failure Path</td>
-  <td><code>GET</code></td>
-  <td><code>/error</code></td>
-  <td>ไม่ต้องส่ง body</td>
-</tr>
-</table>
-
-<p><b>สำหรับ POST ใน JMeter:</b> ตั้ง <code>Content-Type: application/json</code> และใส่ body ในส่วน Body Data</p>
-<p><b>สำหรับ token test:</b> เรียก <code>/prep</code> ก่อน แล้วใช้ JSON Extractor เก็บ <code>authorizationHeader</code> หรือ <code>token</code> จากนั้นเพิ่ม HTTP Header Manager เป็น <code>Authorization = ${authorizationHeader}</code> หรือ <code>x-access-token = ${token}</code></p>
-<p><b>สำหรับ tearDown Thread Group:</b> เพิ่ม <code>tearDown Thread Group</code> แล้วใส่ sampler <code>POST /cleanup</code> เพื่อเก็บกวาดไฟล์ชั่วคราวหลัง main test จบ</p>
-
-<h2>🧱 Metrics Layers</h2>
-<table class="endpoint-table">
-<tr>
-  <th>Layer</th>
-  <th>เป้าหมาย</th>
-  <th>Endpoint ที่เกี่ยวข้อง</th>
-</tr>
-<tr>
-  <td>Application Metrics</td>
-  <td>validate SLA/SLO และวัดจากมุม end-user</td>
-  <td><code>/fast</code>, <code>/slow</code>, <code>/status</code>, <code>/error</code>, <code>POST /submit-one</code>, <code>POST /submit-two</code></td>
-</tr>
-<tr>
-  <td>Runtime Metrics</td>
-  <td>หา concurrency limit, runtime ceiling และ processing bottleneck</td>
-  <td><code>/busy</code>, <code>/cpu</code>, <code>/memory</code>, <code>/metrics</code></td>
-</tr>
-<tr>
-  <td>Infrastructure Metrics</td>
-  <td>หา CPU, memory และ disk I/O bottleneck ของ host/container</td>
-  <td><code>/cpu</code>, <code>/memory</code>, <code>/io?mode=read</code>, <code>/io?mode=write</code></td>
-</tr>
-<tr>
-  <td>Database Metrics</td>
-  <td>หา slow query, locking และ connection constraints</td>
-  <td>ยังไม่มี endpoint จริงในโปรเจกต์นี้</td>
-</tr>
-</table>
-
-<h2>🧪 Test Matrix By Layer</h2>
-<h3>Application Metrics Layer</h3>
-<table class="endpoint-table">
-<tr>
-  <th>Scenario</th>
-  <th>Endpoint</th>
-  <th>Docker Command</th>
-  <th>JMeter ที่แนะนำ</th>
-  <th>ผลที่คาดว่าจะเจอ</th>
-</tr>
-<tr>
-  <td>Baseline</td>
-  <td><code>/fast</code></td>
-  <td><code>docker run --rm -p 3001:3001 local-api:latest</code></td>
-  <td>20 users, ramp-up 2 sec, loop 100</td>
-  <td>200 เกือบทั้งหมด, latency ต่ำ, error ใกล้ 0</td>
-</tr>
-<tr>
-  <td>Latency Test</td>
-  <td><code>/slow</code></td>
-  <td><code>docker run --rm -p 3001:3001 -e SLOW_DELAY_MS=500 local-api:latest</code></td>
-  <td>50 users, ramp-up 2 sec, loop 50</td>
-  <td>200 เกือบทั้งหมด แต่ response time สูงตาม delay</td>
-</tr>
-<tr>
-  <td>Validation</td>
-  <td><code>POST /submit-one</code></td>
-  <td><code>docker run --rm -p 3001:3001 local-api:latest</code></td>
-  <td>20 users, ramp-up 1 sec, loop 20</td>
-  <td>ส่งครบได้ 200, ไม่ครบได้ 400</td>
-</tr>
-<tr>
-  <td>Validation 2 Fields</td>
-  <td><code>POST /submit-two</code></td>
-  <td><code>docker run --rm -p 3001:3001 local-api:latest</code></td>
-  <td>20 users, ramp-up 1 sec, loop 20</td>
-  <td>ส่งครบได้ 200, ขาด field ได้ 400</td>
-</tr>
-<tr>
-  <td>Failure Path</td>
-  <td><code>/error</code></td>
-  <td><code>docker run --rm -p 3001:3001 local-api:latest</code></td>
-  <td>20 users, ramp-up 1 sec, loop 20</td>
-  <td>ได้ 500 ทุก request</td>
-</tr>
-<tr>
-  <td>Soak</td>
-  <td><code>/slow</code> หรือ <code>/fast</code></td>
-  <td><code>docker run --rm -p 3001:3001 -e SLOW_DELAY_MS=200 local-api:latest</code></td>
-  <td>30-50 users, ramp-up 10 sec, 15-60 min</td>
-  <td>ใช้ดู p95 drift, throughput drift และเสถียรภาพระยะยาว</td>
-</tr>
-</table>
-
-<h3>Runtime Metrics Layer</h3>
-<table class="endpoint-table">
-<tr>
-  <th>Scenario</th>
-  <th>Endpoint</th>
-  <th>Docker Command</th>
-  <th>JMeter ที่แนะนำ</th>
-  <th>ผลที่คาดว่าจะเจอ</th>
-</tr>
-<tr>
-  <td>Stress</td>
-  <td><code>/busy</code></td>
-  <td><code>docker run --rm -p 3001:3001 -e MAX_CONCURRENT=50 -e BUSY_DELAY_MS=3000 local-api:latest</code></td>
-  <td>150 users, ramp-up 1 sec, loop 20</td>
-  <td>เริ่มเห็น 503 และ throughput ไม่โตตาม users</td>
-</tr>
-<tr>
-  <td>Spike</td>
-  <td><code>/busy</code></td>
-  <td><code>docker run --rm -p 3001:3001 -e MAX_CONCURRENT=20 -e BUSY_DELAY_MS=3000 local-api:latest</code></td>
-  <td>300 users, ramp-up 0-1 sec, loop 5</td>
-  <td>503 เพิ่มเร็ว, active requests ชน limit ทันที</td>
-</tr>
-<tr>
-  <td>CPU Stress</td>
-  <td><code>/cpu</code></td>
-  <td><code>docker run --rm -p 3001:3001 -e CPU_ITERATIONS=50000000 local-api:latest</code></td>
-  <td>50 users, ramp-up 1 sec, loop 20</td>
-  <td>ยังได้ 200 แต่ latency สูงและ endpoint อื่นอาจช้าตาม</td>
-</tr>
-<tr>
-  <td>Memory Stress</td>
-  <td><code>/memory</code></td>
-  <td><code>docker run --rm -p 3001:3001 -e MEMORY_ARRAY_SIZE=3000000 local-api:latest</code></td>
-  <td>30 users, ramp-up 1 sec, loop 20</td>
-  <td>memory usage สูง, latency แกว่ง, ถ้าหนักมากอาจ crash</td>
-</tr>
-<tr>
-  <td>IO Stress</td>
-  <td><code>/io?mode=write</code></td>
-  <td><code>docker run --rm -p 3001:3001 -e IO_FILE_SIZE_KB=4096 local-api:latest</code></td>
-  <td>30 users, ramp-up 1 sec, loop 20</td>
-  <td>write latency สูง, throughput ลด, storage ช้าจะเห็นชัด</td>
-</tr>
-<tr>
-  <td>Rate Limit</td>
-  <td><code>/fast</code></td>
-  <td><code>docker run --rm -p 3001:3001 -e RATE_LIMIT_ENABLED=true -e RATE_LIMIT_MAX=100 -e RATE_LIMIT_WINDOW_MS=60000 local-api:latest</code></td>
-  <td>200 users, ramp-up 1 sec, loop 10</td>
-  <td>เริ่มเห็น 429 หลังเกิน quota</td>
-</tr>
-</table>
-
-<h3>Infrastructure Metrics Layer</h3>
-<table class="endpoint-table">
-<tr>
-  <th>Scenario</th>
-  <th>Endpoint</th>
-  <th>Docker Command</th>
-  <th>JMeter ที่แนะนำ</th>
-  <th>ผลที่คาดว่าจะเจอ</th>
-</tr>
-<tr>
-  <td>CPU Bottleneck</td>
-  <td><code>/cpu</code></td>
-  <td><code>docker run --rm -p 3001:3001 --cpus="0.5" -e CPU_ITERATIONS=50000000 local-api:latest</code></td>
-  <td>50 users, ramp-up 1 sec, loop 20</td>
-  <td>CPU ตัน, latency สูง, endpoint อื่นช้าตาม</td>
-</tr>
-<tr>
-  <td>Memory Bottleneck</td>
-  <td><code>/memory</code></td>
-  <td><code>docker run --rm -p 3001:3001 --memory="256m" -e MEMORY_ARRAY_SIZE=3000000 local-api:latest</code></td>
-  <td>30 users, ramp-up 1 sec, loop 20</td>
-  <td>GC ถี่, latency แกว่ง, อาจ OOM</td>
-</tr>
-<tr>
-  <td>IO Stress</td>
-  <td><code>/io?mode=write</code></td>
-  <td><code>docker run --rm -p 3001:3001 --memory="256m" -e IO_FILE_SIZE_KB=4096 local-api:latest</code></td>
-  <td>30 users, ramp-up 1 sec, loop 20</td>
-  <td>write latency สูง, throughput ลด, storage ช้าจะเห็นชัด</td>
-</tr>
-<tr>
-  <td>IO Read Profile</td>
-  <td><code>/io?mode=read</code></td>
-  <td><code>docker run --rm -p 3001:3001 --memory="256m" -e IO_FILE_SIZE_KB=4096 local-api:latest</code></td>
-  <td>30 users, ramp-up 1 sec, loop 20</td>
-  <td>read latency มักดีกว่า write แต่ยังเห็นผลจาก disk/cache</td>
-</tr>
-</table>
-
-<h3>Copy Ready Commands</h3>
-<pre>docker run --rm -p 3001:3001 local-api:latest</pre>
-<pre>docker run --rm -p 3001:3001 -e SLOW_DELAY_MS=500 local-api:latest</pre>
-<pre>docker run --rm -p 3001:3001 -e MAX_CONCURRENT=50 -e BUSY_DELAY_MS=3000 local-api:latest</pre>
-<pre>docker run --rm -p 3001:3001 -e MAX_CONCURRENT=20 -e BUSY_DELAY_MS=3000 local-api:latest</pre>
-<pre>docker run --rm -p 3001:3001 -e CPU_ITERATIONS=50000000 local-api:latest</pre>
-<pre>docker run --rm -p 3001:3001 --cpus="0.5" -e CPU_ITERATIONS=50000000 local-api:latest</pre>
-<pre>docker run --rm -p 3001:3001 -e MEMORY_ARRAY_SIZE=3000000 local-api:latest</pre>
-<pre>docker run --rm -p 3001:3001 --memory="256m" -e MEMORY_ARRAY_SIZE=3000000 local-api:latest</pre>
-<pre>docker run --rm -p 3001:3001 -e IO_FILE_SIZE_KB=4096 local-api:latest</pre>
-<pre>docker run --rm -p 3001:3001 --memory="256m" -e IO_FILE_SIZE_KB=4096 local-api:latest</pre>
-<pre>docker run --rm -p 3001:3001 -e RATE_LIMIT_ENABLED=true -e RATE_LIMIT_MAX=100 -e RATE_LIMIT_WINDOW_MS=60000 local-api:latest</pre>
-
-<h3>Database Metrics Layer</h3>
-<table class="endpoint-table">
-<tr>
-  <th>Scenario</th>
-  <th>Endpoint</th>
-  <th>สถานะ</th>
-</tr>
-<tr>
-  <td>DB Read Test</td>
-  <td>ยังไม่มี</td>
-  <td>ต้องเพิ่ม endpoint query database จริงก่อน</td>
-</tr>
-<tr>
-  <td>DB Write Test</td>
-  <td>ยังไม่มี</td>
-  <td>ต้องเพิ่ม endpoint write/transaction ก่อน</td>
-</tr>
-</table>
-
-<h2>▶ Suggested Order</h2>
-<ul>
-  <li>เริ่มจาก <code>Application Metrics Layer</code> เพื่อเก็บ SLA/SLO baseline</li>
-  <li>ตามด้วย <code>Runtime Metrics Layer</code> เพื่อดู concurrency และ runtime ceiling</li>
-  <li>ไล่ต่อที่ <code>Infrastructure Metrics Layer</code> เพื่อบังคับให้เห็น CPU, memory และ I/O bottleneck</li>
-  <li>ถ้าจะวิเคราะห์ <code>Database Metrics Layer</code> ต้องเพิ่ม database endpoints ก่อน</li>
-</ul>
+<div class="note">
+  <b>ขั้นถัดไป:</b> เมื่อเข้าใจ endpoint แล้ว ให้เปิด <a href="/demo.html">Demo Learning Path</a> เพื่อเรียน e-commerce flow และสร้าง JMeter test plan
+</div>
 
 <script>
   const statusEl = document.getElementById("runtime-status");
   const metaEl = document.getElementById("runtime-meta");
-
   async function refreshRuntimeStatus() {
     try {
-      const response = await fetch("/status", { cache: "no-store" });
-
-      if (!response.ok) {
-        throw new Error("Status endpoint returned non-200");
-      }
-
-      const data = await response.json();
+      const res = await fetch("/status", { cache: "no-store" });
+      if (!res.ok) throw new Error("non-200");
+      const d = await res.json();
       statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
-      metaEl.textContent =
-        `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
-    } catch (error) {
-      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
-      metaEl.textContent = "If this page opened directly from file, status check will not work. Open it via Node/Express instead.";
+      metaEl.textContent = `PID: ${d.pid} | Uptime: ${d.uptimeSec}s | Active: ${d.activeRequests}`;
+    } catch {
+      statusEl.innerHTML = '<span class="status-bad-light">Server not reachable</span>';
+      metaEl.textContent = "Open via Node/Express to enable status check.";
     }
   }
-
   refreshRuntimeStatus();
   setInterval(refreshRuntimeStatus, 5000);
 </script>
-
 </body>
 </html>

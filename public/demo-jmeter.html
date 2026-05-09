@@ -33,6 +33,9 @@
     <a href="/demo-endpoints.html">Demo Endpoints</a>
     <a href="/demo-jmeter.html">JMeter Guide</a>
     <a href="/demo-test-types.html">Test Types</a>
+    <a href="/tools.html">Tools</a>
+    <a href="/assignment.html">Assignment</a>
+    <a href="/glossary.html">Glossary</a>
     <a href="/status">/status</a>
   </div>
   <div class="topbar-status">
@@ -195,25 +198,6 @@ demoLanguage=en
 Expected result
 - demo endpoints return "language": "en"
 - message fields are returned in English</pre>
-
-<h2>Override Strategy</h2>
-<table>
-<tr><th>Variable</th><th>Initial Value</th><th>Later Override</th></tr>
-<tr><td><code>demoSearchTerm</code></td><td><code>mouse</code></td><td><code>/demo/context -> $.searchTerm</code></td></tr>
-<tr><td><code>demoProductId</code></td><td><code>sku-101</code></td><td><code>/demo/context -> $.recommendedProductId</code></td></tr>
-<tr><td><code>demoCartId</code></td><td><code>demo-cart</code></td><td><code>/demo/context -> $.cartId</code></td></tr>
-<tr><td><code>demoShopperId</code></td><td><code>demo-user-01</code></td><td><code>/demo/context -> $.shopperId</code></td></tr>
-<tr><td><code>demoOrderId</code></td><td><code>NOT_SET</code></td><td><code>/demo/checkout -> $.orderId</code></td></tr>
-</table>
-
-<h2>Copy Ready Variables Block</h2>
-<pre>demoSearchTerm=mouse
-demoProductId=sku-101
-demoCartId=demo-cart
-demoShopperId=demo-user-01
-demoQuantity=1
-demoAuthToken=lab-token
-demoOrderId=NOT_SET</pre>
 
 <h2>Throughput + Transaction Example</h2>
 <pre>Thread Group

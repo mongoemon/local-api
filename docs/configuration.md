@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | `PORT` | `3001` | port ของ server |
 | `AUTH_BEARER_TOKEN` | `lab-token` | token ที่ใช้กับ `/protected` |
+| `JWT_SECRET` | `local-api-jwt-secret` | secret key สำหรับ sign/verify JWT ใน `/auth/login` และ `/auth/verify` |
 | `RATE_LIMIT_ENABLED` | `false` | เปิด/ปิด rate limit |
 | `RATE_LIMIT_WINDOW_MS` | `60000` | ช่วงเวลา rate limit |
 | `RATE_LIMIT_MAX` | `10000` | จำนวน request สูงสุดต่อ window |
@@ -25,6 +26,7 @@
 ```powershell
 $env:PORT=4000
 $env:AUTH_BEARER_TOKEN="demo-secret"
+$env:JWT_SECRET="my-secure-jwt-secret"
 $env:MAX_CONCURRENT=20
 $env:BUSY_DELAY_MS=3000
 $env:CPU_ITERATIONS=50000000

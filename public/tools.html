@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Performance Testing Tools</title>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2, h3 { color: #1f2937; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .warn { background: #fefce8; border-left: 4px solid #ca8a04; padding: 12px; margin: 20px 0; }
+    .tool-card {
+      border: 1px solid #d1d5db;
+      padding: 20px;
+      margin: 16px 0;
+      background: #ffffff;
+    }
+    .tool-card h3 { margin-top: 0; margin-bottom: 6px; }
+    .tool-card .meta { font-size: 13px; color: #6b7280; margin-bottom: 12px; }
+    .tool-card .meta span { margin-right: 16px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 6px;
+    }
+    .badge-free { background: #dcfce7; color: #166534; }
+    .badge-paid { background: #fee2e2; color: #991b1b; }
+    .badge-freemium { background: #fef3c7; color: #92400e; }
+    .badge-oss { background: #dbeafe; color: #1e40af; }
+    .stack-box {
+      border: 1px solid #d1d5db;
+      padding: 16px;
+      margin: 12px 0;
+      background: #f9fafb;
+    }
+    .stack-box h3 { margin-top: 0; }
+    .category-header {
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 10px 16px;
+      margin: 32px 0 0 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
+      justify-content: space-between; gap: 16px; padding: 14px 24px; background: #1f2937;
+      color: #f9fafb; border-bottom: 1px solid #111827; z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
+    .topbar a:last-child { margin-right: 0; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/">Main</a>
+    <a href="/demo.html">Demo Home</a>
+    <a href="/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/demo-jmeter.html">JMeter Guide</a>
+    <a href="/demo-test-types.html">Test Types</a>
+    <a href="/tools.html">Tools</a>
+    <a href="/assignment.html">Assignment</a>
+    <a href="/glossary.html">Glossary</a>
+    <a href="/status">/status</a>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>Performance Testing Tools In Real Industry</h1>
+
+<div class="note">
+  หน้านี้รวบรวมเครื่องมือที่ใช้จริงในวงการ performance testing จัดกลุ่มตามบทบาท
+  พร้อมอธิบายว่าแต่ละตัวใช้ทำอะไร และทำไมองค์กรถึงเลือกใช้
+</div>
+
+<h2>Tool Categories</h2>
+<ol>
+  <li><a href="#load-generation">Load Generation</a> — เครื่องมือสร้าง traffic เพื่อทดสอบ</li>
+  <li><a href="#monitoring">Monitoring &amp; Metrics</a> — เก็บและดู metric ระหว่างและหลังทดสอบ</li>
+  <li><a href="#visualization">Visualization &amp; Dashboards</a> — แสดงผล metric เป็นกราฟ</li>
+  <li><a href="#apm">APM — Application Performance Monitoring</a> — ติดตาม performance ระดับ code</li>
+  <li><a href="#cloud-load">Cloud Load Testing</a> — รัน test แบบกระจายหลายภูมิภาค</li>
+  <li><a href="#api-testing">API Testing &amp; Exploration</a> — ทดสอบ API แบบ manual และ automated</li>
+  <li><a href="#stacks">Common Tool Stacks</a> — ชุดเครื่องมือที่ใช้ร่วมกันในองค์กรจริง</li>
+  <li><a href="#comparison">Comparison Table</a> — เปรียบเทียบโดยตรง</li>
+  <li><a href="#how-to-choose">How To Choose</a> — เลือกอะไรให้กับโปรเจกต์ตัวเอง</li>
+</ol>
+
+<!-- =========================================================== -->
+<div class="category-header" id="load-generation">1. Load Generation Tools</div>
+<p style="margin-top:16px">เครื่องมือกลุ่มนี้ทำหน้าที่สร้าง traffic จำลองผู้ใช้จริง เพื่อวัด response time, throughput และ error rate</p>
+
+<div class="tool-card">
+  <h3>Apache JMeter</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free</span>
+    <span>ภาษา: Java GUI + XML config (.jmx)</span>
+    <span>Platform: Desktop (Windows / Mac / Linux)</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> สร้าง test plan ผ่าน GUI, ยิง HTTP request, จำลอง concurrent users, สร้าง report</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>มีมานานกว่า 25 ปี มี community ขนาดใหญ่และมี plugin ครอบคลุม</li>
+    <li>GUI ใช้งานได้โดยไม่ต้องเขียน code — เหมาะกับ QA ที่ไม่ถนัดการเขียนโปรแกรม</li>
+    <li>รองรับ protocol หลากหลาย: HTTP, HTTPS, FTP, JDBC, JMS, SOAP, LDAP</li>
+    <li>มี plugin เช่น Concurrency Thread Group, Stepping Thread Group, Backend Listener ที่ติดตั้งเพิ่มได้</li>
+    <li>รัน Non-GUI mode ใน CI/CD ได้ด้วย <code>jmeter -n -t plan.jmx -l results.jtl</code></li>
+    <li>ใช้งานร่วมกับ BlazeMeter Cloud เพื่อรัน distributed test ได้</li>
+  </ul>
+  <p><strong>จุดอ่อน:</strong> ใช้ RAM มาก, GUI ล้าสมัย, test script เป็น XML อ่านยากเมื่อ diff ใน Git</p>
+  <p><strong>ใช้เมื่อ:</strong> ต้องการเครื่องมือฟรี, ทีมไม่ถนัด code, ต้องการ plugin ecosystem ที่กว้าง</p>
+</div>
+
+<div class="tool-card">
+  <h3>k6 (by Grafana Labs)</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free (k6 Cloud เสียค่าใช้จ่าย)</span>
+    <span>ภาษา: JavaScript (ES6+)</span>
+    <span>Platform: CLI, Docker, CI/CD</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> เขียน test script เป็น JS, รันจาก terminal, export metric ไป Prometheus/InfluxDB/Grafana</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>Script เป็น JS จริง — เขียนได้ flexible, เก็บใน Git ได้ดี, review ง่าย</li>
+    <li>ใช้ resource น้อยกว่า JMeter มาก (เขียนใน Go) — รัน virtual user ได้มากกว่าต่อ CPU</li>
+    <li>built-in metrics ออกแบบมาสำหรับ Prometheus/Grafana stack โดยตรง</li>
+    <li>รัน CI/CD ได้ทันทีโดยไม่ต้องติดตั้ง GUI หรือ Java</li>
+    <li>รองรับ Scenarios API — กำหนดหลาย load profile ในไฟล์เดียว</li>
+    <li>ต่อกับ k6 Cloud สำหรับ distributed test และ dashboard online ได้</li>
+  </ul>
+  <p><strong>จุดอ่อน:</strong> ไม่มี GUI, ต้องเขียน JS, ไม่รองรับ protocol นอก HTTP ได้กว้างเท่า JMeter</p>
+  <p><strong>ใช้เมื่อ:</strong> ทีม dev/DevOps ที่ถนัด code, ต้องการ CI/CD integration, ใช้ Grafana stack อยู่แล้ว</p>
+  <pre>// ตัวอย่าง k6 script เบื้องต้น
+import http from "k6/http";
+import { check, sleep } from "k6";
+
+export const options = {
+  vus: 20,
+  duration: "30s",
+};
+
+export default function () {
+  const res = http.get("http://localhost:3001/fast");
+  check(res, { "status is 200": (r) => r.status === 200 });
+  sleep(1);
+}</pre>
+</div>
+
+<div class="tool-card">
+  <h3>Gatling</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Open Source + Enterprise</span></span>
+    <span>ภาษา: Scala DSL (หรือ Java/Kotlin ใน Gatling 3.7+)</span>
+    <span>Platform: CLI, Maven/Gradle plugin, CI/CD</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> เขียน test เป็น code (Scala/Java/Kotlin), สร้าง HTML report ที่สวยงามในตัว, simulate realistic user sessions</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>ใช้ Akka actor model ภายใน — handle concurrent users ได้มากโดยใช้ thread น้อย</li>
+    <li>built-in HTML report แสดง percentile, response time distribution, error timeline โดยไม่ต้องตั้ง Grafana</li>
+    <li>เหมาะกับ Java/Scala shop ที่ developer เขียน test เองได้</li>
+    <li>รัน Maven/Gradle plugin ได้ตรง — CI/CD pipeline ใน Java project ทำง่ายมาก</li>
+    <li>test script ดูแลง่ายใน Git เพราะเป็น code ไม่ใช่ XML</li>
+  </ul>
+  <p><strong>จุดอ่อน:</strong> Scala DSL มี learning curve สูง, community เล็กกว่า JMeter และ k6</p>
+  <p><strong>ใช้เมื่อ:</strong> Java/Scala ecosystem, ต้องการ built-in HTML report, developer-written performance test</p>
+</div>
+
+<div class="tool-card">
+  <h3>Locust</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free</span>
+    <span>ภาษา: Python</span>
+    <span>Platform: CLI, Web UI, Docker, Kubernetes</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> เขียน test เป็น Python, มี Web UI แบบ real-time, รัน distributed บน Kubernetes ได้</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>Python อ่านง่าย, ทีม data/backend Python เขียน test ได้เลยโดยไม่ต้องเรียนเครื่องมือใหม่</li>
+    <li>Web UI ดู real-time graph ระหว่างรัน test — ปรับจำนวน user ระหว่างรันได้</li>
+    <li>scale ออกหลาย worker บน Kubernetes ได้ง่ายด้วย distributed mode</li>
+    <li>flexible มาก — เขียน custom logic, authentication flow, stateful session ได้เต็มที่</li>
+  </ul>
+  <p><strong>จุดอ่อน:</strong> Python GIL อาจจำกัด throughput ต่อ process — ต้อง distributed เพื่อ load สูง</p>
+  <p><strong>ใช้เมื่อ:</strong> ทีม Python, ต้องการ real-time control, distributed load บน Kubernetes</p>
+</div>
+
+<div class="tool-card">
+  <h3>Artillery</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Open Source + Pro</span></span>
+    <span>ภาษา: YAML config + JavaScript hooks</span>
+    <span>Platform: CLI, CI/CD, AWS Lambda</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> กำหนด load scenario ด้วย YAML, เขียน custom logic ด้วย JS, รัน serverless load test บน AWS Lambda</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>YAML config อ่านง่าย — เหมาะกับ DevOps ที่ไม่ถนัดเขียน JS เต็ม ๆ</li>
+    <li>รัน distributed บน AWS Lambda โดยไม่ต้องตั้ง infrastructure เอง (Artillery Pro)</li>
+    <li>built-in support สำหรับ HTTP, WebSocket, Socket.io, gRPC</li>
+    <li>ใช้ node ecosystem ได้ทั้งหมดใน custom hooks</li>
+  </ul>
+  <p><strong>จุดอ่อน:</strong> feature ขั้นสูงส่วนใหญ่อยู่ใน Pro tier, community เล็กกว่า JMeter/k6</p>
+  <p><strong>ใช้เมื่อ:</strong> cloud-native team, AWS ecosystem, ต้องการ serverless distributed load</p>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="monitoring">2. Monitoring &amp; Metrics Collection</div>
+<p style="margin-top:16px">เครื่องมือกลุ่มนี้เก็บ metric จาก application และ infrastructure ระหว่างและหลังการทดสอบ</p>
+
+<div class="tool-card">
+  <h3>Prometheus</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free</span>
+    <span>ภาษา: Go (server), PromQL (query)</span>
+    <span>Platform: Docker, Kubernetes, bare metal</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> เก็บ time-series metric โดย scrape จาก endpoint <code>/metrics</code> ของแต่ละ service ทุก N วินาที</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>เป็น de facto standard ของ metrics collection ใน cloud-native/Kubernetes ecosystem</li>
+    <li>pull-based model — Prometheus ไป scrape service เอง ทำให้ service ไม่ต้องรู้จัก Prometheus</li>
+    <li>PromQL query language ทรงพลัง — คำนวณ rate, percentile, aggregation ได้ทันที</li>
+    <li>มี client library ทุกภาษา — Node.js (<code>prom-client</code>), Go, Java, Python</li>
+    <li>Local API นี้ก็ใช้ <code>prom-client</code> — ดูได้ที่ <code>GET /metrics</code></li>
+  </ul>
+  <p><strong>ใช้คู่กับ:</strong> Grafana (visualization), Alertmanager (alerting), k6 (export metric)</p>
+  <pre># ตัวอย่าง PromQL — p95 ของ HTTP request duration
+histogram_quantile(0.95,
+  sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route)
+)</pre>
+</div>
+
+<div class="tool-card">
+  <h3>InfluxDB</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Open Source + Cloud</span></span>
+    <span>ภาษา: Flux / InfluxQL (query)</span>
+    <span>Platform: Docker, Cloud</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> time-series database ที่ออกแบบมาเก็บ metric เฉพาะ — เขียน/อ่านเร็วกว่า general-purpose DB มาก</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>JMeter Backend Listener ส่ง metric ไป InfluxDB ได้ทันทีระหว่างรัน test</li>
+    <li>k6 มี <code>--out influxdb</code> flag สำหรับ export real-time metric</li>
+    <li>เหมาะกับ JMeter + InfluxDB + Grafana stack (stack นิยมมากในองค์กรไทย)</li>
+  </ul>
+  <p><strong>ใช้คู่กับ:</strong> JMeter (Backend Listener), k6 (<code>--out influxdb</code>), Grafana</p>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="visualization">3. Visualization &amp; Dashboards</div>
+<p style="margin-top:16px">เครื่องมือกลุ่มนี้แสดง metric เป็นกราฟ dashboard ใช้ดูระหว่างรัน test และวิเคราะห์ผลหลังรัน</p>
+
+<div class="tool-card">
+  <h3>Grafana</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Open Source + Cloud</span></span>
+    <span>Platform: Docker, Kubernetes, Grafana Cloud</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> สร้าง dashboard ดึงข้อมูลจาก Prometheus, InfluxDB, Elasticsearch, Loki และ datasource อื่น ๆ อีกหลายสิบตัว</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>visualization ทรงพลัง — graph, heatmap, table, stat panel, alert ในที่เดียว</li>
+    <li>มี pre-built dashboard สำหรับ JMeter และ k6 ให้ import ได้ฟรีจาก Grafana.com</li>
+    <li>ดู real-time metric ระหว่างรัน load test — เห็น latency spike ได้ทันที</li>
+    <li>เป็น standard ของ DevOps / SRE team ทั่วโลก ทำให้ทีม ops และ perf test ใช้ tool เดียวกัน</li>
+    <li>ตั้ง alert ส่ง Slack/PagerDuty ได้เมื่อ metric เกิน threshold</li>
+  </ul>
+  <p><strong>ใช้คู่กับ:</strong> Prometheus, InfluxDB, Loki (logs), Tempo (traces)</p>
+  <p><strong>Stack ที่พบบ่อย:</strong></p>
+  <ul>
+    <li>JMeter → InfluxDB → Grafana</li>
+    <li>k6 → Prometheus → Grafana</li>
+    <li>Locust → Prometheus → Grafana</li>
+  </ul>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="apm">4. APM — Application Performance Monitoring</div>
+<p style="margin-top:16px">APM ไปลึกกว่า metric — ติดตาม request ระดับ code, trace ข้าม service, หา bottleneck ที่แท้จริงใน production</p>
+
+<div class="tool-card">
+  <h3>Datadog</h3>
+  <div class="meta">
+    <span><span class="badge badge-paid">Commercial</span> Paid</span>
+    <span>Platform: SaaS (cloud)</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> เก็บ metric, log, trace และ RUM (Real User Monitoring) ในที่เดียว พร้อม AI-powered anomaly detection</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>all-in-one — ไม่ต้องตั้ง Prometheus + Grafana + Loki แยก</li>
+    <li>APM Traces ดู call stack ของแต่ละ request ได้ — เห็นว่า bottleneck อยู่ที่ database query ตัวไหน</li>
+    <li>ต่อกับ JMeter / k6 เพื่อเปรียบ load test metric กับ infra metric ในหน้าเดียว</li>
+    <li>RUM วัด performance จากฝั่ง real browser ของผู้ใช้จริง</li>
+    <li>นิยมในองค์กรขนาดกลาง-ใหญ่ที่ต้องการ support และ SLA จาก vendor</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>New Relic</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Free tier + Paid</span></span>
+    <span>Platform: SaaS (cloud)</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> APM, infrastructure monitoring, browser monitoring, synthetic monitoring ในที่เดียว</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>free tier ค่อนข้างใจกว้าง (100 GB data/month) — เหมาะกับ startup</li>
+    <li>auto-instrumentation สำหรับ Node.js, Java, .NET, Python — ติดตั้ง agent แล้วเห็น trace ทันที</li>
+    <li>NRQL (New Relic Query Language) ใช้ query metric, log, trace ได้ในที่เดียว</li>
+    <li>มี Synthetics — สร้าง test script ที่รันซ้ำตลอดเวลาจาก global locations</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>Dynatrace</h3>
+  <div class="meta">
+    <span><span class="badge badge-paid">Commercial</span> Paid</span>
+    <span>Platform: SaaS / On-premise</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> AI-powered full-stack monitoring — automatic root cause analysis, code-level visibility, infrastructure monitoring</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>Davis AI วิเคราะห์ root cause ให้อัตโนมัติ — ไม่ต้องไล่ดู metric เอง</li>
+    <li>OneAgent ติดตั้งเครื่องเดียว monitor ได้ทุกอย่าง — JVM, containers, network</li>
+    <li>enterprise-grade: นิยมในธนาคาร, telco, รัฐบาล ที่ต้องการ on-premise deployment</li>
+    <li>ต่อกับ JMeter/k6 เพื่อ correlate load test กับ APM trace ได้</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>OpenTelemetry (OTel)</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free (standard, ไม่ใช่ tool)</span>
+    <span>Platform: ทุก environment</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> standard กลางสำหรับ instrumentation — เก็บ traces, metrics, logs ในรูปแบบเดียว ส่งไปยัง backend ใดก็ได้</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>vendor-neutral — ใช้ OTel แล้วส่ง telemetry ไป Datadog, New Relic, Jaeger, Prometheus ได้โดยไม่ต้องเขียนใหม่</li>
+    <li>เป็น CNCF standard — ทุก cloud provider รองรับ</li>
+    <li>แทนที่ proprietary SDK ของ Datadog/New Relic ได้ — ลด vendor lock-in</li>
+  </ul>
+  <p><strong>ใช้คู่กับ:</strong> Jaeger (traces), Prometheus (metrics), Loki (logs), Grafana Tempo</p>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="cloud-load">5. Cloud Load Testing Platforms</div>
+<p style="margin-top:16px">เมื่อต้องการ load สูงหรือ distributed test จากหลายภูมิภาค จะใช้ platform เหล่านี้แทนการรันบนเครื่องเดียว</p>
+
+<div class="tool-card">
+  <h3>BlazeMeter (by Perforce)</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Free tier + Paid</span></span>
+    <span>Platform: SaaS</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> upload JMeter .jmx file แล้วรันบน cloud infrastructure ได้ทันที พร้อม real-time dashboard และ report</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>ใช้ JMeter script ที่มีอยู่แล้วได้ทันที — ไม่ต้องเรียน tool ใหม่</li>
+    <li>รัน test จากหลาย region พร้อมกัน — เหมาะกับ global application</li>
+    <li>ไม่ต้องตั้ง infrastructure เอง — เหมาะกับ test ที่ต้องการ load หลักพัน VU</li>
+    <li>มี CI/CD plugin สำหรับ Jenkins, GitHub Actions, Azure DevOps</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>k6 Cloud (by Grafana Labs)</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Free tier + Paid</span></span>
+    <span>Platform: SaaS</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> รัน k6 script บน cloud infrastructure, ดู result บน dashboard ออนไลน์, เปรียบเทียบผลระหว่าง test run</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>ต่อจาก k6 CLI ได้ทันทีด้วย <code>k6 cloud script.js</code></li>
+    <li>รัน distributed จากหลาย region พร้อม result consolidation อัตโนมัติ</li>
+    <li>trend comparison — เปรียบผล run นี้กับ run ก่อนหน้าได้</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>Azure Load Testing</h3>
+  <div class="meta">
+    <span><span class="badge badge-paid">Paid</span> (ตาม VUH — Virtual User Hours)</span>
+    <span>Platform: Azure SaaS</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> managed load testing service บน Azure — upload JMeter script หรือ URL แล้วรันได้ทันที</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>integrate กับ Azure DevOps / GitHub Actions ได้ตรง — pass/fail test ใน CI pipeline</li>
+    <li>ดู App Service, AKS, Azure Monitor metric ในหน้าเดียวกับ load test result</li>
+    <li>เหมาะกับ organization ที่ใช้ Azure ecosystem อยู่แล้ว</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>AWS Distributed Load Testing</h3>
+  <div class="meta">
+    <span><span class="badge badge-paid">Paid</span> (AWS infrastructure cost)</span>
+    <span>Platform: AWS (Fargate + CloudWatch)</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> deploy Taurus/JMeter containers บน AWS Fargate เพื่อรัน distributed load test</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>เหมาะกับ AWS ecosystem — ดู CloudWatch metric ควบกับ load test result</li>
+    <li>scale worker container ได้ตามต้องการ ไม่มีขีดจำกัดคงที่</li>
+  </ul>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="api-testing">6. API Testing &amp; Exploration</div>
+<p style="margin-top:16px">เครื่องมือกลุ่มนี้ใช้สำรวจ API, ทดสอบ manual, และเขียน automated functional test ก่อนทำ load test</p>
+
+<div class="tool-card">
+  <h3>Postman</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Free + Paid</span></span>
+    <span>Platform: Desktop, Web</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> ส่ง HTTP request แบบ manual, เขียน test script ด้วย JavaScript, สร้าง Collection แชร์กันในทีม</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li>ใช้ง่ายที่สุดสำหรับ explore API ครั้งแรก — ไม่ต้องเขียน code</li>
+    <li>Postman Collection Runner รัน functional test ทั้ง collection ได้อัตโนมัติ</li>
+    <li>แชร์ Collection ระหว่างทีม dev, QA, perf test ได้ — ทุกคนใช้ request เดียวกัน</li>
+    <li>Newman CLI รัน Collection ใน CI/CD ได้โดยไม่ต้องเปิด GUI</li>
+  </ul>
+  <p><strong>ใช้เมื่อ:</strong> explore API ครั้งแรก, debug request, สร้าง functional test ก่อน load test</p>
+</div>
+
+<div class="tool-card">
+  <h3>curl / httpie</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free</span>
+    <span>Platform: Terminal (ทุก OS)</span>
+  </div>
+  <p><strong>ใช้ทำอะไร:</strong> ส่ง HTTP request จาก terminal โดยตรง — เร็ว, ไม่ต้องติดตั้ง GUI</p>
+  <p><strong>ทำไมองค์กรเลือกใช้:</strong></p>
+  <ul>
+    <li><code>curl</code> มีในทุก Unix system — ใช้ได้ใน CI/CD, Docker, production server</li>
+    <li><code>httpie</code> (<code>http</code> command) output อ่านง่ายกว่า curl มาก — highlight JSON อัตโนมัติ</li>
+    <li>เหมาะสำหรับ quick sanity check และ scripting ใน shell</li>
+  </ul>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="stacks">7. Common Tool Stacks ในองค์กรจริง</div>
+<p style="margin-top:16px">องค์กรมักใช้เครื่องมือหลายตัวร่วมกัน ด้านล่างนี้คือ stack ที่พบบ่อยในไทยและต่างประเทศ</p>
+
+<div class="stack-box">
+  <h3>Stack A: JMeter + InfluxDB + Grafana (Classic Stack)</h3>
+  <p><strong>พบบ่อยในองค์กรที่ใช้ JMeter มาก่อน และต้องการ real-time dashboard</strong></p>
+  <pre>JMeter (ยิง load)
+  └─ Backend Listener → InfluxDB (เก็บ metric แบบ real-time)
+                          └─ Grafana Dashboard (แสดงกราฟ real-time)
+
+หลังรัน:
+JMeter → สร้าง HTML report จาก .jtl file</pre>
+  <ul>
+    <li>เหมาะกับ: QA team ที่ใช้ JMeter อยู่แล้ว</li>
+    <li>เริ่มต้น: ติดตั้ง InfluxDB + Grafana ด้วย Docker Compose</li>
+    <li>import dashboard สำเร็จรูปจาก Grafana.com ID: 1152 (JMeter dashboard)</li>
+  </ul>
+</div>
+
+<div class="stack-box">
+  <h3>Stack B: k6 + Prometheus + Grafana (Modern DevOps Stack)</h3>
+  <p><strong>พบบ่อยในทีม DevOps / SRE ที่ใช้ Kubernetes และ Prometheus อยู่แล้ว</strong></p>
+  <pre>k6 (ยิง load)
+  └─ --out prometheus-rw → Prometheus (scrape metric)
+                             └─ Grafana Dashboard (แสดงกราฟ)
+
+หรือ:
+k6 → --out influxdb → InfluxDB → Grafana</pre>
+  <ul>
+    <li>เหมาะกับ: dev/DevOps ที่เขียน JavaScript ได้, ใช้ Kubernetes</li>
+    <li>เริ่มต้น: <code>k6 run --out prometheus-rw=http://localhost:9090/api/v1/write script.js</code></li>
+    <li>import dashboard จาก Grafana.com ID: 19665 (k6 Prometheus dashboard)</li>
+  </ul>
+</div>
+
+<div class="stack-box">
+  <h3>Stack C: JMeter + BlazeMeter Cloud (Enterprise Load)</h3>
+  <p><strong>พบบ่อยในองค์กรที่ต้องการ load สูง (หลักพัน VU) โดยไม่ต้องตั้ง infrastructure เอง</strong></p>
+  <pre>JMeter .jmx (script บนเครื่อง dev)
+  └─ upload → BlazeMeter Cloud
+                └─ รัน distributed จาก multiple regions
+                └─ real-time dashboard + report PDF</pre>
+  <ul>
+    <li>เหมาะกับ: ต้องการ 500–10,000 VU, global test</li>
+    <li>เริ่มต้น: สมัคร BlazeMeter free tier (50 VU, 10 min/test)</li>
+  </ul>
+</div>
+
+<div class="stack-box">
+  <h3>Stack D: k6 + Grafana Cloud + APM (Full Observability)</h3>
+  <p><strong>พบบ่อยใน modern cloud-native organization</strong></p>
+  <pre>k6 Cloud (load generation)
+  └─ Grafana Cloud (load test dashboard)
+
+Application (รัน under test)
+  └─ OpenTelemetry → Grafana Tempo (traces)
+  └─ prom-client → Prometheus → Grafana (metrics)
+  └─ Loki (logs)
+
+Grafana Explore
+  └─ correlate: load test timeline + app traces + logs</pre>
+  <ul>
+    <li>เหมาะกับ: startup / tech company ที่ต้องการ full observability</li>
+    <li>ข้อดี: เห็น load test + app trace + log ในหน้าเดียว — หา root cause ได้เร็วมาก</li>
+  </ul>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="comparison">8. Comparison Table</div>
+
+<table style="margin-top:16px">
+  <tr>
+    <th>Tool</th>
+    <th>Category</th>
+    <th>Script Language</th>
+    <th>Learning Curve</th>
+    <th>Best For</th>
+    <th>Cost</th>
+  </tr>
+  <tr>
+    <td><strong>JMeter</strong></td>
+    <td>Load Generation</td>
+    <td>GUI / XML</td>
+    <td>ปานกลาง</td>
+    <td>QA team, protocol หลากหลาย, plugin ecosystem</td>
+    <td>Free</td>
+  </tr>
+  <tr>
+    <td><strong>k6</strong></td>
+    <td>Load Generation</td>
+    <td>JavaScript</td>
+    <td>ต่ำ (ถ้าเขียน JS ได้)</td>
+    <td>Developer, CI/CD, Grafana stack</td>
+    <td>Free / k6 Cloud paid</td>
+  </tr>
+  <tr>
+    <td><strong>Gatling</strong></td>
+    <td>Load Generation</td>
+    <td>Scala / Java / Kotlin</td>
+    <td>สูง</td>
+    <td>Java/Scala team, built-in HTML report</td>
+    <td>Free / Enterprise paid</td>
+  </tr>
+  <tr>
+    <td><strong>Locust</strong></td>
+    <td>Load Generation</td>
+    <td>Python</td>
+    <td>ต่ำ (ถ้าเขียน Python ได้)</td>
+    <td>Python team, distributed K8s</td>
+    <td>Free</td>
+  </tr>
+  <tr>
+    <td><strong>Artillery</strong></td>
+    <td>Load Generation</td>
+    <td>YAML + JS</td>
+    <td>ต่ำ</td>
+    <td>DevOps, AWS serverless</td>
+    <td>Free / Pro paid</td>
+  </tr>
+  <tr>
+    <td><strong>Prometheus</strong></td>
+    <td>Metrics Collection</td>
+    <td>PromQL</td>
+    <td>ปานกลาง</td>
+    <td>Cloud-native metrics, Kubernetes</td>
+    <td>Free</td>
+  </tr>
+  <tr>
+    <td><strong>InfluxDB</strong></td>
+    <td>Time-series DB</td>
+    <td>Flux / InfluxQL</td>
+    <td>ต่ำ</td>
+    <td>JMeter real-time metric storage</td>
+    <td>Free / Cloud paid</td>
+  </tr>
+  <tr>
+    <td><strong>Grafana</strong></td>
+    <td>Visualization</td>
+    <td>Dashboard UI</td>
+    <td>ต่ำ</td>
+    <td>Dashboard for any metric source</td>
+    <td>Free / Cloud paid</td>
+  </tr>
+  <tr>
+    <td><strong>Datadog</strong></td>
+    <td>APM + Monitoring</td>
+    <td>NRQL / UI</td>
+    <td>ต่ำ</td>
+    <td>All-in-one enterprise monitoring</td>
+    <td>Paid</td>
+  </tr>
+  <tr>
+    <td><strong>New Relic</strong></td>
+    <td>APM + Monitoring</td>
+    <td>NRQL / UI</td>
+    <td>ต่ำ</td>
+    <td>All-in-one, generous free tier</td>
+    <td>Free tier / Paid</td>
+  </tr>
+  <tr>
+    <td><strong>BlazeMeter</strong></td>
+    <td>Cloud Load Testing</td>
+    <td>JMeter .jmx</td>
+    <td>ต่ำ</td>
+    <td>JMeter cloud scale, distributed</td>
+    <td>Free tier / Paid</td>
+  </tr>
+  <tr>
+    <td><strong>Postman</strong></td>
+    <td>API Testing</td>
+    <td>JavaScript</td>
+    <td>ต่ำ</td>
+    <td>Explore API, functional test</td>
+    <td>Free / Paid team features</td>
+  </tr>
+  <tr>
+    <td><strong>OpenTelemetry</strong></td>
+    <td>Instrumentation Standard</td>
+    <td>SDK (ทุกภาษา)</td>
+    <td>ปานกลาง</td>
+    <td>Vendor-neutral observability</td>
+    <td>Free</td>
+  </tr>
+</table>
+
+<!-- =========================================================== -->
+<div class="category-header" id="how-to-choose">9. How To Choose</div>
+
+<table style="margin-top:16px">
+  <tr><th>ถ้าทีมของคุณ</th><th>แนะนำ Load Tool</th><th>แนะนำ Monitoring Stack</th></tr>
+  <tr>
+    <td>เป็น QA ที่ไม่ถนัด code, เริ่มต้น performance testing</td>
+    <td><strong>JMeter</strong> (GUI, plugin, community)</td>
+    <td>JMeter HTML report → ค่อยเพิ่ม InfluxDB + Grafana</td>
+  </tr>
+  <tr>
+    <td>เป็น developer ที่ถนัด JavaScript, ใช้ CI/CD</td>
+    <td><strong>k6</strong> (code-friendly, CI-ready)</td>
+    <td>k6 + Prometheus + Grafana</td>
+  </tr>
+  <tr>
+    <td>เป็น Java/Kotlin developer, ต้องการ built-in report</td>
+    <td><strong>Gatling</strong> (Maven/Gradle plugin)</td>
+    <td>Gatling HTML report → ค่อยเพิ่ม Grafana</td>
+  </tr>
+  <tr>
+    <td>ถนัด Python, ต้องการ distributed บน Kubernetes</td>
+    <td><strong>Locust</strong></td>
+    <td>Locust + Prometheus + Grafana</td>
+  </tr>
+  <tr>
+    <td>ต้องการ cloud scale (1,000+ VU), ไม่อยาก manage infra</td>
+    <td><strong>BlazeMeter</strong> (JMeter cloud) หรือ <strong>k6 Cloud</strong></td>
+    <td>Built-in cloud dashboard</td>
+  </tr>
+  <tr>
+    <td>ใช้ Azure / AWS ecosystem</td>
+    <td><strong>Azure Load Testing</strong> หรือ <strong>AWS DLT</strong></td>
+    <td>Azure Monitor / CloudWatch</td>
+  </tr>
+  <tr>
+    <td>ต้องการ full observability (traces + metrics + logs)</td>
+    <td>k6 หรือ JMeter</td>
+    <td>OpenTelemetry + Grafana Stack (Tempo, Prometheus, Loki)</td>
+  </tr>
+</table>
+
+<div class="note" style="margin-top:32px">
+  <strong>สำหรับ Lab นี้:</strong> เราใช้ JMeter เป็น load generation tool หลัก
+  และ Local API expose <code>GET /metrics</code> ในรูปแบบ Prometheus format
+  ซึ่งสามารถ scrape ด้วย Prometheus และแสดงผลใน Grafana ได้ทันทีถ้าต้องการ setup จริง
+</div>
+
+<script>
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl = document.getElementById("runtime-meta");
+  async function refreshRuntimeStatus() {
+    try {
+      const response = await fetch("/status", { cache: "no-store" });
+      if (!response.ok) throw new Error("Status endpoint returned non-200");
+      const data = await response.json();
+      statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent = `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
+    } catch (error) {
+      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      metaEl.textContent = "Open this page through Node/Express to enable live status.";
+    }
+  }
+  refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 5000);
+</script>
+</body>
+</html>

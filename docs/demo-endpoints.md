@@ -83,7 +83,7 @@ curl "http://localhost:3001/demo/dashboard?lang=en"
       "price": 89.0
     }
   ],
-  "categories": ["accessories", "electronics", "lifecycle", "stationery"],
+  "categories": ["accessories", "electronics", "lifestyle", "stationery"],
   "metrics": {
     "productCount": 5,
     "activeCartCount": 0
@@ -199,18 +199,20 @@ curl -X POST http://localhost:3001/demo/cart/add \
 {
   "language": "en",
   "message": "item added to cart",
-  "cartId": "cart-abc123",
-  "itemCount": 2,
-  "total": 49.0,
-  "items": [
-    {
-      "productId": "sku-101",
-      "name": "Wireless Mouse",
-      "price": 24.5,
-      "quantity": 2,
-      "lineTotal": 49.0
-    }
-  ]
+  "cart": {
+    "cartId": "cart-abc123",
+    "itemCount": 2,
+    "total": 49.0,
+    "items": [
+      {
+        "productId": "sku-101",
+        "name": "Wireless Mouse",
+        "quantity": 2,
+        "unitPrice": 24.5,
+        "lineTotal": 49.0
+      }
+    ]
+  }
 }
 ```
 
@@ -242,38 +244,35 @@ curl -X POST http://localhost:3001/demo/checkout \
   -H "Content-Type: application/json" \
   -d '{
     "cartId": "cart-abc123",
-    "billingAddress": {
-      "street": "123 Main St",
-      "city": "Bangkok",
-      "zipCode": "10110"
-    },
-    "couponCode": "WELCOME10"
+    "customerId": "shopper-xyz"
   }'
 ```
 
 **Request Body:**
-- `cartId` (required): Cart ID
-- `billingAddress` (optional): Address object
-- `couponCode` (optional): Coupon code
+- `cartId` (optional): Cart ID — falls back to `"demo-cart"` if omitted
+- `customerId` (optional): Customer identifier — falls back to `"guest"` if omitted
 
 **Response (200 OK):**
 ```json
 {
   "language": "en",
   "message": "checkout completed",
-  "orderId": "order-x1y2z3-a4b5-c6d7-e8f9",
-  "total": 49.0,
-  "items": [
-    {
-      "productId": "sku-101",
-      "name": "Wireless Mouse",
-      "price": 24.5,
-      "quantity": 2,
-      "lineTotal": 49.0
-    }
-  ],
-  "timestamp": 1776398960000,
-  "nextEndpoint": "/demo/order/status"
+  "orderId": "ord-x1y2z3-a4b5-c6d7-e8f9",
+  "customerId": "shopper-xyz",
+  "cart": {
+    "cartId": "cart-abc123",
+    "itemCount": 2,
+    "total": 49.0,
+    "items": [
+      {
+        "productId": "sku-101",
+        "name": "Wireless Mouse",
+        "quantity": 2,
+        "unitPrice": 24.5,
+        "lineTotal": 49.0
+      }
+    ]
+  }
 }
 ```
 
@@ -282,14 +281,6 @@ curl -X POST http://localhost:3001/demo/checkout \
 {
   "error": "empty_cart",
   "message": "Add at least one item before checkout"
-}
-```
-
-**Error (400 Bad Request) - Missing cartId:**
-```json
-{
-  "error": "missing_required_parameter",
-  "required": ["cartId"]
 }
 ```
 
@@ -313,20 +304,11 @@ curl "http://localhost:3001/demo/order/status?orderId=order-x1y2z3&lang=th"
 {
   "language": "th",
   "message": "โหลดสถานะคำสั่งซื้อแล้ว",
-  "orderId": "order-x1y2z3-a4b5-c6d7-e8f9",
+  "orderId": "ord-x1y2z3-a4b5-c6d7-e8f9",
+  "customerId": "shopper-xyz",
   "status": "confirmed",
-  "items": [
-    {
-      "productId": "sku-101",
-      "name": "Wireless Mouse",
-      "price": 24.5,
-      "quantity": 2,
-      "lineTotal": 49.0
-    }
-  ],
-  "total": 49.0,
-  "createdAt": "2026-04-17T04:09:25.000Z",
-  "estimatedDelivery": "2026-04-19T04:09:25.000Z"
+  "itemCount": 2,
+  "total": 49.0
 }
 ```
 
@@ -372,7 +354,7 @@ curl -s -X POST http://localhost:3001/demo/cart/add \
 # 4. Checkout
 CHECKOUT=$(curl -s -X POST http://localhost:3001/demo/checkout \
   -H "Content-Type: application/json" \
-  -d "{\"cartId\":\"$CART_ID\"}")
+  -d "{\"cartId\":\"$CART_ID\",\"customerId\":\"shopper-demo\"}")
 ORDER_ID=$(echo $CHECKOUT | jq -r '.orderId')
 
 # 5. Check order status

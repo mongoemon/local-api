@@ -108,7 +108,7 @@ curl -X POST http://localhost:3001/auth/verify \
 
 ## Production Notes
 
-- ⚠️ Change `JWT_SECRET` in `config.js` before production
+- ⚠️ Set `JWT_SECRET` environment variable before production (default is `local-api-jwt-secret`)
 - ⚠️ Replace demo credentials with database validation
 - ⚠️ Implement proper password hashing (bcrypt/argon2)
 - ⚠️ Use HTTPS in production (not HTTP)

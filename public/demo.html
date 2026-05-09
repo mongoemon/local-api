@@ -16,19 +16,9 @@
     .card h3 { margin-top: 0; }
     .card a { color: #2563eb; text-decoration: none; }
     .topbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 14px 24px;
-      background: #1f2937;
-      color: #f9fafb;
-      border-bottom: 1px solid #111827;
-      z-index: 1000;
+      position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
+      justify-content: space-between; gap: 16px; padding: 14px 24px; background: #1f2937;
+      color: #f9fafb; border-bottom: 1px solid #111827; z-index: 1000;
     }
     .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
     .topbar a:last-child { margin-right: 0; }
@@ -48,6 +38,7 @@
     <a href="/demo-endpoints.html">Demo Endpoints</a>
     <a href="/demo-jmeter.html">JMeter Guide</a>
     <a href="/demo-test-types.html">Test Types</a>
+    <a href="/tools.html">Tools</a>
     <a href="/assignment.html">Assignment</a>
     <a href="/glossary.html">Glossary</a>
     <a href="/status">/status</a>
@@ -61,8 +52,7 @@
 <h1>Demo Learning Path</h1>
 
 <div class="note">
-  หน้านี้เป็นจุดเริ่มต้นสำหรับผู้เริ่มใช้งานใหม่
-  ลำดับที่แนะนำคือ: รู้จัก endpoint -> สร้าง JMeter structure -> เลือก controller -> เลือก test type
+  จุดเริ่มต้นสำหรับผู้เริ่มใช้งานใหม่ ทำตามลำดับนี้จะเห็นภาพรวมทั้งหมดก่อนลงรายละเอียด
 </div>
 
 <h2>Start Here</h2>
@@ -70,22 +60,22 @@
   <div class="card">
     <h3>1. Demo Endpoints</h3>
     <p>เริ่มจากดูว่าแต่ละเส้นทำอะไร ต้องส่งอะไร และ response ที่ควรได้คืออะไร</p>
-    <p><a href="/demo-endpoints.html">Open Demo Endpoints</a></p>
+    <p><a href="/demo-endpoints.html">Open Demo Endpoints &rarr;</a></p>
   </div>
   <div class="card">
     <h3>2. JMeter Structure</h3>
-    <p>ดูโครงสร้าง JMeter แบบเริ่มต้น, Transaction Controller, Throughput Controller, Extractor, If Controller</p>
-    <p><a href="/demo-jmeter.html">Open JMeter Guide</a></p>
+    <p>สร้าง JMeter test plan ตามลำดับ ตั้งแต่ Thread Group, Extractor, จนถึง Controller</p>
+    <p><a href="/demo-jmeter.html">Open JMeter Guide &rarr;</a></p>
   </div>
   <div class="card">
     <h3>3. Test Types</h3>
-    <p>เลือก thread group และ test type ให้เหมาะกับ SLA, load, stress, spike, endurance</p>
-    <p><a href="/demo-test-types.html">Open Test Types</a></p>
+    <p>เลือก thread group และ test type ให้เหมาะกับ SLA — load, stress, spike, endurance</p>
+    <p><a href="/demo-test-types.html">Open Test Types &rarr;</a></p>
   </div>
   <div class="card">
     <h3>4. Read The Result</h3>
     <p>หลังรันเสร็จ ให้ดู report, transaction time, error rate และเทียบกับ SLA ที่ลูกค้าต้องการ</p>
-    <p><a href="#read-the-result">Jump To Result Reading</a></p>
+    <p><a href="#read-the-result">Jump To Result Reading &rarr;</a></p>
   </div>
 </div>
 
@@ -115,10 +105,10 @@ GET /demo/order/status?orderId=${demoOrderId}</pre>
   <li><a href="/demo/product/details?productId=sku-101">/demo/product/details?productId=sku-101</a></li>
 </ul>
 
-<h2 id="read-the-result">4. Read The Result</h2>
+<h2 id="read-the-result">Read The Result</h2>
 <div class="note">
-  หลังจากรัน test เสร็จ อย่าดูแค่ request ผ่านหรือไม่ผ่าน
-  ให้ดู 4 อย่างพร้อมกัน: transaction time, error rate, throughput, และ traffic mix ว่าตรงกับความต้องการลูกค้าหรือไม่
+  หลังจากรัน test เสร็จ อย่าดูแค่ว่า request ผ่านหรือไม่
+  ให้ดู 4 อย่างพร้อมกัน: transaction time, error rate, throughput, และ traffic mix
 </div>
 
 <h2>What To Open In JMeter</h2>
@@ -127,8 +117,8 @@ GET /demo/order/status?orderId=${demoOrderId}</pre>
   <tr><td><code>View Results Tree</code></td><td>response จริงของแต่ละ request</td><td>ใช้ debug เมื่อ request fail, variable ไม่ถูก extract, หรือ body/header ผิด</td></tr>
   <tr><td><code>Summary Report</code></td><td>average, min, max, error %, throughput</td><td>ใช้ดูภาพรวมเร็ว ๆ ว่ารอบ test ผ่าน SLA ขั้นต้นหรือไม่</td></tr>
   <tr><td><code>Aggregate Report</code></td><td>median, 90%, 95%, 99%</td><td>ใช้ตัดสิน SLA เพราะ percentile สำคัญกว่าค่าเฉลี่ย</td></tr>
-  <tr><td><code>Transaction Controller Parent Sample</code></td><td>เวลารวมของ flow</td><td>ใช้ตอบลูกค้าว่า user journey ทั้งก้อนเร็วพอหรือไม่ ไม่ใช่ดูแค่ step เดี่ยว</td></tr>
-  <tr><td><code>Backend Listener</code> ถ้ามี</td><td>metric ต่อเนื่องระหว่างรันนาน ๆ</td><td>ใช้ดู drift ใน load/endurance test</td></tr>
+  <tr><td><code>Transaction Controller</code> parent sample</td><td>เวลารวมของ flow</td><td>ใช้ตอบลูกค้าว่า user journey ทั้งก้อนเร็วพอหรือไม่</td></tr>
+  <tr><td><code>Backend Listener</code> (ถ้ามี)</td><td>metric ต่อเนื่องระหว่างรันนาน ๆ</td><td>ใช้ดู drift ใน load/endurance test</td></tr>
 </table>
 
 <h2>What To Look At First</h2>
@@ -140,128 +130,13 @@ GET /demo/order/status?orderId=${demoOrderId}</pre>
   <li>ถ้ามี <code>If Controller</code> ให้เช็กว่า <code>order status</code> ถูกเรียกเฉพาะตอนมี <code>orderId</code> จริง</li>
 </ol>
 
-<h2>Suggested SLA Examples</h2>
-<table>
-  <tr><th>Customer Need</th><th>What To Measure</th><th>Example Pass Criteria</th></tr>
-  <tr><td>หน้า dashboard ต้องตอบไว</td><td><code>GET /demo/dashboard</code> ใน <code>Aggregate Report</code></td><td><code>95% &lt; 500 ms</code>, error <code>&lt; 1%</code></td></tr>
-  <tr><td>การค้นหาสินค้าต้องลื่น</td><td><code>GET /demo/search</code> percentile และ throughput</td><td><code>95% &lt; 700 ms</code>, throughput ตรงกับโหลดที่คาดหวัง</td></tr>
-  <tr><td>การ add to cart + checkout ต้องจบเร็ว</td><td>parent sample ของ <code>Transaction Controller - Add And Checkout</code></td><td><code>95% &lt; 1500 ms</code>, error <code>&lt; 2%</code></td></tr>
-  <tr><td>ระบบต้องรองรับ traffic ปกติได้</td><td>flow รวม + throughput</td><td>ที่ <code>20 users</code> หรือ rate ที่ลูกค้าระบุ ยังไม่เกิด SLA breach</td></tr>
-  <tr><td>cart flow ควรเกิดประมาณบางส่วนของ traffic</td><td>sample count ของ flow ใต้ <code>Throughput Controller</code></td><td>ถ้าตั้ง <code>40%</code> ควรเห็น cart flow ประมาณ <code>35-45%</code> ของ browse flow</td></tr>
-</table>
-
-<h2>Example Interpretation</h2>
-<pre>Customer requirement
-- Browse flow p95 &lt; 800 ms
-- Add And Checkout p95 &lt; 1500 ms
-- Error rate &lt; 1%
-- Cart flow around 40% of total browse traffic
-
-Test result
-- Browse Flow p95 = 620 ms
-- Add And Checkout p95 = 1320 ms
-- Error rate = 0.3%
-- Browse sample count = 1000
-- Cart flow sample count = 392
-
-Interpretation
-- Browse flow passed
-- Add And Checkout passed
-- Error rate passed
-- Cart flow mix passed because 392/1000 = 39.2%
-- Overall result: this test run matches the customer target</pre>
-
-<h2>Example Of A Failed Result</h2>
-<pre>Customer requirement
-- Add And Checkout p95 &lt; 1500 ms
-- Error rate &lt; 1%
-
-Test result
-- Add And Checkout p95 = 2400 ms
-- Error rate = 3.8%
-
-Interpretation
-- Transaction is too slow at the tested load
-- Reliability is below target
-- This run does not meet the customer SLA
-- Next action: reduce load, inspect failed samplers, or tune app/runtime before rerun</pre>
-
-<h2>How To Tell The Result Matches Customer Needs</h2>
-<ul>
-  <li>ต้องเขียน pass criteria ก่อนรันเสมอ เช่น <code>p95</code>, <code>error %</code>, throughput, และ traffic mix</li>
-  <li>อย่าใช้แค่ค่า <code>Average</code> เพราะลูกค้ามักสนใจประสบการณ์ส่วนใหญ่ของผู้ใช้ ซึ่งดูจาก percentile</li>
-  <li>ถ้าลูกค้าพูดถึง flow เช่น browse, checkout, order lookup ให้ดู parent sample ของ transaction เป็นหลัก</li>
-  <li>ถ้าลูกค้าพูดถึงสัดส่วน traffic เช่น มีเพียงบางคน checkout ให้ดู sample count ของ flow ใต้ <code>Throughput Controller</code></li>
-  <li>ถ้าผลยังไม่ตรง SLA ให้บอกชัดว่า fail ที่ค่าไหนและที่โหลดระดับไหน เช่น <code>p95 breach at 50 users</code></li>
-</ul>
-
-<h2>SLA By Test Type</h2>
 <div class="note">
-  SLA ไม่ควรถูกดูแบบเหมารวมทุก test type
-  ต้องดูว่า SLA นั้นตั้งใจใช้กับโหลดปกติ, ช่วงพีค, การกดดันจนเกิน capacity, หรือความเสถียรระยะยาว
+  สำหรับตัวอย่าง SLA statements, test type decision, และ run order — ดูที่ <a href="/demo-test-types.html">Test Types</a>
 </div>
-
-<table>
-  <tr><th>Test Type</th><th>Should You Use It For SLA?</th><th>What It Usually Proves</th></tr>
-  <tr><td><code>Load Test</code></td><td>ใช่ เป็นตัวหลัก</td><td>ระบบยังผ่าน SLA ภายใต้ expected traffic จริงหรือไม่</td></tr>
-  <tr><td><code>Stress Test</code></td><td>ใช้ได้ แต่เป็น threshold SLA</td><td>ระบบเริ่ม degrade หรือ fail ที่โหลดระดับไหน</td></tr>
-  <tr><td><code>Spike Test</code></td><td>ใช้ได้ ถ้า SLA พูดถึง peak หรือ recovery</td><td>ระบบรับโหลดพุ่งเร็วได้ไหม และ recover กลับมาในกี่วินาที</td></tr>
-  <tr><td><code>Endurance Test</code></td><td>ใช้ได้ ถ้า SLA พูดถึง stability</td><td>SLA ยังนิ่งหรือ drift เมื่อรันนาน ๆ</td></tr>
-</table>
-
-<h2>How To Decide Which Test Type Matches The SLA</h2>
-<table>
-  <tr><th>If The SLA Says</th><th>Use This Test Type First</th><th>Why</th></tr>
-  <tr><td>รองรับผู้ใช้หรือ request ในภาวะปกติ</td><td><code>Load Test</code></td><td>เป็นการพิสูจน์ target หลักใน expected traffic</td></tr>
-  <tr><td>ห้ามพังแม้โหลดสูงกว่าปกติ</td><td><code>Stress Test</code></td><td>ใช้หา degradation point และ failure threshold</td></tr>
-  <tr><td>ต้องทน traffic peak หรือ flash sale</td><td><code>Spike Test</code></td><td>ใช้จำลอง load ที่ขึ้นเร็วผิดปกติ</td></tr>
-  <tr><td>ต้องนิ่งตลอดวันหรือหลายชั่วโมง</td><td><code>Endurance Test</code></td><td>ใช้จับ latency drift, leak, และ stability ปลายรอบ</td></tr>
-</table>
-
-<h2>Example SLA Statements And Recommended Test Type</h2>
-<table>
-  <tr><th>Example SLA Statement</th><th>Recommended Test Type</th><th>What To Measure</th></tr>
-  <tr><td>Under normal weekday traffic, product search must complete with <code>p95 &lt; 700 ms</code> and error rate below <code>1%</code>.</td><td><code>Load Test</code></td><td><code>/demo/search</code> percentile and error % at expected user/rate level</td></tr>
-  <tr><td>At expected business load, the full checkout journey must complete within <code>1.5 s</code> for <code>95%</code> of users.</td><td><code>Load Test</code></td><td>parent sample ของ <code>Transaction Controller - Add And Checkout</code></td></tr>
-  <tr><td>The service must remain available until at least <code>80 concurrent users</code>; after that point graceful degradation is acceptable.</td><td><code>Stress Test</code></td><td>จุดที่ error rate เริ่มสูงหรือ latency breach เมื่อเพิ่ม concurrency</td></tr>
-  <tr><td>During campaign launch, traffic may jump to <code>3x</code> normal within one minute, and the API must recover within <code>2 minutes</code>.</td><td><code>Spike Test</code></td><td>latency jump, error burst, และ recovery time หลัง spike</td></tr>
-  <tr><td>The platform must keep <code>p95 &lt; 900 ms</code> for browsing traffic throughout an <code>8-hour</code> business window.</td><td><code>Endurance Test</code></td><td>percentile trend ตลอดช่วงเวลา ไม่ใช่แค่ต้นรอบ</td></tr>
-  <tr><td>No more than <code>40%</code> of browse sessions should proceed to cart and checkout in the standard usage model.</td><td><code>Load Test</code> with <code>Throughput Controller</code></td><td>sample count ของ browse flow เทียบกับ cart flow</td></tr>
-</table>
-
-<h2>How To Analyze These SLA Statements</h2>
-<pre>Statement
-"At expected business load, the full checkout journey must complete within 1.5 s for 95% of users."
-
-Analysis
-- This is a user journey statement, not a single endpoint statement
-- Main metric is transaction p95
-- Main test type is Load Test
-- Best component is Transaction Controller parent sample
-- Pass only if tested at expected load, not at 1 user only</pre>
-
-<pre>Statement
-"The service must remain available until at least 80 concurrent users; after that point graceful degradation is acceptable."
-
-Analysis
-- This is a capacity threshold statement
-- Main test type is Stress Test
-- Best thread group is Concurrency Thread Group
-- Pass if the system still meets availability/error target below 80 concurrent users
-- After 80, slower response or some rejection may be acceptable depending on the statement</pre>
-
-<pre>Statement
-"During campaign launch, traffic may jump to 3x normal within one minute, and the API must recover within 2 minutes."
-
-Analysis
-- This is not a normal SLA-only statement
-- Main test type is Spike Test
-- Focus on error burst, percentile jump, and recovery window
-- Pass only if the system returns to acceptable latency/error within the stated recovery time</pre>
 
 <h2>Proof Of Concept You Can Copy And Paste</h2>
 <div class="note">
-  ใช้ส่วนนี้เป็นตัวอย่างเดโมรอบแรกได้เลย ถ้าต้องการทำ proof of concept แบบเร็ว ให้คัดลอก statement, structure, และค่าตั้งต้นนี้ไปใช้ก่อน
+  ถ้าต้องการทำ proof of concept แบบเร็ว ให้คัดลอก statement, structure, และค่าตั้งต้นนี้ไปใช้ก่อน
 </div>
 
 <h2>POC SLA Statement</h2>
@@ -368,25 +243,18 @@ Conclusion
 <script>
   const statusEl = document.getElementById("runtime-status");
   const metaEl = document.getElementById("runtime-meta");
-
   async function refreshRuntimeStatus() {
     try {
       const response = await fetch("/status", { cache: "no-store" });
-
-      if (!response.ok) {
-        throw new Error("Status endpoint returned non-200");
-      }
-
+      if (!response.ok) throw new Error("Status endpoint returned non-200");
       const data = await response.json();
       statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
-      metaEl.textContent =
-        `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
+      metaEl.textContent = `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
     } catch (error) {
       statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
       metaEl.textContent = "Open this page through Node/Express to enable live status.";
     }
   }
-
   refreshRuntimeStatus();
   setInterval(refreshRuntimeStatus, 5000);
 </script>
