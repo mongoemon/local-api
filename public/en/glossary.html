@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Performance Testing Glossary</title>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2, h3 { color: #1f2937; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #d1d5db; padding: 12px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 24px;
+      background: #1f2937;
+      color: #f9fafb;
+      border-bottom: 1px solid #111827;
+      z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
+    .topbar a:last-child { margin-right: 0; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/en/">Main</a>
+    <a href="/en/demo.html">Demo Home</a>
+    <a href="/en/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/en/demo-jmeter.html">JMeter Guide</a>
+    <a href="/en/demo-test-types.html">Test Types</a>
+    <a href="/en/tools.html">Tools</a>
+    <a href="/en/assignment.html">Assignment</a>
+    <a href="/en/glossary.html">Glossary</a>
+    <span style="border-left:1px solid #4b5563;padding-left:14px"><a href="/glossary.html">TH</a> &nbsp;|&nbsp; <strong style="color:#f9fafb">EN</strong></span>
+    <a href="/status">/status</a>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>Performance Testing Glossary</h1>
+
+<div class="note">
+  This page collects terms commonly encountered in performance testing, with clear explanations and short examples.
+</div>
+
+<table>
+  <tr>
+    <th>Term</th>
+    <th>Definition</th>
+  </tr>
+  <tr>
+    <td><strong>Throughput</strong></td>
+    <td>The number of requests the system successfully responds to within a given time period. Typically measured in requests per second (RPS) or transactions per second (TPS).
+      <br><strong>Counted as completed requests / transactions</strong>, not individual internal steps or processes within the system.
+      <br><strong>Examples:</strong>
+      <ul>
+        <li>If throughput = 120 RPS, the system successfully handled 120 requests in one second.</li>
+        <li>If an API performs 3 internal steps (e.g., read DB, write log, send response) but completes the full request, it counts as 1 request — not 3.</li>
+        <li>If the system completed 900 requests over 10 seconds, throughput = 90 RPS.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Latency</strong></td>
+    <td>The time from when a request is initiated until the first byte of a response begins to arrive. Typically observed as p50/p95/p99 values.</td>
+  </tr>
+  <tr>
+    <td><strong>Response Time</strong></td>
+    <td>The total time the system takes to fully respond to a request, from receipt to completion. Usually measured as median, p95, or p99.</td>
+  </tr>
+  <tr>
+    <td><strong>Concurrency</strong></td>
+    <td>The number of requests being processed simultaneously in the system or within a thread group at a given moment.</td>
+  </tr>
+  <tr>
+    <td><strong>Ramp-up</strong></td>
+    <td>The time taken to gradually increase the number of users or requests to the target load level, simulating a realistic traffic build-up.</td>
+  </tr>
+  <tr>
+    <td><strong>Ramp-down</strong></td>
+    <td>The time taken to gradually reduce the number of users or requests after a test completes, allowing the system to return to a normal state gracefully.</td>
+  </tr>
+  <tr>
+    <td><strong>Spike Test</strong></td>
+    <td>A sudden, short-duration increase in load to observe how the system responds and how quickly it recovers.</td>
+  </tr>
+  <tr>
+    <td><strong>Stress Test</strong></td>
+    <td>A test that pushes the system beyond its normal operating capacity to identify failure points, overload handling behavior, and recovery characteristics.</td>
+  </tr>
+  <tr>
+    <td><strong>Soak Test</strong></td>
+    <td>A test that applies a sustained, constant load over an extended period to check for memory leaks, resource exhaustion, and long-term stability.</td>
+  </tr>
+  <tr>
+    <td><strong>Load Test</strong></td>
+    <td>A test that applies the expected real-world load to verify that SLA/SLO targets are met under normal operating conditions.</td>
+  </tr>
+  <tr>
+    <td><strong>Bottleneck</strong></td>
+    <td>The part of the system that limits overall throughput or causes elevated latency — for example, CPU, memory, disk I/O, or the database.</td>
+  </tr>
+  <tr>
+    <td><strong>SLA</strong></td>
+    <td>Service Level Agreement — a business-level commitment about the quality of service, such as p95 &lt; 200ms or 99.9% availability.</td>
+  </tr>
+  <tr>
+    <td><strong>SLO</strong></td>
+    <td>Service Level Objective — a technical target set to meet the SLA, covering metrics such as response time, error rate, and availability.</td>
+  </tr>
+  <tr>
+    <td><strong>Error Rate</strong></td>
+    <td>The percentage of requests that failed relative to the total number of requests. Failures include 4xx/5xx responses, timeouts, and assertion failures.
+      <br><strong>Note:</strong> A slow response is <strong>not</strong> an error. If the response is 2xx and passes all assertions, it is considered successful.
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Time to First Byte (TTFB)</strong></td>
+    <td>The time elapsed from when a request is sent until the client receives the first byte of the response.</td>
+  </tr>
+  <tr>
+    <td><strong>Warm-up</strong></td>
+    <td>A period that allows the system to reach a steady operating state before measurement begins — for example, loading caches or opening connection pools.</td>
+  </tr>
+  <tr>
+    <td><strong>Think Time</strong></td>
+    <td>A pause between requests in a simulated user session, used to mimic real user behavior.</td>
+  </tr>
+  <tr>
+    <td><strong>CPU Saturation</strong></td>
+    <td>A state in which the CPU is fully utilized and can no longer accept additional requests.</td>
+  </tr>
+  <tr>
+    <td><strong>Uptime</strong></td>
+    <td>The length of time a system or service has been running continuously without interruption. For example, a server running without a restart for 7 days has an uptime of 7 days.</td>
+  </tr>
+  <tr>
+    <td><strong>PID</strong></td>
+    <td>Process ID — a unique identifier assigned to a running process by the operating system. Used to monitor processes, collect logs, or terminate them.</td>
+  </tr>
+  <tr>
+    <td><strong>Memory Leak</strong></td>
+    <td>A condition in which the system fails to release memory after use, causing memory usage to grow continuously until a crash or out-of-memory (OOM) error occurs.</td>
+  </tr>
+  <tr>
+    <td><strong>Throughput Ceiling</strong></td>
+    <td>The maximum throughput level a system can sustain before errors appear or latency spikes.</td>
+  </tr>
+  <tr>
+    <td><strong>p90 / p95 / p99</strong></td>
+    <td>Percentile values of response time. p90 means 90% of requests completed faster than this value; p95 means 95%; p99 means 99%.
+      <br><strong>Example:</strong> If p95 = 200ms, then 95% of all requests responded in under 200ms, while the slowest 5% may have taken longer.
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Thread Group</strong></td>
+    <td>A group of simulated users in JMeter that defines the number of threads, ramp-up time, and loop count.</td>
+  </tr>
+  <tr>
+    <td><strong>Sampler</strong></td>
+    <td>A component that sends requests — such as HTTP Request, JDBC Request, or FTP Request — to simulate real requests the system will receive.</td>
+  </tr>
+  <tr>
+    <td><strong>Listener</strong></td>
+    <td>A component that collects and displays test results — for example, Aggregate Report, Summary Report, or View Results Tree.</td>
+  </tr>
+  <tr>
+    <td><strong>Assertion</strong></td>
+    <td>A validation rule applied to a response — for example, checking that the response code is 200 or that the body contains expected content.</td>
+  </tr>
+  <tr>
+    <td><strong>Timer</strong></td>
+    <td>Adds a delay between requests to simulate real user wait time.</td>
+  </tr>
+  <tr>
+    <td><strong>Config Element</strong></td>
+    <td>Stores shared settings such as HTTP Header Manager or CSV Data Set Config for reuse across multiple samplers.</td>
+  </tr>
+  <tr>
+    <td><strong>PreProcessor / PostProcessor</strong></td>
+    <td>Scripts or transformations applied before or after a request is sent — for example, extracting a token or transforming data from a response.</td>
+  </tr>
+</table>
+
+<h2>Metric SLA</h2>
+<p>In performance testing, the primary metrics used as SLA criteria are:</p>
+<ul>
+  <li><strong>p90 / p95 / p99</strong> - percentile response time values</li>
+  <li><strong>Error rate</strong> - percentage of failed requests</li>
+  <li><strong>Throughput</strong> - number of requests per second the system can handle</li>
+  <li><strong>Availability</strong> - percentage of time the system is operational and reachable</li>
+  <li><strong>CPU utilization</strong> - percentage of CPU used during the test</li>
+  <li><strong>Memory usage</strong> - amount of memory consumed by the system during the test</li>
+  <li><strong>TTFB</strong> - time until the first byte is returned to the client</li>
+</ul>
+
+<h3>Example SLA Formats</h3>
+<table>
+  <tr>
+    <th>Metric</th>
+    <th>Example SLA</th>
+    <th>Description</th>
+    <th>Example Result</th>
+  </tr>
+  <tr>
+    <td><strong>p90</strong></td>
+    <td>&lt; 150ms</td>
+    <td>90% of requests must complete within this value</td>
+    <td>Result = 132ms → Pass</td>
+  </tr>
+  <tr>
+    <td><strong>p95</strong></td>
+    <td>&lt; 200ms</td>
+    <td>95% of requests must complete within this value</td>
+    <td>Result = 215ms → Fail</td>
+  </tr>
+  <tr>
+    <td><strong>p99</strong></td>
+    <td>&lt; 300ms</td>
+    <td>99% of requests must complete within this value</td>
+    <td>Result = 280ms → Pass</td>
+  </tr>
+  <tr>
+    <td><strong>Error rate</strong></td>
+    <td>&lt; 1%</td>
+    <td>No more than 1% of requests may fail</td>
+    <td>Result = 0.8% → Pass</td>
+  </tr>
+  <tr>
+    <td><strong>Throughput</strong></td>
+    <td>&gt;= 120 RPS</td>
+    <td>The system must handle at least 120 requests per second</td>
+    <td>Result = 145 RPS → Pass</td>
+  </tr>
+  <tr>
+    <td><strong>Availability</strong></td>
+    <td>&gt;= 99.9%</td>
+    <td>The system must be available for more than 99.9% of the test duration</td>
+    <td>Result = 99.95% → Pass</td>
+  </tr>
+  <tr>
+    <td><strong>CPU utilization</strong></td>
+    <td>&lt; 80%</td>
+    <td>CPU must not reach saturation during the test</td>
+    <td>Result = 76% → Pass</td>
+  </tr>
+  <tr>
+    <td><strong>Memory usage</strong></td>
+    <td>&lt; 70% of available RAM</td>
+    <td>Memory usage must not exceed the level that would trigger GC pressure or failure</td>
+    <td>Result = 55% → Pass</td>
+  </tr>
+  <tr>
+    <td><strong>TTFB</strong></td>
+    <td>&lt; 100ms</td>
+    <td>Time to first byte must not exceed this threshold</td>
+    <td>Result = 88ms → Pass</td>
+  </tr>
+</table>
+
+<h2>p90 / p95 / p99 in JMeter</h2>
+<p>In JMeter, p90/p95/p99 values are visible in listeners such as <strong>Aggregate Report</strong> or <strong>Summary Report</strong>, which display percentile values directly.</p>
+<ul>
+  <li><strong>Aggregate Report</strong>: Provides columns for <code>90%</code>, <code>95%</code>, and <code>99%</code> showing response time at each percentile.</li>
+  <li><strong>Summary Report</strong>: Displays <code>90%</code>, <code>95%</code>, and <code>99%</code> similarly and is well-suited for a high-level test overview.</li>
+  <li><strong>View Results in Table</strong>: Shows the response of each individual sample, but percentile values must be read from an aggregating listener.</li>
+</ul>
+<p>Example usage:</p>
+<pre>1) Add a <strong>Thread Group</strong> and HTTP Request sampler
+2) Add an <strong>Aggregate Report</strong> listener
+3) Run the test
+4) Read the values in the <code>90%</code>, <code>95%</code>, and <code>99%</code> columns
+</pre>
+
+<h3>Common JMeter listeners</h3>
+<ul>
+  <li><strong>Aggregate Report</strong> - View a summary of averages, median, percentiles, throughput, and error rate</li>
+  <li><strong>Summary Report</strong> - A simplified results summary suitable for a high-level overview</li>
+  <li><strong>View Results in Table</strong> - Inspect per-sample details, but not suitable for reading long percentile sequences</li>
+  <li><strong>View Results Tree</strong> - Examine individual request/response pairs when debugging a script or an assertion</li>
+</ul>
+
+<h3>How to Read Results from a Listener</h3>
+<ul>
+  <li>Check <strong>90%</strong>, <strong>95%</strong>, and <strong>99%</strong> to see whether they meet the SLA</li>
+  <li>If <strong>p95 fails</strong> but <strong>p90 passes</strong>, the slowest 5% of requests are creating the problem</li>
+  <li>If <strong>p99</strong> is well above the SLA value, the slowest 1% have an issue — possibly a bug in a specific path</li>
+  <li>If <strong>Error rate &gt; 1%</strong>, too many requests are failing, even if latency still looks acceptable.
+    <br><strong>JMeter counts as an error</strong> when the response code is 4xx/5xx, a timeout occurs, or an assertion fails.
+    <br><strong>Not an error</strong> when the response succeeds (2xx) but latency is higher than the SLA value.</li>
+  <li>Use <strong>Throughput</strong> to determine whether the system still has headroom for more load</li>
+</ul>
+
+<p>If <code>95%</code> is significantly above the SLA value, the slowest 5% of requests are causing some users to experience slow performance — investigate the bottleneck further.</p>
+
+<h2>Example Results After a Test Run</h2>
+<p>Assume the following SLA:</p>
+<ul>
+  <li><strong>p90 &lt; 150ms</strong></li>
+  <li><strong>p95 &lt; 200ms</strong></li>
+  <li><strong>p99 &lt; 300ms</strong></li>
+  <li><strong>Error rate &lt; 1%</strong></li>
+</ul>
+
+<table>
+  <tr>
+    <th>Metric</th>
+    <th>Actual Result</th>
+    <th>Status</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>p90</td>
+    <td>132ms</td>
+    <td>Pass</td>
+    <td>90% of requests responded faster than 132ms</td>
+  </tr>
+  <tr>
+    <td>p95</td>
+    <td>215ms</td>
+    <td>Fail</td>
+    <td>Must be under 200ms, but the slowest 5% took 215ms</td>
+  </tr>
+  <tr>
+    <td>p99</td>
+    <td>280ms</td>
+    <td>Pass</td>
+    <td>99% of requests responded faster than 280ms</td>
+  </tr>
+  <tr>
+    <td>Error rate</td>
+    <td>0.8%</td>
+    <td>Pass</td>
+    <td>Below the 1% threshold</td>
+  </tr>
+</table>
+
+<p>This example shows that overall performance is acceptable, but the root cause of the slowest 5% of requests (p95 fail) needs further investigation.</p>
+
+<p><strong>JMeter listeners</strong> such as <code>Aggregate Report</code> report these values in the <code>90%</code>, <code>95%</code>, and <code>99%</code> columns, enabling direct comparison against your SLA.</p>
+
+<div class="note">
+  Keep this page open as a reference while writing JMeter scripts or analyzing performance test results.
+</div>
+
+<script>
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl = document.getElementById("runtime-meta");
+
+  async function refreshRuntimeStatus() {
+    try {
+      const response = await fetch("/status", { cache: "no-store" });
+
+      if (!response.ok) {
+        throw new Error("Status endpoint returned non-200");
+      }
+
+      const data = await response.json();
+      statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent =
+        `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
+    } catch (error) {
+      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      metaEl.textContent = error.message;
+    }
+  }
+
+  refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 10000);
+</script>
+
+</body>
+</html>

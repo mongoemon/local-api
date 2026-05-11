@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Performance Testing Tools</title>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2, h3 { color: #1f2937; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .warn { background: #fefce8; border-left: 4px solid #ca8a04; padding: 12px; margin: 20px 0; }
+    .tool-card {
+      border: 1px solid #d1d5db;
+      padding: 20px;
+      margin: 16px 0;
+      background: #ffffff;
+    }
+    .tool-card h3 { margin-top: 0; margin-bottom: 6px; }
+    .tool-card .meta { font-size: 13px; color: #6b7280; margin-bottom: 12px; }
+    .tool-card .meta span { margin-right: 16px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 6px;
+    }
+    .badge-free { background: #dcfce7; color: #166534; }
+    .badge-paid { background: #fee2e2; color: #991b1b; }
+    .badge-freemium { background: #fef3c7; color: #92400e; }
+    .badge-oss { background: #dbeafe; color: #1e40af; }
+    .stack-box {
+      border: 1px solid #d1d5db;
+      padding: 16px;
+      margin: 12px 0;
+      background: #f9fafb;
+    }
+    .stack-box h3 { margin-top: 0; }
+    .category-header {
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 10px 16px;
+      margin: 32px 0 0 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
+      justify-content: space-between; gap: 16px; padding: 14px 24px; background: #1f2937;
+      color: #f9fafb; border-bottom: 1px solid #111827; z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
+    .topbar a:last-child { margin-right: 0; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/en/">Main</a>
+    <a href="/en/demo.html">Demo Home</a>
+    <a href="/en/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/en/demo-jmeter.html">JMeter Guide</a>
+    <a href="/en/demo-test-types.html">Test Types</a>
+    <a href="/en/tools.html">Tools</a>
+    <a href="/en/assignment.html">Assignment</a>
+    <a href="/en/glossary.html">Glossary</a>
+    <a href="/status">/status</a>
+    <span style="border-left:1px solid #4b5563;padding-left:14px"><a href="/tools.html">TH</a> &nbsp;|&nbsp; <strong style="color:#f9fafb">EN</strong></span>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>Performance Testing Tools In Real Industry</h1>
+
+<div class="note">
+  This page compiles tools actually used in the performance testing industry, grouped by role,
+  with descriptions of what each tool does and why organizations choose to use it.
+</div>
+
+<h2>Tool Categories</h2>
+<ol>
+  <li><a href="#load-generation">Load Generation</a> — tools that generate traffic for testing</li>
+  <li><a href="#monitoring">Monitoring &amp; Metrics</a> — collect and view metrics during and after testing</li>
+  <li><a href="#visualization">Visualization &amp; Dashboards</a> — display metrics as charts and graphs</li>
+  <li><a href="#apm">APM — Application Performance Monitoring</a> — track performance at the code level</li>
+  <li><a href="#cloud-load">Cloud Load Testing</a> — run distributed tests across multiple regions</li>
+  <li><a href="#api-testing">API Testing &amp; Exploration</a> — manual and automated API testing</li>
+  <li><a href="#stacks">Common Tool Stacks</a> — tool combinations used together in real organizations</li>
+  <li><a href="#comparison">Comparison Table</a> — direct side-by-side comparison</li>
+  <li><a href="#how-to-choose">How To Choose</a> — selecting the right tools for your project</li>
+</ol>
+
+<!-- =========================================================== -->
+<div class="category-header" id="load-generation">1. Load Generation Tools</div>
+<p style="margin-top:16px">This group of tools generates traffic to simulate real users, measuring response time, throughput, and error rate.</p>
+
+<div class="tool-card">
+  <h3>Apache JMeter</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free</span>
+    <span>Language: Java GUI + XML config (.jmx)</span>
+    <span>Platform: Desktop (Windows / Mac / Linux)</span>
+  </div>
+  <p><strong>What it does:</strong> Build test plans through a GUI, fire HTTP requests, simulate concurrent users, generate reports.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Over 25 years of history with a large community and comprehensive plugin ecosystem.</li>
+    <li>GUI requires no coding — ideal for QA engineers who are not comfortable writing code.</li>
+    <li>Supports a wide range of protocols: HTTP, HTTPS, FTP, JDBC, JMS, SOAP, LDAP.</li>
+    <li>Plugins such as Concurrency Thread Group, Stepping Thread Group, and Backend Listener can be added on demand.</li>
+    <li>Runs in Non-GUI mode in CI/CD with <code>jmeter -n -t plan.jmx -l results.jtl</code>.</li>
+    <li>Integrates with BlazeMeter Cloud for distributed testing.</li>
+  </ul>
+  <p><strong>Weaknesses:</strong> High RAM usage, outdated GUI, test scripts are XML which is difficult to diff in Git.</p>
+  <p><strong>Use when:</strong> You need a free tool, your team is not comfortable with code, or you need a wide plugin ecosystem.</p>
+</div>
+
+<div class="tool-card">
+  <h3>k6 (by Grafana Labs)</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free (k6 Cloud is paid)</span>
+    <span>Language: JavaScript (ES6+)</span>
+    <span>Platform: CLI, Docker, CI/CD</span>
+  </div>
+  <p><strong>What it does:</strong> Write test scripts in JavaScript, run from the terminal, export metrics to Prometheus/InfluxDB/Grafana.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Scripts are real JavaScript — flexible to write, easy to store in Git, and straightforward to review.</li>
+    <li>Uses far fewer resources than JMeter (written in Go) — can run more virtual users per CPU.</li>
+    <li>Built-in metrics designed directly for the Prometheus/Grafana stack.</li>
+    <li>Runs in CI/CD immediately without installing a GUI or Java.</li>
+    <li>Supports the Scenarios API — define multiple load profiles in a single file.</li>
+    <li>Connects to k6 Cloud for distributed testing and an online dashboard.</li>
+  </ul>
+  <p><strong>Weaknesses:</strong> No GUI, requires writing JavaScript, does not support as wide a range of protocols as JMeter.</p>
+  <p><strong>Use when:</strong> You have a dev/DevOps team comfortable with code, need CI/CD integration, or are already using the Grafana stack.</p>
+  <pre>// Basic k6 script example
+import http from "k6/http";
+import { check, sleep } from "k6";
+
+export const options = {
+  vus: 20,
+  duration: "30s",
+};
+
+export default function () {
+  const res = http.get("http://localhost:3001/fast");
+  check(res, { "status is 200": (r) => r.status === 200 });
+  sleep(1);
+}</pre>
+</div>
+
+<div class="tool-card">
+  <h3>Gatling</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Open Source + Enterprise</span></span>
+    <span>Language: Scala DSL (or Java/Kotlin in Gatling 3.7+)</span>
+    <span>Platform: CLI, Maven/Gradle plugin, CI/CD</span>
+  </div>
+  <p><strong>What it does:</strong> Write tests as code (Scala/Java/Kotlin), generate beautiful built-in HTML reports, simulate realistic user sessions.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Uses the Akka actor model internally — handles large numbers of concurrent users with fewer threads.</li>
+    <li>Built-in HTML reports show percentiles, response time distributions, and error timelines without requiring Grafana setup.</li>
+    <li>Well-suited for Java/Scala shops where developers can write their own performance tests.</li>
+    <li>Runs via Maven/Gradle plugin directly — very easy to integrate into CI/CD pipelines for Java projects.</li>
+    <li>Test scripts are easy to maintain in Git because they are code, not XML.</li>
+  </ul>
+  <p><strong>Weaknesses:</strong> Scala DSL has a steep learning curve; community is smaller than JMeter and k6.</p>
+  <p><strong>Use when:</strong> You are in a Java/Scala ecosystem, need built-in HTML reports, or have developers writing their own performance tests.</p>
+</div>
+
+<div class="tool-card">
+  <h3>Locust</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free</span>
+    <span>Language: Python</span>
+    <span>Platform: CLI, Web UI, Docker, Kubernetes</span>
+  </div>
+  <p><strong>What it does:</strong> Write tests in Python, provides a real-time Web UI, runs distributed on Kubernetes.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Python is easy to read — data and Python backend teams can write tests without learning a new tool.</li>
+    <li>Web UI shows real-time graphs while the test runs — user count can be adjusted mid-run.</li>
+    <li>Scales out to multiple workers on Kubernetes easily with distributed mode.</li>
+    <li>Highly flexible — supports custom logic, authentication flows, and stateful sessions.</li>
+  </ul>
+  <p><strong>Weaknesses:</strong> Python's GIL may limit per-process throughput — distributed mode is needed for high load.</p>
+  <p><strong>Use when:</strong> You have a Python team, need real-time control, or require distributed load on Kubernetes.</p>
+</div>
+
+<div class="tool-card">
+  <h3>Artillery</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Open Source + Pro</span></span>
+    <span>Language: YAML config + JavaScript hooks</span>
+    <span>Platform: CLI, CI/CD, AWS Lambda</span>
+  </div>
+  <p><strong>What it does:</strong> Define load scenarios in YAML, write custom logic in JavaScript, run serverless load tests on AWS Lambda.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>YAML config is easy to read — suitable for DevOps engineers who do not want to write full JavaScript.</li>
+    <li>Runs distributed on AWS Lambda without managing infrastructure (Artillery Pro).</li>
+    <li>Built-in support for HTTP, WebSocket, Socket.io, and gRPC.</li>
+    <li>Full access to the Node.js ecosystem within custom hooks.</li>
+  </ul>
+  <p><strong>Weaknesses:</strong> Most advanced features are in the Pro tier; community is smaller than JMeter/k6.</p>
+  <p><strong>Use when:</strong> You have a cloud-native team, work in an AWS ecosystem, or need serverless distributed load.</p>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="monitoring">2. Monitoring &amp; Metrics Collection</div>
+<p style="margin-top:16px">This group of tools collects metrics from the application and infrastructure during and after testing.</p>
+
+<div class="tool-card">
+  <h3>Prometheus</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free</span>
+    <span>Language: Go (server), PromQL (query)</span>
+    <span>Platform: Docker, Kubernetes, bare metal</span>
+  </div>
+  <p><strong>What it does:</strong> Collects time-series metrics by scraping the <code>/metrics</code> endpoint of each service every N seconds.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>The de facto standard for metrics collection in the cloud-native/Kubernetes ecosystem.</li>
+    <li>Pull-based model — Prometheus scrapes services itself, so services do not need to know about Prometheus.</li>
+    <li>Powerful PromQL query language — instantly calculates rates, percentiles, and aggregations.</li>
+    <li>Client libraries available for every language — Node.js (<code>prom-client</code>), Go, Java, Python.</li>
+    <li>This Local API uses <code>prom-client</code> — accessible at <code>GET /metrics</code>.</li>
+  </ul>
+  <p><strong>Use together with:</strong> Grafana (visualization), Alertmanager (alerting), k6 (metric export)</p>
+  <pre># PromQL example — p95 of HTTP request duration
+histogram_quantile(0.95,
+  sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route)
+)</pre>
+</div>
+
+<div class="tool-card">
+  <h3>InfluxDB</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Open Source + Cloud</span></span>
+    <span>Language: Flux / InfluxQL (query)</span>
+    <span>Platform: Docker, Cloud</span>
+  </div>
+  <p><strong>What it does:</strong> A time-series database designed specifically for storing metrics — much faster for writes and reads than a general-purpose database.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>JMeter's Backend Listener can send metrics to InfluxDB in real time during a test run.</li>
+    <li>k6 has a <code>--out influxdb</code> flag for real-time metric export.</li>
+    <li>Well-suited for the JMeter + InfluxDB + Grafana stack (widely used in Thai organizations).</li>
+  </ul>
+  <p><strong>Use together with:</strong> JMeter (Backend Listener), k6 (<code>--out influxdb</code>), Grafana</p>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="visualization">3. Visualization &amp; Dashboards</div>
+<p style="margin-top:16px">This group of tools displays metrics as chart dashboards, used for monitoring during test runs and analyzing results afterward.</p>
+
+<div class="tool-card">
+  <h3>Grafana</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Open Source + Cloud</span></span>
+    <span>Platform: Docker, Kubernetes, Grafana Cloud</span>
+  </div>
+  <p><strong>What it does:</strong> Creates dashboards that pull data from Prometheus, InfluxDB, Elasticsearch, Loki, and dozens of other data sources.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Powerful visualization — graphs, heatmaps, tables, stat panels, and alerts all in one place.</li>
+    <li>Pre-built dashboards for JMeter and k6 are available for free import from Grafana.com.</li>
+    <li>View real-time metrics during a load test — latency spikes are visible immediately.</li>
+    <li>The standard tool for DevOps / SRE teams worldwide, allowing ops and performance test teams to share the same tooling.</li>
+    <li>Set alerts to send Slack/PagerDuty notifications when metrics exceed a threshold.</li>
+  </ul>
+  <p><strong>Use together with:</strong> Prometheus, InfluxDB, Loki (logs), Tempo (traces)</p>
+  <p><strong>Common stacks:</strong></p>
+  <ul>
+    <li>JMeter → InfluxDB → Grafana</li>
+    <li>k6 → Prometheus → Grafana</li>
+    <li>Locust → Prometheus → Grafana</li>
+  </ul>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="apm">4. APM — Application Performance Monitoring</div>
+<p style="margin-top:16px">APM goes deeper than metrics — it traces requests at the code level, traces across services, and identifies the true bottleneck in production.</p>
+
+<div class="tool-card">
+  <h3>Datadog</h3>
+  <div class="meta">
+    <span><span class="badge badge-paid">Commercial</span> Paid</span>
+    <span>Platform: SaaS (cloud)</span>
+  </div>
+  <p><strong>What it does:</strong> Collects metrics, logs, traces, and RUM (Real User Monitoring) in one place, with AI-powered anomaly detection.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>All-in-one — no need to set up Prometheus, Grafana, and Loki separately.</li>
+    <li>APM Traces show the call stack for each request — reveals which specific database query is the bottleneck.</li>
+    <li>Integrates with JMeter / k6 to compare load test metrics against infrastructure metrics on one screen.</li>
+    <li>RUM measures performance from the perspective of real users' browsers.</li>
+    <li>Popular in mid-to-large organizations that need vendor support and a guaranteed SLA.</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>New Relic</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Free tier + Paid</span></span>
+    <span>Platform: SaaS (cloud)</span>
+  </div>
+  <p><strong>What it does:</strong> APM, infrastructure monitoring, browser monitoring, and synthetic monitoring all in one place.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Fairly generous free tier (100 GB data/month) — well-suited for startups.</li>
+    <li>Auto-instrumentation for Node.js, Java, .NET, and Python — install the agent and traces appear immediately.</li>
+    <li>NRQL (New Relic Query Language) can query metrics, logs, and traces in one place.</li>
+    <li>Synthetics — create test scripts that run continuously from global locations.</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>Dynatrace</h3>
+  <div class="meta">
+    <span><span class="badge badge-paid">Commercial</span> Paid</span>
+    <span>Platform: SaaS / On-premise</span>
+  </div>
+  <p><strong>What it does:</strong> AI-powered full-stack monitoring — automatic root cause analysis, code-level visibility, and infrastructure monitoring.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Davis AI automatically analyzes root causes — no need to manually trace through metrics.</li>
+    <li>OneAgent installs on one machine and monitors everything — JVM, containers, and network.</li>
+    <li>Enterprise-grade: widely used in banks, telecoms, and government agencies that require on-premise deployment.</li>
+    <li>Integrates with JMeter/k6 to correlate load test results with APM traces.</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>OpenTelemetry (OTel)</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free (a standard, not a tool)</span>
+    <span>Platform: Any environment</span>
+  </div>
+  <p><strong>What it does:</strong> A common standard for instrumentation — collects traces, metrics, and logs in a unified format and sends them to any backend.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Vendor-neutral — using OTel allows telemetry to be sent to Datadog, New Relic, Jaeger, or Prometheus without rewriting code.</li>
+    <li>A CNCF standard — supported by every cloud provider.</li>
+    <li>Can replace proprietary SDKs from Datadog/New Relic — reduces vendor lock-in.</li>
+  </ul>
+  <p><strong>Use together with:</strong> Jaeger (traces), Prometheus (metrics), Loki (logs), Grafana Tempo</p>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="cloud-load">5. Cloud Load Testing Platforms</div>
+<p style="margin-top:16px">When high load or distributed testing across multiple regions is needed, these platforms are used instead of running on a single machine.</p>
+
+<div class="tool-card">
+  <h3>BlazeMeter (by Perforce)</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Free tier + Paid</span></span>
+    <span>Platform: SaaS</span>
+  </div>
+  <p><strong>What it does:</strong> Upload a JMeter .jmx file and run it on cloud infrastructure immediately, with a real-time dashboard and reports.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Existing JMeter scripts work immediately — no need to learn a new tool.</li>
+    <li>Run tests from multiple regions simultaneously — ideal for global applications.</li>
+    <li>No infrastructure to manage — suitable for tests requiring thousands of virtual users.</li>
+    <li>CI/CD plugins available for Jenkins, GitHub Actions, and Azure DevOps.</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>k6 Cloud (by Grafana Labs)</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Free tier + Paid</span></span>
+    <span>Platform: SaaS</span>
+  </div>
+  <p><strong>What it does:</strong> Run k6 scripts on cloud infrastructure, view results on an online dashboard, and compare results across test runs.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Connects directly from the k6 CLI with <code>k6 cloud script.js</code>.</li>
+    <li>Runs distributed across multiple regions with automatic result consolidation.</li>
+    <li>Trend comparison — compare the current run against previous runs.</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>Azure Load Testing</h3>
+  <div class="meta">
+    <span><span class="badge badge-paid">Paid</span> (billed by VUH — Virtual User Hours)</span>
+    <span>Platform: Azure SaaS</span>
+  </div>
+  <p><strong>What it does:</strong> A managed load testing service on Azure — upload a JMeter script or URL and run immediately.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Direct integration with Azure DevOps / GitHub Actions — pass/fail tests in a CI pipeline.</li>
+    <li>View App Service, AKS, and Azure Monitor metrics alongside load test results on the same screen.</li>
+    <li>Ideal for organizations already using the Azure ecosystem.</li>
+  </ul>
+</div>
+
+<div class="tool-card">
+  <h3>AWS Distributed Load Testing</h3>
+  <div class="meta">
+    <span><span class="badge badge-paid">Paid</span> (AWS infrastructure cost)</span>
+    <span>Platform: AWS (Fargate + CloudWatch)</span>
+  </div>
+  <p><strong>What it does:</strong> Deploys Taurus/JMeter containers on AWS Fargate to run distributed load tests.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Well-suited for the AWS ecosystem — view CloudWatch metrics alongside load test results.</li>
+    <li>Worker containers can be scaled as needed with no fixed limits.</li>
+  </ul>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="api-testing">6. API Testing &amp; Exploration</div>
+<p style="margin-top:16px">This group of tools is used to explore APIs, perform manual testing, and write automated functional tests before load testing.</p>
+
+<div class="tool-card">
+  <h3>Postman</h3>
+  <div class="meta">
+    <span><span class="badge badge-freemium">Free + Paid</span></span>
+    <span>Platform: Desktop, Web</span>
+  </div>
+  <p><strong>What it does:</strong> Send HTTP requests manually, write test scripts in JavaScript, create Collections to share within a team.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li>Easiest tool for first-time API exploration — no coding required.</li>
+    <li>Postman Collection Runner can run an entire functional test collection automatically.</li>
+    <li>Share Collections between dev, QA, and performance test teams — everyone uses the same requests.</li>
+    <li>Newman CLI can run Collections in CI/CD without opening a GUI.</li>
+  </ul>
+  <p><strong>Use when:</strong> Exploring an API for the first time, debugging requests, or creating functional tests before load testing.</p>
+</div>
+
+<div class="tool-card">
+  <h3>curl / httpie</h3>
+  <div class="meta">
+    <span><span class="badge badge-free badge-oss">Open Source</span> Free</span>
+    <span>Platform: Terminal (all OS)</span>
+  </div>
+  <p><strong>What it does:</strong> Send HTTP requests directly from the terminal — fast, no GUI installation required.</p>
+  <p><strong>Why organizations use it:</strong></p>
+  <ul>
+    <li><code>curl</code> is available on every Unix system — works in CI/CD, Docker, and production servers.</li>
+    <li><code>httpie</code> (<code>http</code> command) produces much more readable output than curl — automatically highlights JSON.</li>
+    <li>Ideal for quick sanity checks and shell scripting.</li>
+  </ul>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="stacks">7. Common Tool Stacks in Real Organizations</div>
+<p style="margin-top:16px">Organizations typically use multiple tools together. Below are the stacks most commonly found in Thailand and internationally.</p>
+
+<div class="stack-box">
+  <h3>Stack A: JMeter + InfluxDB + Grafana (Classic Stack)</h3>
+  <p><strong>Common in organizations that already use JMeter and want a real-time dashboard.</strong></p>
+  <pre>JMeter (generates load)
+  └─ Backend Listener → InfluxDB (stores metrics in real time)
+                          └─ Grafana Dashboard (displays real-time graphs)
+
+After the run:
+JMeter → generates an HTML report from the .jtl file</pre>
+  <ul>
+    <li>Best for: QA teams already using JMeter.</li>
+    <li>Getting started: Install InfluxDB + Grafana with Docker Compose.</li>
+    <li>Import a ready-made dashboard from Grafana.com ID: 1152 (JMeter dashboard).</li>
+  </ul>
+</div>
+
+<div class="stack-box">
+  <h3>Stack B: k6 + Prometheus + Grafana (Modern DevOps Stack)</h3>
+  <p><strong>Common in DevOps / SRE teams already running Kubernetes and Prometheus.</strong></p>
+  <pre>k6 (generates load)
+  └─ --out prometheus-rw → Prometheus (scrapes metrics)
+                             └─ Grafana Dashboard (displays graphs)
+
+Or:
+k6 → --out influxdb → InfluxDB → Grafana</pre>
+  <ul>
+    <li>Best for: dev/DevOps teams who write JavaScript and use Kubernetes.</li>
+    <li>Getting started: <code>k6 run --out prometheus-rw=http://localhost:9090/api/v1/write script.js</code></li>
+    <li>Import dashboard from Grafana.com ID: 19665 (k6 Prometheus dashboard).</li>
+  </ul>
+</div>
+
+<div class="stack-box">
+  <h3>Stack C: JMeter + BlazeMeter Cloud (Enterprise Load)</h3>
+  <p><strong>Common in organizations that need high load (thousands of VUs) without managing their own infrastructure.</strong></p>
+  <pre>JMeter .jmx (script on a dev machine)
+  └─ upload → BlazeMeter Cloud
+                └─ runs distributed from multiple regions
+                └─ real-time dashboard + PDF report</pre>
+  <ul>
+    <li>Best for: tests requiring 500–10,000 VUs, global testing.</li>
+    <li>Getting started: Sign up for a BlazeMeter free tier (50 VU, 10 min/test).</li>
+  </ul>
+</div>
+
+<div class="stack-box">
+  <h3>Stack D: k6 + Grafana Cloud + APM (Full Observability)</h3>
+  <p><strong>Common in modern cloud-native organizations.</strong></p>
+  <pre>k6 Cloud (load generation)
+  └─ Grafana Cloud (load test dashboard)
+
+Application (running under test)
+  └─ OpenTelemetry → Grafana Tempo (traces)
+  └─ prom-client → Prometheus → Grafana (metrics)
+  └─ Loki (logs)
+
+Grafana Explore
+  └─ correlate: load test timeline + app traces + logs</pre>
+  <ul>
+    <li>Best for: startups and tech companies that need full observability.</li>
+    <li>Advantage: View load test results, application traces, and logs on a single screen — root cause analysis is much faster.</li>
+  </ul>
+</div>
+
+<!-- =========================================================== -->
+<div class="category-header" id="comparison">8. Comparison Table</div>
+
+<table style="margin-top:16px">
+  <tr>
+    <th>Tool</th>
+    <th>Category</th>
+    <th>Script Language</th>
+    <th>Learning Curve</th>
+    <th>Best For</th>
+    <th>Cost</th>
+  </tr>
+  <tr>
+    <td><strong>JMeter</strong></td>
+    <td>Load Generation</td>
+    <td>GUI / XML</td>
+    <td>Medium</td>
+    <td>QA teams, multiple protocols, plugin ecosystem</td>
+    <td>Free</td>
+  </tr>
+  <tr>
+    <td><strong>k6</strong></td>
+    <td>Load Generation</td>
+    <td>JavaScript</td>
+    <td>Low (if you can write JS)</td>
+    <td>Developers, CI/CD, Grafana stack</td>
+    <td>Free / k6 Cloud paid</td>
+  </tr>
+  <tr>
+    <td><strong>Gatling</strong></td>
+    <td>Load Generation</td>
+    <td>Scala / Java / Kotlin</td>
+    <td>High</td>
+    <td>Java/Scala teams, built-in HTML reports</td>
+    <td>Free / Enterprise paid</td>
+  </tr>
+  <tr>
+    <td><strong>Locust</strong></td>
+    <td>Load Generation</td>
+    <td>Python</td>
+    <td>Low (if you can write Python)</td>
+    <td>Python teams, distributed on K8s</td>
+    <td>Free</td>
+  </tr>
+  <tr>
+    <td><strong>Artillery</strong></td>
+    <td>Load Generation</td>
+    <td>YAML + JS</td>
+    <td>Low</td>
+    <td>DevOps, AWS serverless</td>
+    <td>Free / Pro paid</td>
+  </tr>
+  <tr>
+    <td><strong>Prometheus</strong></td>
+    <td>Metrics Collection</td>
+    <td>PromQL</td>
+    <td>Medium</td>
+    <td>Cloud-native metrics, Kubernetes</td>
+    <td>Free</td>
+  </tr>
+  <tr>
+    <td><strong>InfluxDB</strong></td>
+    <td>Time-series DB</td>
+    <td>Flux / InfluxQL</td>
+    <td>Low</td>
+    <td>JMeter real-time metric storage</td>
+    <td>Free / Cloud paid</td>
+  </tr>
+  <tr>
+    <td><strong>Grafana</strong></td>
+    <td>Visualization</td>
+    <td>Dashboard UI</td>
+    <td>Low</td>
+    <td>Dashboard for any metric source</td>
+    <td>Free / Cloud paid</td>
+  </tr>
+  <tr>
+    <td><strong>Datadog</strong></td>
+    <td>APM + Monitoring</td>
+    <td>NRQL / UI</td>
+    <td>Low</td>
+    <td>All-in-one enterprise monitoring</td>
+    <td>Paid</td>
+  </tr>
+  <tr>
+    <td><strong>New Relic</strong></td>
+    <td>APM + Monitoring</td>
+    <td>NRQL / UI</td>
+    <td>Low</td>
+    <td>All-in-one, generous free tier</td>
+    <td>Free tier / Paid</td>
+  </tr>
+  <tr>
+    <td><strong>BlazeMeter</strong></td>
+    <td>Cloud Load Testing</td>
+    <td>JMeter .jmx</td>
+    <td>Low</td>
+    <td>JMeter cloud scale, distributed</td>
+    <td>Free tier / Paid</td>
+  </tr>
+  <tr>
+    <td><strong>Postman</strong></td>
+    <td>API Testing</td>
+    <td>JavaScript</td>
+    <td>Low</td>
+    <td>Explore APIs, functional testing</td>
+    <td>Free / Paid team features</td>
+  </tr>
+  <tr>
+    <td><strong>OpenTelemetry</strong></td>
+    <td>Instrumentation Standard</td>
+    <td>SDK (all languages)</td>
+    <td>Medium</td>
+    <td>Vendor-neutral observability</td>
+    <td>Free</td>
+  </tr>
+</table>
+
+<!-- =========================================================== -->
+<div class="category-header" id="how-to-choose">9. How To Choose</div>
+
+<table style="margin-top:16px">
+  <tr><th>If your team is...</th><th>Recommended Load Tool</th><th>Recommended Monitoring Stack</th></tr>
+  <tr>
+    <td>QA without a coding background, just starting with performance testing</td>
+    <td><strong>JMeter</strong> (GUI, plugins, community)</td>
+    <td>JMeter HTML report → gradually add InfluxDB + Grafana</td>
+  </tr>
+  <tr>
+    <td>Developers comfortable with JavaScript, using CI/CD</td>
+    <td><strong>k6</strong> (code-friendly, CI-ready)</td>
+    <td>k6 + Prometheus + Grafana</td>
+  </tr>
+  <tr>
+    <td>Java/Kotlin developers who want built-in reports</td>
+    <td><strong>Gatling</strong> (Maven/Gradle plugin)</td>
+    <td>Gatling HTML report → gradually add Grafana</td>
+  </tr>
+  <tr>
+    <td>Comfortable with Python, need distributed testing on Kubernetes</td>
+    <td><strong>Locust</strong></td>
+    <td>Locust + Prometheus + Grafana</td>
+  </tr>
+  <tr>
+    <td>Need cloud-scale load (1,000+ VUs) without managing infrastructure</td>
+    <td><strong>BlazeMeter</strong> (JMeter cloud) or <strong>k6 Cloud</strong></td>
+    <td>Built-in cloud dashboard</td>
+  </tr>
+  <tr>
+    <td>Using Azure / AWS ecosystems</td>
+    <td><strong>Azure Load Testing</strong> or <strong>AWS DLT</strong></td>
+    <td>Azure Monitor / CloudWatch</td>
+  </tr>
+  <tr>
+    <td>Need full observability (traces + metrics + logs)</td>
+    <td>k6 or JMeter</td>
+    <td>OpenTelemetry + Grafana Stack (Tempo, Prometheus, Loki)</td>
+  </tr>
+</table>
+
+<div class="note" style="margin-top:32px">
+  <strong>For this Lab:</strong> We use JMeter as the primary load generation tool.
+  The Local API exposes <code>GET /metrics</code> in Prometheus format,
+  which can be scraped by Prometheus and displayed in Grafana immediately if you choose to set up the full stack.
+</div>
+
+<script>
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl = document.getElementById("runtime-meta");
+  async function refreshRuntimeStatus() {
+    try {
+      const response = await fetch("/status", { cache: "no-store" });
+      if (!response.ok) throw new Error("Status endpoint returned non-200");
+      const data = await response.json();
+      statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent = `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
+    } catch (error) {
+      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      metaEl.textContent = "Open this page through Node/Express to enable live status.";
+    }
+  }
+  refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 5000);
+</script>
+</body>
+</html>

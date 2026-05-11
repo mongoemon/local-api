@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Assignment for Beginners</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2, h3 { color: #1f2937; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .task { border: 1px solid #d1d5db; padding: 18px; margin: 16px 0; background: #ffffff; }
+    .task h3 { margin-top: 0; }
+    .task strong { display: block; margin-bottom: 8px; }
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 24px;
+      background: #1f2937;
+      color: #f9fafb;
+      border-bottom: 1px solid #111827;
+      z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
+    .topbar a:last-child { margin-right: 0; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/en/">Main</a>
+    <a href="/en/demo.html">Demo Home</a>
+    <a href="/en/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/en/demo-jmeter.html">JMeter Guide</a>
+    <a href="/en/demo-test-types.html">Test Types</a>
+    <a href="/en/tools.html">Tools</a>
+    <a href="/en/assignment.html">Assignment</a>
+    <a href="/en/glossary.html">Glossary</a>
+    <a href="/status">/status</a>
+    <span style="border-left:1px solid #4b5563;padding-left:14px"><a href="/assignment.html">TH</a> &nbsp;|&nbsp; <strong style="color:#f9fafb">EN</strong></span>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>Assignment for Beginners</h1>
+
+<div class="note">
+  This page is a set of exercises for beginners, designed to let you try each part of the API one at a time and see answers immediately.
+  It is ideal for practising writing requests, reading responses, and understanding the purpose of each endpoint.
+</div>
+
+<h2>How to use</h2>
+<ul>
+  <li>Read the prompt in each section first.</li>
+  <li>Try calling the endpoint using a browser, Postman, or curl.</li>
+  <li>Read the answer below each task to verify your result.</li>
+</ul>
+
+<div class="note">
+  Before you begin, review the <a href="/en/demo-jmeter.html">JMeter Guide</a> for setting up Thread Groups, Variables, and Extractors,
+  and <a href="/en/demo-test-types.html">Test Types</a> for selecting the right test type and run order.
+</div>
+
+<div class="task">
+  <h3>Task 1: Call the baseline endpoint</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>GET /fast</code> and verify what message is returned in the response.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Use a browser, curl, or Postman to open <code>http://localhost:3001/fast</code>.</li>
+    <li>For a baseline test, start with 1 thread or a single request.</li>
+    <li>Confirm that the response is JSON and contains a <code>message</code> field.</li>
+    <li>Verify that the message value is <code>fast response</code>.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>The correct response will be JSON:</p>
+  <pre>{
+  "message": "fast response"
+}</pre>
+  <p>If you receive this response, the server is running and the baseline endpoint is responding normally.</p>
+</div>
+
+<div class="task">
+  <h3>Task 2: Test the delay endpoint</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>GET /slow</code> and observe the time taken for the request and the message in the response.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Use curl or Postman to call <code>http://localhost:3001/slow</code>.</li>
+    <li>Start with 1–2 threads or 1–2 concurrent requests to observe the delay clearly.</li>
+    <li>Note the elapsed time from sending the request to receiving the response.</li>
+    <li>Check that the response message indicates the delay, e.g., <code>slow response (200ms)</code>.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>The response will be JSON similar to:</p>
+  <pre>{
+  "message": "slow response (200ms)"
+}</pre>
+  <p>The number after "slow response" comes from the <code>config.workloads.slowDelayMs</code> setting in the system.</p>
+</div>
+
+<div class="task">
+  <h3>Task 3: Verify the legacy auth flow</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>GET /prep</code> to see the token and authorization header provided by the system, then call <code>GET /protected</code> with the header <code>Authorization: Bearer lab-token</code>.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Open <code>GET http://localhost:3001/prep</code> and check that the response contains the <code>token</code> and <code>authorizationHeader</code> fields.</li>
+    <li>Use the value <code>lab-token</code> in the <code>Authorization: Bearer lab-token</code> header when calling <code>/protected</code>.</li>
+    <li>Primarily test with 1 request, but use 2–3 threads concurrently if you want to observe concurrent behavior.</li>
+    <li>Verify that the response grants access to the protected resource.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>The response from <code>/prep</code> will include a <code>token</code> field and an <code>authorizationHeader</code> field; the token value is normally <code>lab-token</code>.</p>
+  <p>When calling <code>/protected</code> with the following header:</p>
+  <pre>Authorization: Bearer lab-token</pre>
+  <p>The correct response will be:</p>
+  <pre>{
+  "message": "protected resource access granted",
+  "authenticated": true,
+  "tokenSource": "authorization"
+}</pre>
+</div>
+
+<div class="task">
+  <h3>Task 4: Try JWT-based auth</h3>
+  <strong>Prompt</strong>
+  <p>Use <code>POST /auth/login</code> with the following JSON body:</p>
+  <pre>{
+  "username": "demo",
+  "password": "password"
+}</pre>
+  <p>Then take the token from the response and call <code>POST /auth/verify</code> with the header <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Send a POST to <code>http://localhost:3001/auth/login</code> with the specified body.</li>
+    <li>Copy the <code>token</code> value from the response.</li>
+    <li>Send another POST to <code>http://localhost:3001/auth/verify</code> with the header <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+    <li>Test with 1–2 concurrent requests to confirm the token remains valid under concurrent use.</li>
+    <li>Verify that the response contains <code>valid: true</code> and that the decoded data matches the user.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>The response from <code>/auth/login</code> will be JSON containing a <code>token</code> field, for example:</p>
+  <pre>{
+  "message": "login successful",
+  "authenticated": true,
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}</pre>
+  <p>Using that token to call <code>POST /auth/verify</code> will return a response similar to:</p>
+  <pre>{
+  "message": "token is valid",
+  "valid": true,
+  "decoded": {
+    "userId": "user-123",
+    "username": "demo",
+    "iat": "...",
+    "exp": "..."
+  }
+}</pre>
+</div>
+
+<div class="task">
+  <h3>Task 5: Test a validation error</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>POST /submit-one</code> without sending a body, or with an empty body, and observe how the system responds.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Use curl or Postman to send a POST to <code>http://localhost:3001/submit-one</code> without a body.</li>
+    <li>Use 1–3 concurrent requests to confirm that validation works across multiple requests.</li>
+    <li>Check that the response is HTTP 400 or contains a JSON error.</li>
+    <li>Try sending a valid body such as <code>{ "name": "test" }</code> and compare the results.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>The response will be HTTP 400 with JSON:</p>
+  <pre>{
+  "error": "missing_required_parameter",
+  "required": ["name"]
+}</pre>
+  <p>If you send a valid body such as <code>{ "name": "test" }</code>, you will receive:</p>
+  <pre>{
+  "message": "received one required parameter",
+  "data": { "name": "test" }
+}</pre>
+</div>
+
+<div class="task">
+  <h3>Task 6: Try the I/O flow and cleanup</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>GET /io?mode=write</code> and <code>GET /io?mode=read</code>, then call <code>POST /cleanup</code> to delete the temporary files.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Call <code>GET http://localhost:3001/io?mode=write</code> to create a temporary file.</li>
+    <li>Call <code>GET http://localhost:3001/io?mode=read</code> to read data from the file.</li>
+    <li>For the I/O flow, try 1–2 concurrent requests to observe sequential behavior.</li>
+    <li>Call <code>POST http://localhost:3001/cleanup</code> to clear all temporary files.</li>
+    <li>Check each step's response to confirm it shows <code>durationMs</code> and the cleanup status.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>Both <code>/io?mode=write</code> and <code>/io?mode=read</code> will return JSON containing <code>durationMs</code> and <code>mode</code>.</p>
+  <p>After that, <code>POST /cleanup</code> will return JSON such as:</p>
+  <pre>{
+  "message": "cleanup completed",
+  "cleaned": ["io-test.dat"],
+  "cleanedCount": 1
+}</pre>
+</div>
+
+<div class="note">
+  Once you have completed all 6 tasks, go back and read the <a href="/en/demo.html">Demo Flow</a> to learn about more complex flows,
+  and use your answers to design your own JMeter test plan.
+</div>
+
+<h2>Next-Level Exercises</h2>
+<div class="task">
+  <h3>Challenge 1: Compare /fast with /slow</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>/fast</code> and <code>/slow</code>, note the time taken for each request, and compare the difference.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Use a timing tool such as curl with timing flags or Postman to call both endpoints.</li>
+    <li>Record the latency values for <code>/fast</code> and <code>/slow</code>.</li>
+    <li>Compare the results to see how much they differ, and confirm that the delay matches the <code>slowDelayMs</code> config value.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>You will see that <code>/slow</code> always takes longer than <code>/fast</code>, with the additional time matching the <code>slowDelayMs</code> configuration.</p>
+</div>
+
+<div class="task">
+  <h3>Challenge 2: Create an error case with /submit-two</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>POST /submit-two</code> with a body that is missing only the <code>type</code> field and observe the response.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Send a POST to <code>http://localhost:3001/submit-two</code> with a body such as <code>{ "name": "test" }</code>.</li>
+    <li>Try 1–3 concurrent requests to verify that the validation error is consistent.</li>
+    <li>Check that the response code is 400 and that the response body lists the missing fields.</li>
+    <li>Try sending a complete body with both <code>name</code> and <code>type</code> and compare the results.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>The response will be HTTP 400 and the JSON will contain:</p>
+  <pre>{
+  "error": "missing_required_parameters",
+  "required": ["name", "type"]
+}</pre>
+</div>
+
+<div class="task">
+  <h3>Challenge 3: Test an invalid token</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>POST /auth/verify</code> with the header <code>Authorization: Bearer invalid-token</code> and observe the response.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Send a POST to <code>http://localhost:3001/auth/verify</code> with the header <code>Authorization: Bearer invalid-token</code>.</li>
+    <li>Try 1–2 requests to confirm that invalid tokens are rejected every time.</li>
+    <li>Check that the response code is 403 and that the response body shows an invalid token error.</li>
+    <li>Compare with a valid token obtained from <code>/auth/login</code> to see the difference.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>The response will be HTTP 403 with JSON:</p>
+  <pre>{
+  "error": "invalid_token",
+  "message": "Token is not valid"
+}</pre>
+</div>
+
+<div class="task">
+  <h3>Challenge 4: Basic metrics</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>GET /metrics</code> and look for the variable <code>http_request_duration_seconds_count</code> or other HTTP-request-related metrics.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Open <code>GET http://localhost:3001/metrics</code> in a browser or with curl.</li>
+    <li>Search for the string <code>http_request_duration_seconds_count</code> or similarly named metrics.</li>
+    <li>Observe that it is a Prometheus counter/histogram and understand how it is used to measure request duration.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>You will find Prometheus-format text containing metric counts and histograms for request duration, which can be used to assess API performance.</p>
+</div>
+
+<h2>Intermediate Assignment</h2>
+<div class="task">
+  <h3>Intermediate 1: Analyze /status at runtime</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>GET /status</code> and observe the values of <code>activeRequests</code>, <code>uptimeSec</code>, and <code>pid</code> when calling it multiple times.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Call <code>GET http://localhost:3001/status</code> multiple times at different intervals.</li>
+    <li>Repeat 2–3 requests per round to check the consistency of the values.</li>
+    <li>Record the values of <code>pid</code>, <code>uptimeSec</code>, and <code>activeRequests</code>.</li>
+    <li>Notice that <code>pid</code> stays constant, <code>uptimeSec</code> increases, and <code>activeRequests</code> may change with load.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>You will see that <code>pid</code> remains constant throughout the session, <code>uptimeSec</code> increases over time, and <code>activeRequests</code> changes according to the number of requests currently being processed.</p>
+</div>
+
+<div class="task">
+  <h3>Intermediate 2: Compare /fast and /slow using /status</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>GET /fast</code> and <code>GET /slow</code> concurrently, then call <code>GET /status</code> to observe <code>activeRequests</code> and the server's responsiveness.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Open two tabs or two terminals: call <code>/fast</code> and <code>/slow</code> at the same time.</li>
+    <li>Start with 1–3 concurrent requests per endpoint.</li>
+    <li>Call <code>GET /status</code> at that moment and record <code>activeRequests</code> and <code>uptimeSec</code>.</li>
+    <li>Observe that the server continues to respond even while <code>/slow</code> takes longer.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>While /slow is running, <code>activeRequests</code> may increase and <code>uptimeSec</code> continues to count up. This confirms that the system remains operational during periods of high latency.</p>
+</div>
+
+<div class="task">
+  <h3>Intermediate 3: Examine error cases with request rate</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>POST /submit-two</code> with a body missing the <code>type</code> field and observe the error response, including the response code and message.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Send multiple requests to <code>/submit-two</code> without the <code>type</code> field.</li>
+    <li>Start with 5–10 concurrent invalid requests to establish a basic error rate.</li>
+    <li>Verify that the response code is always 400 and the body shows the missing fields.</li>
+    <li>If possible, repeat multiple times to confirm that error behavior is consistent.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>You will receive HTTP 400 and a JSON error with the <code>missing_required_parameters</code> field, confirming that the system correctly detects validation errors even under increased load.</p>
+</div>
+
+<div class="task">
+  <h3>Intermediate 4: Find histogram metrics from /metrics</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>GET /metrics</code> and look for a counter or histogram metric for response duration, such as <code>http_request_duration_seconds_bucket</code>.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Call <code>GET http://localhost:3001/metrics</code> and search for metric names containing the word <code>bucket</code> or <code>count</code>.</li>
+    <li>To populate the metrics with data, run 5–10 requests first and then fetch /metrics again.</li>
+    <li>Observe that histogram buckets contain latency ranges such as <code>le="0.1"</code> and <code>le="0.5"</code>.</li>
+    <li>Check whether these metrics can be used to calculate percentiles.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>If you find <code>http_request_duration_seconds_bucket</code>, it means the metric stores latency as a histogram and can be used to analyze percentiles.</p>
+</div>
+
+<h2>Advanced Assignment</h2>
+<div class="task">
+  <h3>Advanced 1: Define an SLA and compare against real results</h3>
+  <strong>Prompt</strong>
+  <p>Define an SLA such as <code>p95 &lt; 200ms</code> and <code>Error rate &lt; 1%</code>, then call <code>GET /metrics</code> or run multiple tests to determine whether the system meets the SLA.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Generate approximately 10–20 requests or 2–5 concurrent threads to produce visible metrics.</li>
+    <li>Call <code>GET /metrics</code> before and after running multiple requests.</li>
+    <li>Locate metrics that show histograms and error counts.</li>
+    <li>Compare the percentile values against the defined SLA, e.g., calculate p95 from the buckets.</li>
+    <li>Check whether the error rate is below 1%.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>Review percentile values from the metric histograms and error counts. If <code>p95</code> exceeds the SLA threshold or the error rate is above 1%, tuning or bottleneck resolution is required.</p>
+</div>
+
+<div class="task">
+  <h3>Advanced 2: Test recovery after high load</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>/slow</code> repeatedly to increase the load, record the <code>activeRequests</code> value, and check whether <code>/status</code> returns to normal after stopping requests.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Send 10–20 repeated requests to <code>/slow</code>, or use 3–5 concurrent threads.</li>
+    <li>Monitor <code>/status</code> during high load to observe <code>activeRequests</code>.</li>
+    <li>Stop sending requests, then call <code>/status</code> again to confirm that <code>activeRequests</code> drops and the server remains responsive.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>After stopping /slow requests, <code>activeRequests</code> should decrease and the server should continue responding to /status normally, demonstrating that the system recovers successfully.</p>
+</div>
+
+<div class="task">
+  <h3>Advanced 3: Check token expiration / invalidation</h3>
+  <strong>Prompt</strong>
+  <p>Use <code>POST /auth/login</code> to obtain a token, then call <code>POST /auth/verify</code> with the same token after a short wait to observe token validation behavior.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Send a POST to <code>/auth/login</code> to receive a token.</li>
+    <li>Use the same token to call <code>/auth/verify</code> with the header <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+    <li>To test expiration, wait 10–30 seconds and try calling again.</li>
+    <li>To observe concurrency, try 2–3 verify requests simultaneously.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>If the token is still valid, you will receive <code>valid: true</code>. If the system has a token expiration configured and it has elapsed, you may encounter <code>invalid_token</code>.</p>
+</div>
+
+<div class="task">
+  <h3>Advanced 4: Create and analyze an error spike</h3>
+  <strong>Prompt</strong>
+  <p>Call <code>POST /submit-two</code> or <code>/error</code> repeatedly to drive the error rate up, then observe how /metrics and /status reflect changes in error rate and activeRequests.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Call <code>POST /submit-two</code> or <code>/error</code> 10–20 times, or use 5–10 concurrent invalid requests.</li>
+    <li>Call <code>GET /metrics</code> to check the error count and related metrics.</li>
+    <li>Call <code>GET /status</code> to confirm the system is still responding and to observe how <code>activeRequests</code> changes.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>You should see the error count increase in metrics. If the error rate exceeds the SLA, service reliability may degrade even if uptime remains high.</p>
+</div>
+
+<h2>Performance Testing Assignments</h2>
+<div class="task">
+  <h3>Load Testing: Test under normal load</h3>
+  <strong>Prompt</strong>
+  <p>Create a JMeter test plan to call <code>GET /fast</code> and <code>GET /slow</code> under normal (expected) load, then analyze throughput, latency, and error rate.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Create a Thread Group in JMeter with 10–20 threads, a 30-second ramp-up, and a loop count of 5–10.</li>
+    <li>Add HTTP Request samplers for <code>/fast</code> and <code>/slow</code>.</li>
+    <li>Add a Response Assertion to verify response code 200 and the correct message.</li>
+    <li>Add an Aggregate Report listener to view average response time, throughput, and error %.</li>
+    <li>Run the test, then call <code>GET /status</code> and <code>GET /metrics</code> to check activeRequests and histogram metrics.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>Load testing should show consistent throughput, latency below the SLA (e.g., p95 &lt; 500ms), and an error rate &lt; 1%. If throughput drops or latency increases, a bottleneck exists.</p>
+</div>
+
+<div class="task">
+  <h3>Stress Testing: Find the breaking point</h3>
+  <strong>Prompt</strong>
+  <p>Progressively increase the load until the system starts to fail (the breaking point) by calling <code>GET /slow</code> and <code>POST /submit-one</code>, then observe when the error rate rises or response time degrades.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Start with a Thread Group of 20–50 threads, a 60-second ramp-up, and a duration of 5–10 minutes.</li>
+    <li>Add HTTP Requests for <code>/slow</code> and <code>/submit-one</code> with a valid body.</li>
+    <li>Use a Constant Timer of 1–2 seconds between requests to simulate user pacing.</li>
+    <li>Add listeners such as View Results Tree and Summary Report to monitor error trends.</li>
+    <li>Run the test and monitor <code>/status</code> every 30 seconds to track activeRequests and uptime.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>Stress testing will reveal the breaking point when the error rate exceeds 5%, response times exceed 2–3 seconds, or the server becomes unresponsive. This point represents the system's maximum capacity.</p>
+</div>
+
+<div class="task">
+  <h3>Spike Testing: Test sudden load bursts</h3>
+  <strong>Prompt</strong>
+  <p>Simulate a sudden load spike by calling <code>GET /fast</code> and <code>GET /slow</code> with a large number of concurrent requests over a short period, then check whether the system recovers.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Create a Thread Group with 50–100 threads, a very fast ramp-up of 10 seconds, and a loop count of 1–2.</li>
+    <li>Add HTTP Requests for <code>/fast</code> and <code>/slow</code>.</li>
+    <li>Use the Ultimate Thread Group or Step-Up Thread Group to create a spike pattern.</li>
+    <li>Add listeners to observe response time and error rate during the spike.</li>
+    <li>After the spike, call <code>/status</code> and <code>/metrics</code> to check recovery and error metrics.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>Spike testing should show a temporary increase in latency during the spike, but the system should recover once the load subsides. If the error rate is high or the server crashes, auto-scaling or resource allocation adjustments are needed.</p>
+</div>
+
+<div class="task">
+  <h3>Endurance Testing: Long-duration test</h3>
+  <strong>Prompt</strong>
+  <p>Run a test continuously for an extended period (hours) under normal load to check for memory leaks, resource exhaustion, or performance degradation over time.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Configure a Thread Group with 5–15 threads, a 30-second ramp-up, and a duration of 30–60 minutes or longer.</li>
+    <li>Add HTTP Requests for <code>/fast</code>, <code>/slow</code>, and <code>/status</code> (to use for monitoring).</li>
+    <li>Add Response Assertions and listeners to track performance trends over time.</li>
+    <li>Run the test and periodically monitor <code>/status</code> and <code>/metrics</code> to observe uptime, activeRequests, and memory usage.</li>
+    <li>Watch for degradation in response time or error rate as time passes.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>Endurance testing will reveal issues such as memory leaks if response time increases or the error rate climbs over time. A well-performing system should maintain consistent performance throughout the entire duration.</p>
+</div>
+
+<div class="task">
+  <h3>Volume Testing: Test with large data volumes</h3>
+  <strong>Prompt</strong>
+  <p>Test the system with large data volumes, such as sending requests with large bodies or calling endpoints that process large amounts of data, and observe how latency and throughput change.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Create a Thread Group with 5–10 threads, a 20-second ramp-up, and a loop count of 3–5.</li>
+    <li>Add an HTTP Request for <code>POST /submit-one</code> or <code>/submit-two</code> with a large body (e.g., a JSON array of 1,000 elements or a very long string).</li>
+    <li>Use CSV Data Set Config to feed large data from a file.</li>
+    <li>Add listeners to observe response time and error rate when dealing with large payloads.</li>
+    <li>Run the test and monitor <code>/status</code> for activeRequests and <code>/metrics</code> for memory or CPU metrics if available.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>Volume testing will reveal whether the system handles large data well. If response time increases significantly or the error rate is high, data processing optimization or increased resource limits are needed.</p>
+</div>
+
+<div class="task">
+  <h3>Scalability Testing: Test scale-out behavior</h3>
+  <strong>Prompt</strong>
+  <p>Test how system performance changes as users or resources are gradually increased, and identify the point at which performance no longer scales linearly.</p>
+  <strong>Steps</strong>
+  <ul>
+    <li>Use the Step-Up Thread Group or Ultimate Thread Group to increase threads incrementally (e.g., start at 5 threads, then 10, 20, 50).</li>
+    <li>Set a duration of 2–5 minutes per step to allow the system to stabilize.</li>
+    <li>Add HTTP Requests for <code>/fast</code> and <code>/slow</code>, as well as <code>/status</code> for monitoring.</li>
+    <li>Add an Aggregate Report to view throughput and response time at each level.</li>
+    <li>Analyze whether throughput increases proportionally with threads and identify the point where performance plateaus or declines.</li>
+  </ul>
+  <strong>Answer</strong>
+  <p>Scalability testing reveals how well the system scales. If throughput does not increase proportionally with the number of users, there is a bottleneck in the architecture or insufficient resources.</p>
+</div>
+
+<script type="module">
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl = document.getElementById("runtime-meta");
+
+  async function refreshRuntimeStatus() {
+    try {
+      const response = await fetch("/status", { cache: "no-store" });
+
+      if (!response.ok) {
+        throw new Error("Status endpoint returned non-200");
+      }
+
+      const data = await response.json();
+      statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent =
+        `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
+    } catch (error) {
+      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      metaEl.textContent = error.message;
+    }
+  }
+
+  await refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 10000);
+</script>
+
+</body>
+</html>

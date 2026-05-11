@@ -28,15 +28,15 @@
 <div class="topbar">
   <div class="topbar-links">
     <strong>Performance Testing Lab</strong>
-    <a href="/">Main</a>
-    <a href="/demo.html">Demo Home</a>
-    <a href="/demo-endpoints.html">Demo Endpoints</a>
-    <a href="/demo-jmeter.html">JMeter Guide</a>
-    <a href="/demo-test-types.html">Test Types</a>
-    <a href="/tools.html">Tools</a>
-    <a href="/assignment.html">Assignment</a>
-    <a href="/glossary.html">Glossary</a>
-    <span style="border-left:1px solid #4b5563;padding-left:14px"><strong style="color:#f9fafb">TH</strong> &nbsp;|&nbsp; <a href="/en/demo-endpoints.html">EN</a></span>
+    <a href="/en/">Main</a>
+    <a href="/en/demo.html">Demo Home</a>
+    <a href="/en/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/en/demo-jmeter.html">JMeter Guide</a>
+    <a href="/en/demo-test-types.html">Test Types</a>
+    <a href="/en/tools.html">Tools</a>
+    <a href="/en/assignment.html">Assignment</a>
+    <a href="/en/glossary.html">Glossary</a>
+    <span style="border-left:1px solid #4b5563;padding-left:14px"><a href="/demo-endpoints.html">TH</a> &nbsp;|&nbsp; <strong style="color:#f9fafb">EN</strong></span>
     <a href="/status">/status</a>
   </div>
   <div class="topbar-status">
@@ -47,7 +47,7 @@
 
 <h1>Demo Endpoints</h1>
 <div class="note">
-  หน้านี้อธิบายแต่ละเส้น ก่อนสร้าง JMeter ให้เข้าใจ endpoint แต่ละตัวให้ชัดก่อน
+  This page describes each endpoint. Before building your JMeter test plan, make sure you understand what each endpoint does.
 </div>
 
 <h2>Recommended Transaction Order</h2>
@@ -75,12 +75,12 @@
 
 <h2>Language Support</h2>
 <div class="note">
-  ทุก demo endpoint รองรับ <code>Accept-Language</code> — ใส่ใน <code>HTTP Header Manager</code> หรือ defaults ได้
+  All demo endpoints support the <code>Accept-Language</code> header — add it in an <code>HTTP Header Manager</code> or in the request defaults.
 </div>
 <table>
 <tr><th>Header</th><th>Value</th><th>Effect</th></tr>
-<tr><td><code>Accept-Language</code></td><td><code>en</code></td><td>message ภาษาอังกฤษ, <code>"language": "en"</code></td></tr>
-<tr><td><code>Accept-Language</code></td><td><code>th</code></td><td>message ภาษาไทย, <code>"language": "th"</code></td></tr>
+<tr><td><code>Accept-Language</code></td><td><code>en</code></td><td>English message, <code>"language": "en"</code></td></tr>
+<tr><td><code>Accept-Language</code></td><td><code>th</code></td><td>Thai message, <code>"language": "th"</code></td></tr>
 </table>
 
 <h2>Request Bodies</h2>
@@ -99,7 +99,7 @@
 
 <h2>Static Copy Paste Values</h2>
 <div class="note">
-  ใช้ค่าคงที่ด้านล่างสำหรับ proof of concept รอบแรก โดยไม่ต้องพึ่ง extractor ก่อน
+  Use the static values below for your first proof-of-concept run without relying on extractors yet.
 </div>
 <table>
 <tr><th>Endpoint</th><th>Copy Paste Value</th></tr>
@@ -108,7 +108,7 @@
 <tr><td><code>GET /demo/product/details</code></td><td><code>/demo/product/details?productId=sku-101</code></td></tr>
 <tr><td><code>POST /demo/cart/add</code></td><td><code>{ "cartId": "demo-cart", "productId": "sku-101", "quantity": 1 }</code></td></tr>
 <tr><td><code>POST /demo/checkout</code></td><td><code>{ "cartId": "demo-cart", "customerId": "demo-user-01" }</code></td></tr>
-<tr><td><code>GET /demo/order/status</code></td><td>ใช้ค่า <code>orderId</code> จาก response ของ checkout</td></tr>
+<tr><td><code>GET /demo/order/status</code></td><td>Use the <code>orderId</code> value from the checkout response</td></tr>
 </table>
 
 <h2>Proof Of Concept Static Flow</h2>
@@ -124,8 +124,8 @@
 
 <h2>Variable Structure</h2>
 <div class="note">
-  ตัวแปรทุกตัวมาจาก response ของ <code>/demo/context</code> หรือ <code>/demo/checkout</code>
-  ตั้งชื่อให้สื่อว่าเอามาจากไหนและจะถูกใช้ต่อที่ไหน
+  All variables come from the response of <code>/demo/context</code> or <code>/demo/checkout</code>.
+  Name them to clearly indicate their source and where they will be used downstream.
 </div>
 <table>
 <tr><th>Variable</th><th>Source (JSON path)</th><th>Use In</th></tr>
@@ -158,14 +158,14 @@ Header: x-access-token: ${demoAuthToken}</pre>
 
 <h2>What To Learn Here</h2>
 <ul>
-  <li>เส้นไหนต้องส่ง query parameter</li>
-  <li>เส้นไหนต้องส่ง JSON body</li>
-  <li>เส้นไหนต้องใช้ค่าจาก response ก่อนหน้า (variable chaining)</li>
-  <li>เมื่อไรควรใช้ค่าคงที่ และเมื่อไรควรใช้ตัวแปร</li>
+  <li>Which endpoints require a query parameter</li>
+  <li>Which endpoints require a JSON body</li>
+  <li>Which endpoints depend on a value from a previous response (variable chaining)</li>
+  <li>When to use static values and when to use variables</li>
 </ul>
 
 <div class="note">
-  สำหรับการตั้งค่า User Defined Variables, HTTP Header Manager, และ JSON Extractor ใน JMeter ดูที่ <a href="/demo-jmeter.html">JMeter Guide</a>
+  For instructions on setting up User Defined Variables, HTTP Header Manager, and JSON Extractor in JMeter, see the <a href="/en/demo-jmeter.html">JMeter Guide</a>.
 </div>
 
 <script>

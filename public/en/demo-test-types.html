@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Types And Thread Groups</title>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2, h3 { color: #1f2937; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .step { border: 1px solid #d1d5db; padding: 16px; margin: 12px 0; background: #ffffff; }
+    .step h3 { margin-top: 0; }
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
+      justify-content: space-between; gap: 16px; padding: 14px 24px; background: #1f2937;
+      color: #f9fafb; border-bottom: 1px solid #111827; z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
+    .topbar a:last-child { margin-right: 0; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/en/">Main</a>
+    <a href="/en/demo.html">Demo Home</a>
+    <a href="/en/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/en/demo-jmeter.html">JMeter Guide</a>
+    <a href="/en/demo-test-types.html">Test Types</a>
+    <a href="/en/tools.html">Tools</a>
+    <a href="/en/assignment.html">Assignment</a>
+    <a href="/en/glossary.html">Glossary</a>
+    <span style="border-left:1px solid #4b5563;padding-left:14px"><a href="/demo-test-types.html">TH</a> &nbsp;|&nbsp; <strong style="color:#f9fafb">EN</strong></span>
+    <a href="/status">/status</a>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>Test Types And Thread Groups</h1>
+<div class="note">
+  This page explains how to choose a test type, pair it with the right thread group, configure it correctly, and interpret results against customer-defined SLAs.
+</div>
+
+<h2>Step 1: Choose a Test Type That Matches Your SLA</h2>
+<div class="note">
+  Before running a test, you need to know what the SLA is addressing — because each test type answers a different question.
+</div>
+
+<table>
+  <tr><th>Test Type</th><th>Use When the SLA Refers To</th><th>Question It Answers</th><th>Example Criterion</th></tr>
+  <tr>
+    <td><code>Load Test</code></td>
+    <td>normal traffic, expected users, baseline performance</td>
+    <td>Does the system meet the SLA under realistic load?</td>
+    <td>p95 &lt; 800ms at 20 users</td>
+  </tr>
+  <tr>
+    <td><code>Stress Test</code></td>
+    <td>capacity, breaking point, graceful degradation</td>
+    <td>At what level does the system start to degrade or fail?</td>
+    <td>System remains stable up to 80 concurrent users</td>
+  </tr>
+  <tr>
+    <td><code>Spike Test</code></td>
+    <td>traffic surge, flash sale, peak event, recovery time</td>
+    <td>Can the system handle a sudden load spike, and how quickly does it recover?</td>
+    <td>3x traffic within 1 minute, recovery within 2 minutes</td>
+  </tr>
+  <tr>
+    <td><code>Endurance Test</code></td>
+    <td>stability, continuous operation, memory drift</td>
+    <td>Does the SLA hold steady or drift when running for many hours?</td>
+    <td>p95 &lt; 900ms sustained over 8 hours</td>
+  </tr>
+</table>
+
+<h2>Step 2: Choose a Thread Group That Fits Your Test Type</h2>
+
+<table>
+  <tr><th>Thread Group</th><th>Suitable For</th><th>Controls</th><th>Choose When</th></tr>
+  <tr>
+    <td><code>Normal</code></td>
+    <td>Load, Endurance</td>
+    <td>Thread count, ramp-up, loop count</td>
+    <td>Getting started, functional checks, baselines, straightforward load tests</td>
+  </tr>
+  <tr>
+    <td><code>Concurrency</code></td>
+    <td>Stress, Spike, Load</td>
+    <td>Number of concurrently active users</td>
+    <td>You need to know how many simultaneous sessions the system can support</td>
+  </tr>
+  <tr>
+    <td><code>Stepping</code></td>
+    <td>Stress, Spike</td>
+    <td>Adds threads in incremental steps over time</td>
+    <td>You want to find a breaking point or observe step-by-step degradation</td>
+  </tr>
+  <tr>
+    <td><code>Arrival Rate</code></td>
+    <td>Load, Endurance</td>
+    <td>Request rate per second (RPS/TPS)</td>
+    <td>You want to control throughput rate rather than user count</td>
+  </tr>
+</table>
+
+<h2>Step 3: JMeter Thread Group Configuration Cheat Sheet</h2>
+<div class="note">
+  The values below are starting points — adjust them based on the load specified by the customer.
+</div>
+
+<h3>Normal Thread Group — Load Test</h3>
+<pre>Thread Group
+  Number of Threads (users):  10–20
+  Ramp-Up Period (seconds):   30
+  Loop Count:                 20
+  Duration (seconds):         — (use loop count instead)
+
+Use for: baseline, functional load, basic load test</pre>
+
+<h3>Concurrency Thread Group — Stress Test</h3>
+<pre>Concurrency Thread Group (requires bzm plugin)
+  Target Concurrency:   start at 10, increase to 80+
+  Ramp-Up Time (sec):   60
+  Ramp-Up Steps:        5
+  Hold Target Rate:     120 seconds
+
+Use for: stress test, finding saturation point, checking active sessions</pre>
+
+<h3>Stepping Thread Group — Spike / Threshold</h3>
+<pre>Stepping Thread Group (requires plugin)
+  Start Threads Count:       5
+  Initial Delay (sec):       0
+  Start users count:         5
+  Start users period (sec):  30
+  End Threads Count:         100
+
+Use for: spike test, finding breaking point step-by-step</pre>
+
+<h3>Arrival Rate Thread Group — Steady Traffic</h3>
+<pre>Arrivals Thread Group (requires bzm plugin)
+  Target Rate (requests/sec): 50
+  Ramp-Up Time (sec):         30
+  Ramp-Up Steps:              3
+  Hold Target Rate (sec):     120
+
+Use for: controlling RPS, open workload simulation, endurance at a fixed rate</pre>
+
+<h2>Step 4: Test Type Structures in JMeter</h2>
+
+<h3>Load Test</h3>
+<pre>Thread Group (Normal or Concurrency or Arrival)
+└─ Transaction Controller - Browse Flow
+   ├─ HTTP Request - demo context
+   ├─ HTTP Request - demo dashboard
+   ├─ HTTP Request - demo search
+   └─ HTTP Request - product details
+└─ Throughput Controller - Cart Flow (40%)
+   └─ Transaction Controller - Add And Checkout
+      ├─ HTTP Request - add to cart
+      └─ HTTP Request - checkout
+└─ If Controller - if demoOrderId exists
+   └─ HTTP Request - order status
+└─ Aggregate Report</pre>
+
+<h3>Stress Test</h3>
+<pre>Concurrency Thread Group
+└─ Transaction Controller or primary endpoint
+   ├─ HTTP Request - target endpoint
+   └─ JSON Extractor (if needed)
+└─ Summary Report
+└─ Aggregate Report</pre>
+
+<h3>Spike Test</h3>
+<pre>Stepping Thread Group or Concurrency Thread Group
+└─ target endpoint or full transaction flow
+└─ View Results Tree (to inspect responses during the spike)
+└─ Aggregate Report</pre>
+
+<h3>Endurance / Soak Test</h3>
+<pre>Normal Thread Group or Arrival Rate Thread Group
+  — set Duration to several hours instead of using Loop Count
+└─ target endpoint or demo flow
+└─ Backend Listener (sends metrics to Grafana/InfluxDB if available)
+└─ Aggregate Report</pre>
+
+<h2>Step 5: Test Matrix By Layer</h2>
+<div class="note">
+  In real-world testing, you need to measure multiple layers simultaneously — not just response time alone.
+</div>
+
+<table>
+  <tr><th>Layer</th><th>What to Test</th><th>Tools</th><th>Suitable Test Types</th></tr>
+  <tr>
+    <td><strong>Application</strong></td>
+    <td>endpoint response time, error rate, transaction flow</td>
+    <td>JMeter Aggregate Report, Summary Report</td>
+    <td>Load, Stress, Spike, Endurance</td>
+  </tr>
+  <tr>
+    <td><strong>Runtime</strong></td>
+    <td>activeRequests, uptime, PID stability, Prometheus metrics</td>
+    <td><code>GET /status</code>, <code>GET /metrics</code></td>
+    <td>Load, Endurance — monitor during the run</td>
+  </tr>
+  <tr>
+    <td><strong>Infrastructure</strong></td>
+    <td>CPU, memory, disk I/O, network</td>
+    <td><code>GET /cpu</code>, <code>GET /memory</code>, <code>GET /io</code>, OS tools</td>
+    <td>Stress, Endurance — observe alongside the app layer</td>
+  </tr>
+  <tr>
+    <td><strong>Reliability</strong></td>
+    <td>recovery time, error pattern, graceful degradation</td>
+    <td>View Results Tree, Backend Listener</td>
+    <td>Spike, Stress</td>
+  </tr>
+</table>
+
+<h2>Step 6: Metrics Layers — Where to Read From</h2>
+
+<table>
+  <tr><th>Metric</th><th>Read From</th><th>Measures</th></tr>
+  <tr>
+    <td>Response time, p90/p95/p99</td>
+    <td>JMeter Aggregate Report</td>
+    <td>Latency per endpoint and across the full flow</td>
+  </tr>
+  <tr>
+    <td>Error rate</td>
+    <td>JMeter Summary/Aggregate Report</td>
+    <td>Percentage of failed requests (4xx, 5xx, timeout, assertion fail)</td>
+  </tr>
+  <tr>
+    <td>Throughput (RPS/TPS)</td>
+    <td>JMeter Aggregate Report</td>
+    <td>Number of requests successfully answered per second</td>
+  </tr>
+  <tr>
+    <td>Active requests</td>
+    <td><code>GET /status</code> → <code>activeRequests</code></td>
+    <td>Number of requests being processed concurrently</td>
+  </tr>
+  <tr>
+    <td>Uptime, PID</td>
+    <td><code>GET /status</code></td>
+    <td>Confirms the server has not crashed and is still the same process</td>
+  </tr>
+  <tr>
+    <td>HTTP request histogram</td>
+    <td><code>GET /metrics</code></td>
+    <td>Latency distribution in Prometheus bucket format</td>
+  </tr>
+  <tr>
+    <td>CPU / Memory</td>
+    <td><code>GET /cpu</code>, <code>GET /memory</code></td>
+    <td>Compute load during the test run</td>
+  </tr>
+</table>
+
+<h2>Step 7: Suggested Run Order for Beginners</h2>
+
+<div class="step">
+  <h3>Round 1 — Baseline (1 user)</h3>
+  <p>Verify that the flow works correctly before adding any load.</p>
+  <ul>
+    <li>1 thread, 1 loop, no ramp-up</li>
+    <li>Open View Results Tree to inspect actual request/response pairs</li>
+    <li>Every step must return 200 and the variable chain must be correct</li>
+    <li>Fix any errors before proceeding — do not run the next round until baseline passes</li>
+  </ul>
+</div>
+
+<div class="step">
+  <h3>Round 2 — Load Test (expected load)</h3>
+  <p>Test at the normal load specified by the customer to validate the primary SLA.</p>
+  <ul>
+    <li>Normal Thread Group: 10–20 threads, ramp-up 30s, loop 20</li>
+    <li>Open Aggregate Report to review p90/p95/p99</li>
+    <li>Compare against the SLA: p95, error rate, traffic mix</li>
+    <li>If it passes, proceed to stress test; if not, investigate the bottleneck first</li>
+  </ul>
+</div>
+
+<div class="step">
+  <h3>Round 3 — Stress Test (push to limit)</h3>
+  <p>Find the point at which the system begins to degrade by progressively increasing load.</p>
+  <ul>
+    <li>Concurrency Thread Group: increase from 20 → 40 → 80 → 120 users</li>
+    <li>Monitor error rate and p95 at each step</li>
+    <li>Record the point where errors first appear or latency breaches the SLA</li>
+    <li>That point is the breaking point / capacity threshold</li>
+  </ul>
+</div>
+
+<div class="step">
+  <h3>Round 4 — Spike Test (burst)</h3>
+  <p>Simulate a sudden load surge to observe recovery behavior.</p>
+  <ul>
+    <li>Stepping Thread Group: ramp from 5 → 100 threads within 30 seconds</li>
+    <li>Watch for error bursts and measure recovery time after the spike subsides</li>
+    <li>If the customer specifies "must recover within 2 minutes," check the timestamps</li>
+  </ul>
+</div>
+
+<div class="step">
+  <h3>Round 5 — Endurance Test (long run)</h3>
+  <p>Run at expected load for an extended period to observe drift and memory behavior.</p>
+  <ul>
+    <li>Normal Thread Group: 10 threads, duration 1–8 hours</li>
+    <li>Compare p95 at the start vs. the end — if it keeps climbing, there is likely a leak</li>
+    <li>Keep <code>GET /status</code> and <code>GET /metrics</code> open to monitor runtime values during the run</li>
+  </ul>
+</div>
+
+<h2>Quick Reference: Test Type → Thread Group → SLA Metric</h2>
+
+<table>
+  <tr><th>Test Type</th><th>Recommended Thread Group</th><th>Primary Metric To Check</th><th>Pass Condition Example</th></tr>
+  <tr>
+    <td><code>Load</code></td>
+    <td>Normal or Arrival Rate</td>
+    <td>p95, error rate, traffic mix</td>
+    <td>p95 &lt; 800ms, error &lt; 1%</td>
+  </tr>
+  <tr>
+    <td><code>Stress</code></td>
+    <td>Concurrency or Stepping</td>
+    <td>Point where errors first appear, p95 breach level</td>
+    <td>System remains stable at 80 users</td>
+  </tr>
+  <tr>
+    <td><code>Spike</code></td>
+    <td>Stepping or Concurrency</td>
+    <td>error burst size, recovery time</td>
+    <td>Recovers within 2 minutes after spike</td>
+  </tr>
+  <tr>
+    <td><code>Endurance</code></td>
+    <td>Normal or Arrival Rate + Duration</td>
+    <td>p95 drift from start to end of run</td>
+    <td>p95 &lt; 900ms sustained over 8 hours</td>
+  </tr>
+</table>
+
+<h2>Quick Guidance</h2>
+<ul>
+  <li>Always start with <code>Normal Thread Group</code> if you are just getting started or need a baseline</li>
+  <li>Use <code>Concurrency Thread Group</code> to find the concurrent user limit</li>
+  <li>Use <code>Stepping Thread Group</code> to find a breaking point in incremental steps</li>
+  <li>Use <code>Arrival Rate Thread Group</code> to control the request rate (RPS)</li>
+  <li>Always check <code>Error %</code> before looking at latency — high error rates make latency figures meaningless</li>
+  <li>Focus on <code>p95</code> in Aggregate Report, not the average</li>
+  <li>Use the parent sample of a <code>Transaction Controller</code> for SLA measured as a user journey</li>
+  <li>Keep <code>GET /status</code> open during the run to monitor <code>activeRequests</code> and confirm the server has not crashed</li>
+</ul>
+
+<script>
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl = document.getElementById("runtime-meta");
+  async function refreshRuntimeStatus() {
+    try {
+      const response = await fetch("/status", { cache: "no-store" });
+      if (!response.ok) throw new Error("Status endpoint returned non-200");
+      const data = await response.json();
+      statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent = `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
+    } catch (error) {
+      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      metaEl.textContent = "Open this page through Node/Express to enable live status.";
+    }
+  }
+  refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 5000);
+</script>
+</body>
+</html>

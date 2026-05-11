@@ -33,15 +33,15 @@
 <div class="topbar">
   <div class="topbar-links">
     <strong>Performance Testing Lab</strong>
-    <a href="/">Main</a>
-    <a href="/demo.html">Demo Home</a>
-    <a href="/demo-endpoints.html">Demo Endpoints</a>
-    <a href="/demo-jmeter.html">JMeter Guide</a>
-    <a href="/demo-test-types.html">Test Types</a>
-    <a href="/tools.html">Tools</a>
-    <a href="/assignment.html">Assignment</a>
-    <a href="/glossary.html">Glossary</a>
-    <span style="border-left:1px solid #4b5563;padding-left:14px"><strong style="color:#f9fafb">TH</strong> &nbsp;|&nbsp; <a href="/en/demo.html">EN</a></span>
+    <a href="/en/">Main</a>
+    <a href="/en/demo.html">Demo Home</a>
+    <a href="/en/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/en/demo-jmeter.html">JMeter Guide</a>
+    <a href="/en/demo-test-types.html">Test Types</a>
+    <a href="/en/tools.html">Tools</a>
+    <a href="/en/assignment.html">Assignment</a>
+    <a href="/en/glossary.html">Glossary</a>
+    <span style="border-left:1px solid #4b5563;padding-left:14px"><a href="/demo.html">TH</a> &nbsp;|&nbsp; <strong style="color:#f9fafb">EN</strong></span>
     <a href="/status">/status</a>
   </div>
   <div class="topbar-status">
@@ -53,40 +53,40 @@
 <h1>Demo Learning Path</h1>
 
 <div class="note">
-  จุดเริ่มต้นสำหรับผู้เริ่มใช้งานใหม่ ทำตามลำดับนี้จะเห็นภาพรวมทั้งหมดก่อนลงรายละเอียด
+  The starting point for new users. Following this order gives you a complete overview before diving into the details.
 </div>
 
 <h2>Start Here</h2>
 <div class="card-grid">
   <div class="card">
     <h3>1. Demo Endpoints</h3>
-    <p>เริ่มจากดูว่าแต่ละเส้นทำอะไร ต้องส่งอะไร และ response ที่ควรได้คืออะไร</p>
-    <p><a href="/demo-endpoints.html">Open Demo Endpoints &rarr;</a></p>
+    <p>Begin by seeing what each route does, what it expects to receive, and what a correct response looks like.</p>
+    <p><a href="/en/demo-endpoints.html">Open Demo Endpoints &rarr;</a></p>
   </div>
   <div class="card">
     <h3>2. JMeter Structure</h3>
-    <p>สร้าง JMeter test plan ตามลำดับ ตั้งแต่ Thread Group, Extractor, จนถึง Controller</p>
-    <p><a href="/demo-jmeter.html">Open JMeter Guide &rarr;</a></p>
+    <p>Build a JMeter test plan step by step, starting from Thread Groups and Extractors all the way through to Controllers.</p>
+    <p><a href="/en/demo-jmeter.html">Open JMeter Guide &rarr;</a></p>
   </div>
   <div class="card">
     <h3>3. Test Types</h3>
-    <p>เลือก thread group และ test type ให้เหมาะกับ SLA — load, stress, spike, endurance</p>
-    <p><a href="/demo-test-types.html">Open Test Types &rarr;</a></p>
+    <p>Choose the right thread group and test type for your SLA — load, stress, spike, or endurance.</p>
+    <p><a href="/en/demo-test-types.html">Open Test Types &rarr;</a></p>
   </div>
   <div class="card">
     <h3>4. Read The Result</h3>
-    <p>หลังรันเสร็จ ให้ดู report, transaction time, error rate และเทียบกับ SLA ที่ลูกค้าต้องการ</p>
+    <p>After a test run, review the report: transaction time, error rate, and throughput — then compare against the customer SLA.</p>
     <p><a href="#read-the-result">Jump To Result Reading &rarr;</a></p>
   </div>
 </div>
 
 <h2>Recommended Learning Order</h2>
 <ol>
-  <li>เปิด <a href="/demo-endpoints.html">Demo Endpoints</a> แล้วลองเรียกแต่ละเส้นด้วย browser หรือ Postman</li>
-  <li>สร้าง JMeter ตาม <a href="/demo-jmeter.html">JMeter Guide</a> โดยเริ่มจาก 1 user</li>
-  <li>เมื่อ flow ทำงานถูกต้อง ค่อยเลือก test type จาก <a href="/demo-test-types.html">Test Types</a></li>
-  <li>เริ่มจาก baseline/load ก่อน แล้วค่อยไป stress/spike/endurance</li>
-  <li>หลังรันเสร็จ ให้กลับมาดูหัวข้อ <a href="#read-the-result">Read The Result</a> เพื่อแปลผลให้ตรงกับ SLA</li>
+  <li>Open <a href="/en/demo-endpoints.html">Demo Endpoints</a> and try calling each route using a browser or Postman.</li>
+  <li>Build a JMeter plan following the <a href="/en/demo-jmeter.html">JMeter Guide</a>, starting with 1 user.</li>
+  <li>Once the flow is working correctly, choose a test type from <a href="/en/demo-test-types.html">Test Types</a>.</li>
+  <li>Start with baseline/load testing first, then move on to stress, spike, and endurance.</li>
+  <li>After each run, return to the <a href="#read-the-result">Read The Result</a> section to interpret the outcome against the SLA.</li>
 </ol>
 
 <h2>Quick Demo Flow</h2>
@@ -108,36 +108,36 @@ GET /demo/order/status?orderId=${demoOrderId}</pre>
 
 <h2 id="read-the-result">Read The Result</h2>
 <div class="note">
-  หลังจากรัน test เสร็จ อย่าดูแค่ว่า request ผ่านหรือไม่
-  ให้ดู 4 อย่างพร้อมกัน: transaction time, error rate, throughput, และ traffic mix
+  After a test run, do not only check whether requests passed or failed.
+  Look at 4 things together: transaction time, error rate, throughput, and traffic mix.
 </div>
 
 <h2>What To Open In JMeter</h2>
 <table>
   <tr><th>Component</th><th>Use It To Check</th><th>Why It Matters</th></tr>
-  <tr><td><code>View Results Tree</code></td><td>response จริงของแต่ละ request</td><td>ใช้ debug เมื่อ request fail, variable ไม่ถูก extract, หรือ body/header ผิด</td></tr>
-  <tr><td><code>Summary Report</code></td><td>average, min, max, error %, throughput</td><td>ใช้ดูภาพรวมเร็ว ๆ ว่ารอบ test ผ่าน SLA ขั้นต้นหรือไม่</td></tr>
-  <tr><td><code>Aggregate Report</code></td><td>median, 90%, 95%, 99%</td><td>ใช้ตัดสิน SLA เพราะ percentile สำคัญกว่าค่าเฉลี่ย</td></tr>
-  <tr><td><code>Transaction Controller</code> parent sample</td><td>เวลารวมของ flow</td><td>ใช้ตอบลูกค้าว่า user journey ทั้งก้อนเร็วพอหรือไม่</td></tr>
-  <tr><td><code>Backend Listener</code> (ถ้ามี)</td><td>metric ต่อเนื่องระหว่างรันนาน ๆ</td><td>ใช้ดู drift ใน load/endurance test</td></tr>
+  <tr><td><code>View Results Tree</code></td><td>The actual response of each individual request</td><td>Use for debugging when a request fails, a variable is not extracted correctly, or the body/headers are wrong</td></tr>
+  <tr><td><code>Summary Report</code></td><td>Average, min, max, error %, throughput</td><td>Use for a quick overall view of whether the test run met the basic SLA threshold</td></tr>
+  <tr><td><code>Aggregate Report</code></td><td>Median, 90%, 95%, 99%</td><td>Use to make SLA decisions — percentiles matter more than averages</td></tr>
+  <tr><td><code>Transaction Controller</code> parent sample</td><td>Total time for the entire flow</td><td>Use to answer whether the complete user journey is fast enough</td></tr>
+  <tr><td><code>Backend Listener</code> (if present)</td><td>Continuous metrics during long runs</td><td>Use to detect drift in load or endurance tests</td></tr>
 </table>
 
 <h2>What To Look At First</h2>
 <ol>
-  <li>ดู <code>Error %</code> ก่อน ถ้ายังมี error สูง แปลว่ายังไม่ผ่านก่อนดู latency</li>
-  <li>ดู <code>90%</code>, <code>95%</code>, <code>99%</code> ใน <code>Aggregate Report</code></li>
-  <li>ดู parent sample ของ <code>Transaction Controller</code> ว่า flow รวมใช้เวลาเท่าไร</li>
-  <li>ดู <code>Throughput Controller</code> ว่า sample count ของ cart flow ใกล้กับ % ที่ตั้งไว้หรือไม่</li>
-  <li>ถ้ามี <code>If Controller</code> ให้เช็กว่า <code>order status</code> ถูกเรียกเฉพาะตอนมี <code>orderId</code> จริง</li>
+  <li>Check <code>Error %</code> first — if errors are still high, the test is not passing regardless of latency numbers</li>
+  <li>Check <code>90%</code>, <code>95%</code>, and <code>99%</code> in the <code>Aggregate Report</code></li>
+  <li>Check the parent sample of the <code>Transaction Controller</code> to see how long the full flow took</li>
+  <li>Check the <code>Throughput Controller</code> to see if the cart flow sample count is close to the configured percentage</li>
+  <li>If an <code>If Controller</code> is present, verify that <code>order status</code> is only called when a real <code>orderId</code> exists</li>
 </ol>
 
 <div class="note">
-  สำหรับตัวอย่าง SLA statements, test type decision, และ run order — ดูที่ <a href="/demo-test-types.html">Test Types</a>
+  For example SLA statements, test type decisions, and run order — see <a href="/en/demo-test-types.html">Test Types</a>.
 </div>
 
 <h2>Proof Of Concept You Can Copy And Paste</h2>
 <div class="note">
-  ถ้าต้องการทำ proof of concept แบบเร็ว ให้คัดลอก statement, structure, และค่าตั้งต้นนี้ไปใช้ก่อน
+  If you need a quick proof of concept, copy the statement, structure, and starting values below to get started immediately.
 </div>
 
 <h2>POC SLA Statement</h2>

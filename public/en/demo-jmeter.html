@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Demo JMeter Guide</title>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2, h3 { color: #1f2937; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
+      justify-content: space-between; gap: 16px; padding: 14px 24px; background: #1f2937;
+      color: #f9fafb; border-bottom: 1px solid #111827; z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
+    .topbar a:last-child { margin-right: 0; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/en/">Main</a>
+    <a href="/en/demo.html">Demo Home</a>
+    <a href="/en/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/en/demo-jmeter.html">JMeter Guide</a>
+    <a href="/en/demo-test-types.html">Test Types</a>
+    <a href="/en/tools.html">Tools</a>
+    <a href="/en/assignment.html">Assignment</a>
+    <a href="/en/glossary.html">Glossary</a>
+    <span style="border-left:1px solid #4b5563;padding-left:14px"><a href="/demo-jmeter.html">TH</a> &nbsp;|&nbsp; <strong style="color:#f9fafb">EN</strong></span>
+    <a href="/status">/status</a>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>JMeter Guide</h1>
+<div class="note">
+  Once you understand the endpoints, use this page to build your JMeter test plan step by step.
+</div>
+
+<h2>Recommended Structure</h2>
+<pre>Test Plan
+├─ HTTP Request Defaults
+├─ HTTP Header Manager
+├─ Thread Group
+│  ├─ Transaction Controller - Demo Commerce Flow
+│  │  ├─ HTTP Request - demo context
+│  │  │  └─ JSON Extractor
+│  │  ├─ HTTP Request - demo dashboard
+│  │  ├─ HTTP Request - demo search
+│  │  ├─ HTTP Request - product details
+│  │  ├─ HTTP Request - add to cart
+│  │  ├─ HTTP Request - checkout
+│  │  │  └─ JSON Extractor
+│  │  └─ HTTP Request - order status
+│  ├─ Summary Report
+│  └─ Aggregate Report
+└─ View Results Tree</pre>
+
+<h2>Build Order</h2>
+<ol>
+  <li>Add <code>HTTP Request Defaults</code> and set the host and port</li>
+  <li>Add <code>User Defined Variables</code> for default values that will be reused across the test plan</li>
+  <li>Add a <code>Thread Group</code></li>
+  <li>Add a <code>Transaction Controller</code> and enable <code>Generate parent sample</code></li>
+  <li>Add HTTP requests in the order of the flow</li>
+  <li>Add an <code>HTTP Header Manager</code> for POST requests</li>
+  <li>Add a <code>JSON Extractor</code> under <code>/demo/context</code> and <code>/demo/checkout</code></li>
+  <li>Add a <code>View Results Tree</code> for debugging</li>
+  <li>Add a <code>Summary Report</code> or <code>Aggregate Report</code></li>
+</ol>
+
+<h2>Important Controllers</h2>
+<table>
+<tr><th>Controller</th><th>Use For</th><th>Example</th></tr>
+<tr><td><code>Transaction Controller</code></td><td>Measure the total elapsed time of a flow</td><td>Browse Flow, Add And Checkout</td></tr>
+<tr><td><code>Throughput Controller</code></td><td>Control what percentage of iterations execute a given part of the flow</td><td>Run cart flow 40% of the time</td></tr>
+<tr><td><code>If Controller</code></td><td>Execute a step only when a required variable is present</td><td>Run order status only when <code>${demoOrderId}</code> is set</td></tr>
+</table>
+
+<h2>Extractor And Variable Flow</h2>
+<ul>
+  <li><code>/demo/context</code> -> extract <code>demoCartId</code>, <code>demoShopperId</code>, <code>demoProductId</code>, <code>demoSearchTerm</code></li>
+  <li><code>/demo/checkout</code> -> extract <code>demoOrderId</code></li>
+  <li><code>If Controller</code> -> check <code>${demoOrderId}</code> before firing <code>/demo/order/status</code></li>
+</ul>
+
+<h2>Suggested User Defined Variables</h2>
+<div class="note">
+  Set these <code>User Defined Variables</code> upfront so the flow can start immediately.
+  The extractors will then override these values when the relevant requests execute.
+</div>
+
+<table>
+<tr><th>Variable</th><th>Suggested Value</th><th>Why This Fits The Demo</th></tr>
+<tr><td><code>demoSearchTerm</code></td><td><code>mouse</code></td><td>Searching for this term returns <code>sku-101</code> in this system</td></tr>
+<tr><td><code>demoProductId</code></td><td><code>sku-101</code></td><td>Works for both product details and add to cart</td></tr>
+<tr><td><code>demoCartId</code></td><td><code>demo-cart</code></td><td>Acts as a fallback value for the first proof-of-concept run</td></tr>
+<tr><td><code>demoShopperId</code></td><td><code>demo-user-01</code></td><td>Used as a static customer ID</td></tr>
+<tr><td><code>demoQuantity</code></td><td><code>1</code></td><td>Simplest starting value and matches the example flow</td></tr>
+<tr><td><code>demoAuthToken</code></td><td><code>lab-token</code></td><td>Matches the default token expected by <code>/protected</code></td></tr>
+<tr><td><code>demoOrderId</code></td><td><code>NOT_SET</code></td><td>Used with <code>If Controller</code> to prevent order status from firing before checkout completes</td></tr>
+<tr><td><code>demoLanguage</code></td><td><code>en</code></td><td>Used with the <code>Accept-Language</code> header across all demo endpoints in the flow</td></tr>
+</table>
+
+<h2>Where To Put These Variables</h2>
+<pre>Test Plan
+└─ User Defined Variables
+   ├─ protocol = http
+   ├─ host = localhost
+   ├─ port = 3001
+   ├─ demoSearchTerm = mouse
+   ├─ demoProductId = sku-101
+   ├─ demoCartId = demo-cart
+   ├─ demoShopperId = demo-user-01
+   ├─ demoQuantity = 1
+   ├─ demoAuthToken = lab-token
+   ├─ contentType = application/json
+   ├─ acceptHeader = application/json
+   ├─ demoLanguage = en
+   └─ demoOrderId = NOT_SET</pre>
+
+<h2>Recommended Test Plan Defaults</h2>
+<table>
+<tr><th>Component</th><th>What To Put There</th><th>Why</th></tr>
+<tr><td><code>HTTP Request Defaults</code></td><td><code>Protocol=${protocol}</code>, <code>Server=${host}</code>, <code>Port=${port}</code></td><td>Change environments from a single location</td></tr>
+<tr><td><code>User Defined Variables</code></td><td>Values reused across multiple requests, e.g. <code>demoSearchTerm</code>, <code>demoProductId</code>, <code>demoCartId</code></td><td>Avoids hardcoding paths, query strings, and request bodies</td></tr>
+<tr><td><code>HTTP Header Manager</code> at Test Plan or Thread Group level</td><td><code>Accept=${acceptHeader}</code></td><td>Applies to all requests in the plan</td></tr>
+<tr><td><code>HTTP Header Manager</code> at Test Plan or Thread Group level</td><td><code>Accept-Language=${demoLanguage}</code></td><td>Switch the demo language for the entire flow from one place</td></tr>
+<tr><td><code>HTTP Header Manager</code> at POST sampler level</td><td><code>Content-Type=${contentType}</code></td><td>Should be scoped only to requests that have a JSON body</td></tr>
+</table>
+
+<h2>Recommended HTTP Header Structure</h2>
+<div class="note">
+  Do not place every header at the top level if it is not actually used by every request.
+  Scope each header to its appropriate level — this makes the plan easier to maintain.
+</div>
+
+<table>
+<tr><th>Header</th><th>Suggested Value</th><th>Where To Put It</th><th>Use Case</th></tr>
+<tr><td><code>Accept</code></td><td><code>${acceptHeader}</code> or <code>application/json</code></td><td>Test Plan or Thread Group</td><td>Applies to most requests in this system</td></tr>
+<tr><td><code>Accept-Language</code></td><td><code>${demoLanguage}</code> or <code>en</code>/<code>th</code></td><td>Test Plan or Thread Group</td><td>Switches the demo language across the entire flow</td></tr>
+<tr><td><code>Content-Type</code></td><td><code>${contentType}</code> or <code>application/json</code></td><td>Only on <code>POST /demo/cart/add</code>, <code>POST /demo/checkout</code>, <code>POST /submit-one</code>, <code>POST /submit-two</code></td><td>Avoids incorrectly attaching a Content-Type to GET requests</td></tr>
+<tr><td><code>x-access-token</code></td><td><code>${demoAuthToken}</code></td><td>Only on the <code>/protected</code> sampler</td><td>Used to test the auth flow</td></tr>
+<tr><td><code>Authorization</code></td><td><code>Bearer ${demoAuthToken}</code></td><td>Only on the <code>/protected</code> sampler</td><td>Alternative to <code>x-access-token</code></td></tr>
+</table>
+
+<h2>Copy Ready Test Plan Defaults</h2>
+<pre>protocol=http
+host=localhost
+port=3001
+acceptHeader=application/json
+contentType=application/json
+demoLanguage=en
+demoSearchTerm=mouse
+demoProductId=sku-101
+demoCartId=demo-cart
+demoShopperId=demo-user-01
+demoQuantity=1
+demoAuthToken=lab-token
+demoOrderId=NOT_SET</pre>
+
+<h2>Practical Rule Of Thumb</h2>
+<ul>
+  <li>Infrastructure values such as protocol, host, and port always belong in the defaults</li>
+  <li>Business values reused across requests, such as search term, product ID, and cart ID, belong in variables</li>
+  <li>Headers used by every request, such as <code>Accept</code>, should be placed at the top level</li>
+  <li>Headers like <code>Accept-Language</code> are well-suited to the top level when the entire flow should use the same language</li>
+  <li>Headers scoped to specific requests, such as <code>Content-Type</code> or auth tokens, should be placed close to the relevant sampler</li>
+  <li>Values like <code>demoOrderId</code> should start with a placeholder such as <code>NOT_SET</code> and be overridden by an extractor later in the flow</li>
+</ul>
+
+<h2>Language Header Proof Of Concept</h2>
+<pre>User Defined Variables
+demoLanguage=th
+
+HTTP Header Manager
+Accept-Language: ${demoLanguage}
+
+Expected result
+- demo endpoints return "language": "th"
+- message fields are returned in Thai
+
+Change to
+demoLanguage=en
+
+Expected result
+- demo endpoints return "language": "en"
+- message fields are returned in English</pre>
+
+<h2>Throughput + Transaction Example</h2>
+<pre>Thread Group
+├─ Transaction Controller - Browse Flow
+├─ Throughput Controller - Cart Flow (40%)
+│  └─ Transaction Controller - Add And Checkout
+└─ If Controller - if demoOrderId exists
+   └─ HTTP Request - order status</pre>
+
+<h2>What To Measure</h2>
+<ul>
+  <li>Total elapsed time of each parent sample</li>
+  <li>Sample count per flow</li>
+  <li>Error rate per step</li>
+</ul>
+
+<script>
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl = document.getElementById("runtime-meta");
+  async function refreshRuntimeStatus() {
+    try {
+      const response = await fetch("/status", { cache: "no-store" });
+      if (!response.ok) throw new Error("Status endpoint returned non-200");
+      const data = await response.json();
+      statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent = `PID: ${data.pid} | Started: ${data.startedAt} | Uptime: ${data.uptimeSec}s | Active Requests: ${data.activeRequests}`;
+    } catch (error) {
+      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      metaEl.textContent = "Open this page through Node/Express to enable live status.";
+    }
+  }
+  refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Performance Testing Lab</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 88px 40px 40px; color: #1f2937; }
+    h1, h2, h3 { color: #1f2937; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    code { background: #f3f4f6; padding: 2px 6px; }
+    pre { background: #f9fafb; border: 1px solid #d1d5db; padding: 12px; overflow-x: auto; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 20px 0; }
+    .warn { background: #fefce8; border-left: 4px solid #ca8a04; padding: 12px; margin: 20px 0; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 20px; }
+    .card { border: 1px solid #d1d5db; padding: 18px; background: #fff; }
+    .card h3 { margin-top: 0; font-size: 1rem; }
+    .card a { color: #2563eb; text-decoration: none; font-weight: bold; }
+    .step { border: 1px solid #d1d5db; padding: 16px; margin: 12px 0; }
+    .step h3 { margin-top: 0; color: #2563eb; }
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 14px 24px; background: #1f2937; color: #f9fafb;
+      border-bottom: 1px solid #111827; z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; text-decoration: none; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/en/">Main</a>
+    <a href="/en/demo.html">Demo</a>
+    <a href="/en/demo-endpoints.html">Endpoints</a>
+    <a href="/en/demo-jmeter.html">JMeter</a>
+    <a href="/en/demo-test-types.html">Test Types</a>
+    <a href="/en/tools.html">Tools</a>
+    <a href="/en/assignment.html">Assignment</a>
+    <a href="/en/glossary.html">Glossary</a>
+    <span style="border-left:1px solid #4b5563;padding-left:14px"><a href="/">TH</a> &nbsp;|&nbsp; <strong style="color:#f9fafb">EN</strong></span>
+    <a href="/status">/status</a>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>Performance Testing Lab</h1>
+
+<p><b>Performance Testing Lab</b> is a local API for safely learning load testing and performance monitoring on your own machine.</p>
+
+<div class="note">
+  <b>New here?</b> Start from this page and follow each step in order. Take your time — working through one thing at a time leads to faster understanding.
+</div>
+
+<h2>🗺️ Learning Path (Start Here)</h2>
+
+<div class="step">
+  <h3>Step 1 — Understand what this API does (5 minutes)</h3>
+  <p>Read the <a href="#endpoint-table">Endpoint Purpose</a> table below to learn what each endpoint is designed to test. For example, <code>/fast</code> measures baseline latency, <code>/busy</code> hits the concurrency limit, and <code>/demo/*</code> simulates an e-commerce flow.</p>
+</div>
+
+<div class="step">
+  <h3>Step 2 — Try calling endpoints in the browser (5–10 minutes)</h3>
+  <p>Click the links in <a href="#try-endpoints">Try These Endpoints</a> below to see real responses from each endpoint before starting with JMeter.</p>
+</div>
+
+<div class="step">
+  <h3>Step 3 — Learn the demo transaction flow</h3>
+  <p>Open the <a href="/en/demo.html">Demo Learning Path</a> and try calling the full e-commerce flow: context → search → add to cart → checkout → order status.</p>
+</div>
+
+<div class="step">
+  <h3>Step 4 — Build a JMeter test plan</h3>
+  <p>Open the <a href="/en/demo-jmeter.html">JMeter Guide</a> and follow the steps in order: set HTTP Request Defaults → create a Thread Group → add a Transaction Controller → configure JSON Extractors.</p>
+</div>
+
+<div class="step">
+  <h3>Step 5 — Choose a test type and thread group</h3>
+  <p>Open <a href="/en/demo-test-types.html">Test Types</a> to decide whether to run a load, stress, spike, or endurance test, and which thread group configuration to use.</p>
+</div>
+
+<div class="step">
+  <h3>Step 6 — Practice with real exercises</h3>
+  <p>Open <a href="/en/assignment.html">Assignment</a> and work through the tasks, from foundational exercises up to full performance testing scenarios.</p>
+</div>
+
+<h2>🔗 Quick Navigation</h2>
+<div class="card-grid">
+  <div class="card">
+    <h3>Demo Learning Path</h3>
+    <p>Overview of the flow and e-commerce transactions</p>
+    <a href="/en/demo.html">Open →</a>
+  </div>
+  <div class="card">
+    <h3>Endpoints</h3>
+    <p>Request format, body, variable structure</p>
+    <a href="/en/demo-endpoints.html">Open →</a>
+  </div>
+  <div class="card">
+    <h3>JMeter Guide</h3>
+    <p>Structure, controllers, extractors, headers</p>
+    <a href="/en/demo-jmeter.html">Open →</a>
+  </div>
+  <div class="card">
+    <h3>Test Types</h3>
+    <p>Thread group config, test matrix, cheat sheet</p>
+    <a href="/en/demo-test-types.html">Open →</a>
+  </div>
+  <div class="card">
+    <h3>Assignment</h3>
+    <p>Exercises with solutions, from beginner to advanced</p>
+    <a href="/en/assignment.html">Open →</a>
+  </div>
+  <div class="card">
+    <h3>Glossary</h3>
+    <p>Performance testing terms with examples</p>
+    <a href="/en/glossary.html">Open →</a>
+  </div>
+</div>
+
+<h2 id="try-endpoints">🔗 Try These Endpoints (Step 2)</h2>
+<p>Click a link to call an endpoint and see the real response — GET endpoints are clickable immediately; POST endpoints require Postman or curl.</p>
+<ul>
+  <li><a href="/fast">/fast</a> — baseline, responds immediately</li>
+  <li><a href="/slow">/slow</a> — adds a 200 ms delay</li>
+  <li><a href="/busy">/busy</a> — adds a 3000 ms delay, used to hit the concurrency limit</li>
+  <li><a href="/cpu">/cpu</a> — CPU workload</li>
+  <li><a href="/memory">/memory</a> — memory allocation</li>
+  <li><a href="/io?mode=read">/io?mode=read</a> — reads a file from disk</li>
+  <li><a href="/io?mode=write">/io?mode=write</a> — writes a file to disk</li>
+  <li><a href="/prep">/prep</a> — generates a token seed for use with /protected</li>
+  <li><code>GET /protected</code> — requires a token; try via Postman</li>
+  <li><a href="/error">/error</a> — simulates a 500 error</li>
+  <li><a href="/status">/status</a> — runtime info</li>
+  <li><a href="/metrics">/metrics</a> — Prometheus metrics</li>
+  <li><code>POST /auth/login</code> — receive a JWT token (use Postman)</li>
+  <li><code>POST /auth/verify</code> — verify a JWT token</li>
+  <li><code>POST /submit-one</code> — test body validation (1 field)</li>
+  <li><code>POST /submit-two</code> — test body validation (2 fields)</li>
+  <li><code>POST /cleanup</code> — delete temporary files created by /io</li>
+</ul>
+
+<p><b>Demo endpoints:</b> <a href="/demo/context">/demo/context</a> · <a href="/demo/dashboard">/demo/dashboard</a> · <a href="/demo/search?q=mouse">/demo/search?q=mouse</a> · <a href="/demo/product/details?productId=sku-101">/demo/product/details?productId=sku-101</a></p>
+
+<div class="warn">
+  <b>Gold standard</b> on this page refers to the target baseline for APIs in this lab — not a universal SLA for all production systems. Adjust targets based on business criticality and your actual infrastructure.
+</div>
+
+<h2 id="endpoint-table">📘 Endpoint Purpose And SLA (Step 3)</h2>
+<table>
+<tr>
+  <th>Endpoint</th>
+  <th>What It Tests</th>
+  <th>Gold Standard / Recommended SLA</th>
+</tr>
+<tr>
+  <td><code>/fast</code></td>
+  <td>Baseline endpoint — measures minimum system latency when the server has almost no work to do</td>
+  <td>p95 &lt; 100 ms, error rate &lt; 1%</td>
+</tr>
+<tr>
+  <td><code>/slow</code></td>
+  <td>Simulates a fixed downstream latency — observe timeout behavior, queueing, and latency budget</td>
+  <td>p95 &lt; 300 ms (including the configured delay), error &lt; 1%</td>
+</tr>
+<tr>
+  <td><code>/busy</code></td>
+  <td>Forces high in-flight requests until the concurrency limit is hit, triggering 503 backpressure</td>
+  <td>No user-facing SLA — used to confirm backpressure is working correctly</td>
+</tr>
+<tr>
+  <td><code>/cpu</code></td>
+  <td>CPU saturation and event-loop blocking</td>
+  <td>p95 should not spike high enough to affect other endpoints; 5xx &lt; 2%</td>
+</tr>
+<tr>
+  <td><code>/memory</code></td>
+  <td>Memory pressure, GC pauses, and OOM risk</td>
+  <td>Process memory should not grow continuously; error rate &lt; 1%</td>
+</tr>
+<tr>
+  <td><code>/prep</code></td>
+  <td>Generates a seed for JMeter pre-processors — <code>requestId</code>, <code>token</code>, <code>authorizationHeader</code></td>
+  <td>Fast, consistent response with no heavy workload</td>
+</tr>
+<tr>
+  <td><code>/protected</code></td>
+  <td>Tests the auth header flow — accepts <code>Authorization: Bearer ...</code> and <code>x-access-token</code></td>
+  <td>200 with valid token, 401 with no token, 403 with invalid token</td>
+</tr>
+<tr>
+  <td><code>/io?mode=read|write</code></td>
+  <td>I/O bottleneck from real file reads/writes in <code>tmp/</code></td>
+  <td>Check <code>durationMs</code> in the response — use to observe disk throughput</td>
+</tr>
+<tr>
+  <td><code>POST /cleanup</code></td>
+  <td>Removes temporary files after /io — intended for use in a tearDown Thread Group</td>
+  <td>Always returns 200, even when there are no files to delete</td>
+</tr>
+<tr>
+  <td><code>POST /submit-one</code></td>
+  <td>Request body validation — requires 1 field: <code>name</code></td>
+  <td>200 when all fields present, 400 when field is missing</td>
+</tr>
+<tr>
+  <td><code>POST /submit-two</code></td>
+  <td>Request body validation — requires 2 fields: <code>name</code> and <code>type</code></td>
+  <td>200 when all fields present, 400 when a field is missing</td>
+</tr>
+<tr>
+  <td><code>/error</code></td>
+  <td>Intentionally simulates HTTP 500 — used to test error handling, retries, and alerting</td>
+  <td>Not a gold endpoint — should always return 500</td>
+</tr>
+<tr>
+  <td><code>/status</code></td>
+  <td>Runtime health check — <code>pid</code>, <code>startedAt</code>, <code>uptimeSec</code>, <code>activeRequests</code></td>
+  <td>Returns 200 at all times while the process is running</td>
+</tr>
+<tr>
+  <td><code>/metrics</code></td>
+  <td>Prometheus scrape endpoint — throughput, latency, request counts</td>
+  <td>Stable; must not slow down other requests</td>
+</tr>
+<tr>
+  <td><code>POST /auth/login</code></td>
+  <td>JWT authentication — send <code>username</code>/<code>password</code> to receive a JWT token valid for 24 hours</td>
+  <td>200 with correct credentials, 401 with wrong credentials, error &lt; 1%</td>
+</tr>
+<tr>
+  <td><code>POST /auth/verify</code></td>
+  <td>Verify a JWT token — send <code>Authorization: Bearer &lt;token&gt;</code></td>
+  <td>200 for valid token, 401 for expired token, 403 for invalid token</td>
+</tr>
+</table>
+
+<h2>📊 Expected Results At Load</h2>
+<table>
+<tr><th>Users</th><th>Avg Response (ms)</th><th>p95 (ms)</th><th>Error Rate</th><th>Status</th></tr>
+<tr><td>10</td><td>20</td><td>30</td><td>0%</td><td>✅ Normal</td></tr>
+<tr><td>100</td><td>60</td><td>120</td><td>0%</td><td>⚠️ Load</td></tr>
+<tr><td>300</td><td>400</td><td>900</td><td>10%</td><td>❌ Bottleneck</td></tr>
+<tr><td>500</td><td>1200</td><td>3000</td><td>30%</td><td>💥 Crash zone</td></tr>
+</table>
+
+<h2>🔥 How To Trigger Each Scenario</h2>
+<table>
+<tr><th>Goal</th><th>Endpoint</th><th>Recommended Settings</th><th>Expected Outcome</th></tr>
+<tr>
+  <td>Measure baseline latency</td>
+  <td><code>/fast</code></td>
+  <td>10–50 users, ramp-up 1–5 sec</td>
+  <td>Almost all 200s with low latency</td>
+</tr>
+<tr>
+  <td>Observe fixed latency</td>
+  <td><code>/slow</code></td>
+  <td>50–100 users, <code>SLOW_DELAY_MS=200–1000</code></td>
+  <td>200 responses but response time rises with the delay</td>
+</tr>
+<tr>
+  <td>Hit the concurrency limit</td>
+  <td><code>/busy</code></td>
+  <td>100–300 users, <code>MAX_CONCURRENT=20–50</code>, <code>BUSY_DELAY_MS=3000</code></td>
+  <td>Some requests get 200, some get 503</td>
+</tr>
+<tr>
+  <td>Observe CPU bottleneck</td>
+  <td><code>/cpu</code></td>
+  <td>20–100 users, <code>CPU_ITERATIONS=10M–100M</code></td>
+  <td>200 responses but high latency; other endpoints slow down as well</td>
+</tr>
+<tr>
+  <td>Observe memory pressure</td>
+  <td><code>/memory</code></td>
+  <td>20–100 users, <code>MEMORY_ARRAY_SIZE=1M–5M</code></td>
+  <td>Variable response times, elevated memory usage</td>
+</tr>
+<tr>
+  <td>Test auth header flow</td>
+  <td><code>/protected</code></td>
+  <td>1–50 users, header <code>Authorization: Bearer lab-token</code></td>
+  <td>200 with valid token, 401 with no token, 403 with invalid token</td>
+</tr>
+<tr>
+  <td>Observe I/O bottleneck</td>
+  <td><code>/io?mode=read|write</code></td>
+  <td>20–100 users, <code>IO_FILE_SIZE_KB=1024–8192</code></td>
+  <td><code>durationMs</code> rises with file size</td>
+</tr>
+<tr>
+  <td>Test body validation</td>
+  <td><code>POST /submit-one</code>, <code>/submit-two</code></td>
+  <td>Send correct and incorrect JSON bodies</td>
+  <td>200 when complete, 400 when a field is missing</td>
+</tr>
+<tr>
+  <td>Test the 5xx path</td>
+  <td><code>/error</code></td>
+  <td>1–50 users</td>
+  <td>500 on every request</td>
+</tr>
+<tr>
+  <td>Clean up temp data</td>
+  <td><code>POST /cleanup</code></td>
+  <td>1 user in a tearDown Thread Group</td>
+  <td>200 with a list of cleaned files</td>
+</tr>
+</table>
+
+<h2>💬 Response Meanings</h2>
+<ul>
+  <li><code>/fast</code> → <code>{ "message": "fast response" }</code> — endpoint has no workload; responds immediately</li>
+  <li><code>/slow</code> → <code>slow response (Xms)</code> — server delays according to <code>SLOW_DELAY_MS</code></li>
+  <li><code>/busy</code> → <code>busy response (Xms)</code> if the request gets through; <code>503 Server too busy</code> (plain text) if the limit is hit</li>
+  <li><code>/cpu</code> → <code>result</code> is the loop sum, <code>iterations</code> is the iteration count</li>
+  <li><code>/memory</code> → <code>size</code> is the number of elements successfully allocated</li>
+  <li><code>/prep</code> → contains <code>token</code>, <code>authorizationHeader</code>, <code>requestId</code>, <code>timestamp</code></li>
+  <li><code>/protected</code> → <code>authenticated: true</code> with a valid token; <code>missing_token</code> or <code>invalid_token</code> otherwise</li>
+  <li><code>/io</code> → <code>mode</code>, <code>fileSizeKb</code>, <code>durationMs</code></li>
+  <li><code>POST /cleanup</code> → <code>cleaned</code> list of deleted files, <code>cleanedCount</code></li>
+  <li><code>POST /submit-one</code> → <code>received one required parameter</code> or <code>missing_required_parameter</code></li>
+  <li><code>POST /submit-two</code> → <code>received two required parameters</code> or <code>missing_required_parameters</code></li>
+  <li><code>/error</code> → <code>intentional server error</code> — always responds with 500</li>
+  <li><code>/status</code> → <code>running: true</code>, <code>pid</code>, <code>startedAt</code>, <code>uptimeSec</code>, <code>activeRequests</code></li>
+  <li><code>/metrics</code> → Prometheus text format, not JSON</li>
+  <li><code>POST /auth/login</code> → <code>token</code> (JWT string) when credentials are correct</li>
+  <li><code>POST /auth/verify</code> → <code>valid: true</code>, <code>decoded</code> with a valid token; <code>token_expired</code> or <code>invalid_token</code> otherwise</li>
+</ul>
+
+<h2>📏 SLA Interpretation</h2>
+<ul>
+  <li><b>Look at p95 or p99</b> rather than the average — percentiles reflect real user experience when the system is under load</li>
+  <li><b>Error rate</b> — if 5xx responses or timeouts exceed 1% on a primary endpoint, the system is failing its threshold</li>
+  <li><b>Availability</b> — for <code>/status</code>, target 99.9% or higher</li>
+  <li><b>Isolation</b> — if loading <code>/cpu</code> causes <code>/fast</code> to breach its SLA, the workloads are not sufficiently resource-isolated</li>
+</ul>
+
+<div class="note">
+  <b>Next step:</b> Once you understand the endpoints, open the <a href="/en/demo.html">Demo Learning Path</a> to learn the e-commerce flow and build a JMeter test plan.
+</div>
+
+<script>
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl = document.getElementById("runtime-meta");
+  async function refreshRuntimeStatus() {
+    try {
+      const res = await fetch("/status", { cache: "no-store" });
+      if (!res.ok) throw new Error("non-200");
+      const d = await res.json();
+      statusEl.innerHTML = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent = `PID: ${d.pid} | Uptime: ${d.uptimeSec}s | Active: ${d.activeRequests}`;
+    } catch {
+      statusEl.innerHTML = '<span class="status-bad-light">Server not reachable</span>';
+      metaEl.textContent = "Open via Node/Express to enable status check.";
+    }
+  }
+  refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 5000);
+</script>
+</body>
+</html>
