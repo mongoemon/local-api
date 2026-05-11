@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Server Configuration</title>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 88px 40px 60px; color: #1f2937; }
+    h1, h2 { color: #1f2937; }
+    h2 { margin-top: 36px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+    table { border-collapse: collapse; width: 100%; margin-top: 16px; }
+    th, td { border: 1px solid #d1d5db; padding: 12px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; font-weight: 600; }
+    code { background: #f3f4f6; padding: 2px 6px; font-size: 12px; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px; margin: 16px 0; font-size: 14px; }
+    .warn { background: #fefce8; border-left: 4px solid #ca8a04; padding: 10px 12px; margin-top: 10px; font-size: 12px; }
+
+    /* Buttons */
+    .btn { display: inline-block; padding: 9px 20px; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 3px; }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #f3f4f6; color: #1f2937; border: 1px solid #d1d5db; }
+    .btn-secondary:hover { background: #e5e7eb; }
+    .btn-reset { background: #16a34a; color: white; }
+    .btn-reset:hover { background: #15803d; }
+    .btn-stress { background: #dc2626; color: white; }
+    .btn-stress:hover { background: #b91c1c; }
+
+    /* Preset bar */
+    .preset-bar { display: flex; gap: 12px; align-items: center; margin: 20px 0 8px; padding: 16px 20px; background: #f9fafb; border: 1px solid #e5e7eb; }
+    .preset-bar > strong { color: #374151; }
+    #preset-note { font-size: 13px; color: #6b7280; margin-left: 4px; }
+
+    /* Field cells */
+    .field-name { font-weight: bold; font-size: 14px; margin-bottom: 3px; }
+    .field-env { font-family: monospace; font-size: 11px; color: #9ca3af; }
+    .field-default { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+    /* Inputs */
+    input[type="number"] { width: 140px; padding: 7px 10px; border: 1px solid #d1d5db; font-size: 14px; box-sizing: border-box; }
+    input[type="number"]:focus { outline: 2px solid #2563eb; border-color: transparent; }
+    .input-unit { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+    /* Toggle switch */
+    .toggle { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track { width: 44px; height: 24px; background: #d1d5db; border-radius: 24px; position: relative; transition: background .2s; flex-shrink: 0; }
+    .toggle input:checked ~ .toggle-track { background: #2563eb; }
+    .toggle-knob { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+    .toggle input:checked ~ .toggle-track .toggle-knob { transform: translateX(20px); }
+    .toggle-label { font-size: 14px; color: #4b5563; min-width: 24px; }
+
+    /* Impact notes */
+    .impact { font-size: 12px; color: #6b7280; margin-top: 8px; line-height: 1.6; }
+    .impact .hi { color: #dc2626; font-weight: bold; }
+    .impact .lo { color: #16a34a; font-weight: bold; }
+
+    /* Action bar */
+    .action-bar { margin-top: 32px; padding: 18px 20px; background: #f9fafb; border: 1px solid #e5e7eb; display: flex; gap: 12px; align-items: center; }
+    #save-note { font-size: 13px; color: #6b7280; margin-left: 4px; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 28px; right: 28px; padding: 12px 20px; font-weight: bold; font-size: 14px; border-radius: 4px; z-index: 9999; display: none; }
+    .toast-ok  { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .toast-err { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+    /* Topbar */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
+      justify-content: space-between; gap: 16px; padding: 14px 24px; background: #1f2937;
+      color: #f9fafb; border-bottom: 1px solid #111827; z-index: 1000;
+    }
+    .topbar a { color: #93c5fd; margin-right: 14px; text-decoration: none; }
+    .topbar a:last-child { margin-right: 0; }
+    .topbar-links, .topbar-status { display: flex; align-items: center; gap: 14px; }
+    .topbar-status { font-size: 14px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-ok-light { color: #86efac; font-weight: bold; }
+    .status-bad-light { color: #fca5a5; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-links">
+    <strong>Performance Testing Lab</strong>
+    <a href="/en/">Main</a>
+    <a href="/en/demo.html">Demo Home</a>
+    <a href="/en/demo-endpoints.html">Demo Endpoints</a>
+    <a href="/en/demo-jmeter.html">JMeter Guide</a>
+    <a href="/en/demo-test-types.html">Test Types</a>
+    <a href="/en/tools.html">Tools</a>
+    <a href="/en/assignment.html">Assignment</a>
+    <a href="/en/glossary.html">Glossary</a>
+    <a href="/en/config.html">Config</a>
+    <span style="border-left:1px solid #4b5563;padding-left:14px"><a href="/config.html">TH</a> &nbsp;|&nbsp; <strong style="color:#f9fafb">EN</strong></span>
+    <a href="/status">/status</a>
+  </div>
+  <div class="topbar-status">
+    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-meta"></span>
+  </div>
+</div>
+
+<h1>Server Configuration</h1>
+<div class="note">
+  All changes take effect immediately — no server restart required. Use the presets to switch between a comfortable default state and a tight stress mode, or tune individual values for targeted testing.
+</div>
+
+<div class="preset-bar">
+  <strong>Quick Presets:</strong>
+  <button class="btn btn-reset"   onclick="applyPreset('default')">Reset to Defaults</button>
+  <button class="btn btn-stress"  onclick="applyPreset('stress')">Apply Stress Mode</button>
+  <span id="preset-note"></span>
+</div>
+
+<!-- =========================================================== -->
+<h2>Rate Limiting</h2>
+<div class="note">
+  Limits how many requests a client can make within a sliding time window. Returns <code>429 Too Many Requests</code> when the count is exceeded.
+  Disabled by default so you never hit a 429 during normal exploration. Enable it during load tests to observe error handling behavior.
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:210px">Setting</th>
+      <th style="width:170px">Value</th>
+      <th>What it controls</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <div class="field-name">Enabled</div>
+        <div class="field-env">RATE_LIMIT_ENABLED</div>
+        <div class="field-default">Default: off</div>
+      </td>
+      <td>
+        <label class="toggle">
+          <input type="checkbox" id="rl-enabled">
+          <span class="toggle-track"><span class="toggle-knob"></span></span>
+          <span class="toggle-label" id="rl-enabled-label">Off</span>
+        </label>
+      </td>
+      <td>
+        When <strong>on</strong>, every inbound request is counted per client IP within the window.
+        Requests that exceed <em>Max per Window</em> receive <code>429</code> until the window resets.
+        <div class="impact">
+          <span class="hi">On:</span> enables rate enforcement — JMeter will produce 429s once threads × loops exceed the limit.<br>
+          <span class="lo">Off:</span> no rate limiting regardless of request volume.
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="field-name">Window Duration</div>
+        <div class="field-env">RATE_LIMIT_WINDOW_MS</div>
+        <div class="field-default">Default: 60000 ms (1 min)</div>
+      </td>
+      <td>
+        <input type="number" id="rl-window" min="1000" max="3600000" step="1000" value="60000">
+        <div class="input-unit">milliseconds</div>
+      </td>
+      <td>
+        How long one rate-limit window lasts. After this period, the request count resets for each client IP.
+        <div class="impact">
+          <span class="hi">Longer:</span> clients stay rate-limited for longer after hitting the cap — harder to recover.<br>
+          <span class="lo">Shorter:</span> window resets sooner — rate limit clears faster after being triggered.
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="field-name">Max per Window</div>
+        <div class="field-env">RATE_LIMIT_MAX</div>
+        <div class="field-default">Default: 10000</div>
+      </td>
+      <td>
+        <input type="number" id="rl-max" min="1" max="100000" step="1" value="10000">
+        <div class="input-unit">requests per window</div>
+      </td>
+      <td>
+        Maximum requests a single client IP can make in one window before receiving <code>429</code>.
+        The default <code>10000</code> is effectively unlimited for local testing.
+        <div class="impact">
+          <span class="hi">Lower (e.g. 30–100):</span> triggers 429 quickly — good for observing error handling in JMeter reports.<br>
+          <span class="lo">Higher:</span> nearly impossible to hit — rate limiting is on but does not interfere.
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- =========================================================== -->
+<h2>Concurrency</h2>
+<div class="note">
+  A hard cap on how many requests can be in-flight at the same time. When the cap is reached, any new incoming request immediately receives <code>503 Service Unavailable</code>.
+  This simulates a server that is genuinely too busy to queue more work.
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:210px">Setting</th>
+      <th style="width:170px">Value</th>
+      <th>What it controls</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <div class="field-name">Max Concurrent Requests</div>
+        <div class="field-env">MAX_CONCURRENT</div>
+        <div class="field-default">Default: 50</div>
+      </td>
+      <td>
+        <input type="number" id="cc-max" min="1" max="1000" step="1" value="50">
+        <div class="input-unit">simultaneous requests</div>
+      </td>
+      <td>
+        Maximum number of requests being processed at the same time. Any request arriving while the cap is full gets <code>503</code> instantly.
+        The count drops as responses finish, so the limit is self-correcting.
+        <div class="impact">
+          <span class="hi">Lower (e.g. 5–10):</span> produces 503s quickly when JMeter threads exceed the cap — good for testing error handling and retry logic.<br>
+          <span class="lo">Higher:</span> harder to saturate — useful for load-testing endpoints without introducing 503 noise.
+        </div>
+        <div class="warn">
+          Setting this below <strong>3</strong> may make this Config page unreachable while a load test is running.
+          The <code>/api/config</code> endpoint is always accessible and can be used to recover via curl.
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- =========================================================== -->
+<h2>Workload Endpoints</h2>
+<div class="note">
+  These control the simulation behavior of <code>/slow</code>, <code>/busy</code>, <code>/cpu</code>, <code>/memory</code>, and <code>/io</code>.
+  Changes apply to the <em>next</em> request — no restart needed.
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:210px">Setting</th>
+      <th style="width:170px">Value</th>
+      <th>What it controls</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <div class="field-name">/slow — Delay</div>
+        <div class="field-env">SLOW_DELAY_MS</div>
+        <div class="field-default">Default: 200 ms</div>
+      </td>
+      <td>
+        <input type="number" id="wl-slow" min="0" max="30000" step="50" value="200">
+        <div class="input-unit">milliseconds</div>
+      </td>
+      <td>
+        How long <code>GET /slow</code> waits before responding. Simulates a sluggish database call or I/O-bound operation.
+        The delay is async (non-blocking) so other concurrent requests are not affected.
+        <div class="impact">
+          <span class="hi">Higher (e.g. 1000–2000 ms):</span> directly raises p95/p99 — easy to observe in JMeter's Aggregate Report.<br>
+          <span class="lo">0 ms:</span> /slow behaves like /fast — useful to isolate other bottlenecks.
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="field-name">/busy — Delay</div>
+        <div class="field-env">BUSY_DELAY_MS</div>
+        <div class="field-default">Default: 3000 ms</div>
+      </td>
+      <td>
+        <input type="number" id="wl-busy" min="0" max="60000" step="500" value="3000">
+        <div class="input-unit">milliseconds</div>
+      </td>
+      <td>
+        How long <code>GET /busy</code> waits before responding. Simulates a heavy background job (report generation, external API call).
+        Long delays cause requests to pile up — combine with a low <em>Max Concurrent</em> to produce sustained 503 pressure.
+        <div class="impact">
+          <span class="hi">Higher (e.g. 8000–15000 ms):</span> active requests fill the concurrency cap quickly, yielding 503s even with a few JMeter threads.<br>
+          <span class="lo">0 ms:</span> removes the bottleneck — useful when testing other parts of a flow.
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="field-name">/cpu — Iterations</div>
+        <div class="field-env">CPU_ITERATIONS</div>
+        <div class="field-default">Default: 10,000,000</div>
+      </td>
+      <td>
+        <input type="number" id="wl-cpu" min="0" max="200000000" step="1000000" value="10000000">
+        <div class="input-unit">loop iterations</div>
+      </td>
+      <td>
+        Number of iterations in the synchronous CPU loop run by <code>GET /cpu</code>.
+        This <strong>blocks Node.js's event loop</strong> while running — all other in-flight requests stall until it completes.
+        At 10M iterations expect roughly 20–50 ms on modern hardware.
+        <div class="impact">
+          <span class="hi">Higher (e.g. 50M–100M):</span> blocks the event loop for 100–500 ms — latency of <em>all endpoints</em> rises under concurrent /cpu load.<br>
+          <span class="lo">1000:</span> effectively instant — removes the CPU bottleneck without changing the route.
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="field-name">/memory — Array Size</div>
+        <div class="field-env">MEMORY_ARRAY_SIZE</div>
+        <div class="field-default">Default: 1,000,000</div>
+      </td>
+      <td>
+        <input type="number" id="wl-mem" min="0" max="20000000" step="500000" value="1000000">
+        <div class="input-unit">array elements</div>
+      </td>
+      <td>
+        Number of elements allocated and filled during each <code>GET /memory</code> request.
+        The array is discarded after the response, creating garbage collection pressure under load.
+        At the default 1M elements of <code>"test"</code>, each request allocates roughly 4–8 MB.
+        <div class="impact">
+          <span class="hi">Higher (e.g. 5M–10M):</span> 20–80 MB per request — GC pauses become visible and latency drifts upward under concurrent load.<br>
+          <span class="lo">1000:</span> trivial allocation — removes memory pressure for isolation testing.
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="field-name">/io — File Size</div>
+        <div class="field-env">IO_FILE_SIZE_KB</div>
+        <div class="field-default">Default: 1024 KB</div>
+      </td>
+      <td>
+        <input type="number" id="wl-io" min="1" max="102400" step="512" value="1024">
+        <div class="input-unit">kilobytes</div>
+      </td>
+      <td>
+        Size of the file written or read by <code>GET /io</code> (stored at <code>tmp/io-test.dat</code>).
+        I/O is async so it does not block the event loop, but disk throughput saturation adds latency under concurrent load.
+        <div class="impact">
+          <span class="hi">Higher (e.g. 10 MB–50 MB):</span> I/O duration increases — disk saturation visible in JMeter when many threads hit /io simultaneously.<br>
+          <span class="lo">10 KB:</span> near-instant — removes I/O latency without disabling the route.
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="action-bar">
+  <button class="btn btn-primary"    onclick="applyChanges()">Apply Changes</button>
+  <button class="btn btn-secondary"  onclick="loadConfig()">Reload from Server</button>
+  <span id="save-note"></span>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  const PRESETS = {
+    default: {
+      rateLimit:   { enabled: false, windowMs: 60000, max: 10000 },
+      concurrency: { maxConcurrent: 50 },
+      workloads:   { slowDelayMs: 200, busyDelayMs: 3000, cpuIterations: 10000000, memoryArraySize: 1000000, ioFileSizeKb: 1024 }
+    },
+    stress: {
+      rateLimit:   { enabled: true, windowMs: 60000, max: 60 },
+      concurrency: { maxConcurrent: 10 },
+      workloads:   { slowDelayMs: 500, busyDelayMs: 5000, cpuIterations: 50000000, memoryArraySize: 5000000, ioFileSizeKb: 4096 }
+    }
+  };
+
+  function fillForm(data) {
+    const rl = data.rateLimit   || {};
+    const cc = data.concurrency || {};
+    const wl = data.workloads   || {};
+
+    if (rl.enabled !== undefined) {
+      document.getElementById("rl-enabled").checked = rl.enabled;
+      document.getElementById("rl-enabled-label").textContent = rl.enabled ? "On" : "Off";
+    }
+    if (rl.windowMs  !== undefined) document.getElementById("rl-window").value = rl.windowMs;
+    if (rl.max       !== undefined) document.getElementById("rl-max").value    = rl.max;
+    if (cc.maxConcurrent   !== undefined) document.getElementById("cc-max").value   = cc.maxConcurrent;
+    if (wl.slowDelayMs     !== undefined) document.getElementById("wl-slow").value  = wl.slowDelayMs;
+    if (wl.busyDelayMs     !== undefined) document.getElementById("wl-busy").value  = wl.busyDelayMs;
+    if (wl.cpuIterations   !== undefined) document.getElementById("wl-cpu").value   = wl.cpuIterations;
+    if (wl.memoryArraySize !== undefined) document.getElementById("wl-mem").value   = wl.memoryArraySize;
+    if (wl.ioFileSizeKb    !== undefined) document.getElementById("wl-io").value    = wl.ioFileSizeKb;
+  }
+
+  function collectForm() {
+    return {
+      rateLimit: {
+        enabled:  document.getElementById("rl-enabled").checked,
+        windowMs: parseInt(document.getElementById("rl-window").value, 10),
+        max:      parseInt(document.getElementById("rl-max").value, 10)
+      },
+      concurrency: {
+        maxConcurrent: parseInt(document.getElementById("cc-max").value, 10)
+      },
+      workloads: {
+        slowDelayMs:     parseInt(document.getElementById("wl-slow").value, 10),
+        busyDelayMs:     parseInt(document.getElementById("wl-busy").value, 10),
+        cpuIterations:   parseInt(document.getElementById("wl-cpu").value, 10),
+        memoryArraySize: parseInt(document.getElementById("wl-mem").value, 10),
+        ioFileSizeKb:    parseInt(document.getElementById("wl-io").value, 10)
+      }
+    };
+  }
+
+  async function loadConfig() {
+    try {
+      const res  = await fetch("/api/config", { cache: "no-store" });
+      const data = await res.json();
+      fillForm(data);
+    } catch {
+      showToast("Could not load config from server", false);
+    }
+  }
+
+  async function applyChanges() {
+    try {
+      const res  = await fetch("/api/config", {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(collectForm())
+      });
+      const data = await res.json();
+      if (data.ok) {
+        fillForm(data.config);
+        showToast("Configuration applied", true);
+        document.getElementById("save-note").textContent = "Saved at " + new Date().toLocaleTimeString();
+      }
+    } catch {
+      showToast("Failed to apply — server unreachable", false);
+    }
+  }
+
+  async function applyPreset(name) {
+    const preset = PRESETS[name];
+    if (!preset) return;
+    fillForm(preset);
+    try {
+      const res  = await fetch("/api/config", {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(preset)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        fillForm(data.config);
+        const label = name === "stress" ? "Stress mode applied" : "Reset to defaults";
+        showToast(label, true);
+        document.getElementById("preset-note").textContent = label + " at " + new Date().toLocaleTimeString();
+        document.getElementById("save-note").textContent = "";
+      }
+    } catch {
+      showToast("Failed to apply preset", false);
+    }
+  }
+
+  function showToast(msg, ok) {
+    const t = document.getElementById("toast");
+    t.textContent  = msg;
+    t.className    = "toast " + (ok ? "toast-ok" : "toast-err");
+    t.style.display = "block";
+    setTimeout(() => { t.style.display = "none"; }, 3000);
+  }
+
+  document.getElementById("rl-enabled").addEventListener("change", function () {
+    document.getElementById("rl-enabled-label").textContent = this.checked ? "On" : "Off";
+  });
+
+  loadConfig();
+
+  const statusEl = document.getElementById("runtime-status");
+  const metaEl   = document.getElementById("runtime-meta");
+  async function refreshRuntimeStatus() {
+    try {
+      const res  = await fetch("/status", { cache: "no-store" });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      statusEl.innerHTML  = '<span class="status-ok-light">Server is running</span>';
+      metaEl.textContent  = `PID: ${data.pid} | Uptime: ${data.uptimeSec}s | Active: ${data.activeRequests}`;
+    } catch {
+      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      metaEl.textContent = "";
+    }
+  }
+  refreshRuntimeStatus();
+  setInterval(refreshRuntimeStatus, 5000);
+</script>
+</body>
+</html>

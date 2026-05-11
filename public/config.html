@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Server Configuration</title>
+  <title>การตั้งค่าเซิร์ฟเวอร์</title>
   <style>
     body { font-family: Arial; margin: 0; padding: 88px 40px 60px; color: #1f2937; }
     h1, h2 { color: #1f2937; }
@@ -81,107 +81,108 @@
 <div class="topbar">
   <div class="topbar-links">
     <strong>Performance Testing Lab</strong>
-    <a href="/">Main</a>
-    <a href="/demo.html">Demo Home</a>
+    <a href="/">หน้าหลัก</a>
+    <a href="/demo.html">Demo</a>
     <a href="/demo-endpoints.html">Demo Endpoints</a>
-    <a href="/demo-jmeter.html">JMeter Guide</a>
-    <a href="/demo-test-types.html">Test Types</a>
-    <a href="/tools.html">Tools</a>
+    <a href="/demo-jmeter.html">คู่มือ JMeter</a>
+    <a href="/demo-test-types.html">ประเภท Test</a>
+    <a href="/tools.html">เครื่องมือ</a>
     <a href="/assignment.html">Assignment</a>
-    <a href="/glossary.html">Glossary</a>
+    <a href="/glossary.html">คำศัพท์</a>
     <a href="/config.html">Config</a>
+    <span style="border-left:1px solid #4b5563;padding-left:14px"><strong style="color:#f9fafb">TH</strong> &nbsp;|&nbsp; <a href="/en/config.html">EN</a></span>
     <a href="/status">/status</a>
   </div>
   <div class="topbar-status">
-    <span id="runtime-status">Checking server status...</span>
+    <span id="runtime-status">กำลังตรวจสอบเซิร์ฟเวอร์...</span>
     <span id="runtime-meta"></span>
   </div>
 </div>
 
-<h1>Server Configuration</h1>
+<h1>การตั้งค่าเซิร์ฟเวอร์</h1>
 <div class="note">
-  All changes take effect immediately — no server restart required. Use the presets to switch between a comfortable default state and a tight stress mode, or tune individual values for targeted testing.
+  การเปลี่ยนแปลงทั้งหมดมีผลทันที — ไม่ต้องรีสตาร์ทเซิร์ฟเวอร์ ใช้ปุ่ม Preset เพื่อสลับระหว่างค่าเริ่มต้นปกติกับโหมด Stress หรือปรับค่าแต่ละตัวสำหรับการทดสอบเฉพาะจุด
 </div>
 
 <div class="preset-bar">
-  <strong>Quick Presets:</strong>
-  <button class="btn btn-reset"   onclick="applyPreset('default')">Reset to Defaults</button>
-  <button class="btn btn-stress"  onclick="applyPreset('stress')">Apply Stress Mode</button>
+  <strong>Preset ด่วน:</strong>
+  <button class="btn btn-reset"   onclick="applyPreset('default')">รีเซ็ตเป็นค่าเริ่มต้น</button>
+  <button class="btn btn-stress"  onclick="applyPreset('stress')">เปิด Stress Mode</button>
   <span id="preset-note"></span>
 </div>
 
 <!-- =========================================================== -->
-<h2>Rate Limiting</h2>
+<h2>การจำกัดอัตราคำขอ (Rate Limiting)</h2>
 <div class="note">
-  Limits how many requests a client can make within a sliding time window. Returns <code>429 Too Many Requests</code> when the count is exceeded.
-  Disabled by default so you never hit a 429 during normal exploration. Enable it during load tests to observe error handling behavior.
+  จำกัดจำนวนคำขอที่ client แต่ละรายสามารถส่งได้ภายในช่วงเวลาที่กำหนด หากเกินจำนวนที่อนุญาตจะได้รับ <code>429 Too Many Requests</code>
+  ปิดไว้เป็นค่าเริ่มต้นเพื่อไม่ให้กระทบการใช้งานปกติ เปิดเมื่อต้องการสังเกตพฤติกรรมการจัดการ error ระหว่าง load test
 </div>
 
 <table>
   <thead>
     <tr>
-      <th style="width:210px">Setting</th>
-      <th style="width:170px">Value</th>
-      <th>What it controls</th>
+      <th style="width:210px">การตั้งค่า</th>
+      <th style="width:170px">ค่า</th>
+      <th>ควบคุมอะไร</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>
-        <div class="field-name">Enabled</div>
+        <div class="field-name">เปิดใช้งาน</div>
         <div class="field-env">RATE_LIMIT_ENABLED</div>
-        <div class="field-default">Default: off</div>
+        <div class="field-default">ค่าเริ่มต้น: ปิด</div>
       </td>
       <td>
         <label class="toggle">
           <input type="checkbox" id="rl-enabled">
           <span class="toggle-track"><span class="toggle-knob"></span></span>
-          <span class="toggle-label" id="rl-enabled-label">Off</span>
+          <span class="toggle-label" id="rl-enabled-label">ปิด</span>
         </label>
       </td>
       <td>
-        When <strong>on</strong>, every inbound request is counted per client IP within the window.
-        Requests that exceed <em>Max per Window</em> receive <code>429</code> until the window resets.
+        เมื่อ <strong>เปิด</strong> ทุก request จะถูกนับต่อ IP ของ client ภายในช่วง window
+        request ที่เกินจำนวน <em>สูงสุดต่อ Window</em> จะได้รับ <code>429</code> จนกว่า window จะรีเซ็ต
         <div class="impact">
-          <span class="hi">On:</span> enables rate enforcement — JMeter will produce 429s once threads × loops exceed the limit.<br>
-          <span class="lo">Off:</span> no rate limiting regardless of request volume.
+          <span class="hi">เปิด:</span> เริ่มบังคับใช้ rate limit — JMeter จะได้รับ 429 เมื่อ threads × loops เกินจำนวนที่กำหนด<br>
+          <span class="lo">ปิด:</span> ไม่มีการจำกัด request ไม่ว่าจะส่งมามากแค่ไหน
         </div>
       </td>
     </tr>
     <tr>
       <td>
-        <div class="field-name">Window Duration</div>
+        <div class="field-name">ระยะเวลา Window</div>
         <div class="field-env">RATE_LIMIT_WINDOW_MS</div>
-        <div class="field-default">Default: 60000 ms (1 min)</div>
+        <div class="field-default">ค่าเริ่มต้น: 60000 ms (1 นาที)</div>
       </td>
       <td>
         <input type="number" id="rl-window" min="1000" max="3600000" step="1000" value="60000">
-        <div class="input-unit">milliseconds</div>
+        <div class="input-unit">มิลลิวินาที</div>
       </td>
       <td>
-        How long one rate-limit window lasts. After this period, the request count resets for each client IP.
+        ระยะเวลาของ window หนึ่งรอบ หลังครบกำหนดนับ request ของแต่ละ IP จะรีเซ็ต
         <div class="impact">
-          <span class="hi">Longer:</span> clients stay rate-limited for longer after hitting the cap — harder to recover.<br>
-          <span class="lo">Shorter:</span> window resets sooner — rate limit clears faster after being triggered.
+          <span class="hi">นานขึ้น:</span> client ถูก rate limit นานขึ้นหลังชน cap — ฟื้นตัวยากขึ้น<br>
+          <span class="lo">สั้นลง:</span> window รีเซ็ตเร็วขึ้น — rate limit หายเร็วหลังถูกเปิดใช้
         </div>
       </td>
     </tr>
     <tr>
       <td>
-        <div class="field-name">Max per Window</div>
+        <div class="field-name">สูงสุดต่อ Window</div>
         <div class="field-env">RATE_LIMIT_MAX</div>
-        <div class="field-default">Default: 10000</div>
+        <div class="field-default">ค่าเริ่มต้น: 10000</div>
       </td>
       <td>
         <input type="number" id="rl-max" min="1" max="100000" step="1" value="10000">
-        <div class="input-unit">requests per window</div>
+        <div class="input-unit">คำขอต่อ window</div>
       </td>
       <td>
-        Maximum requests a single client IP can make in one window before receiving <code>429</code>.
-        The default <code>10000</code> is effectively unlimited for local testing.
+        จำนวน request สูงสุดที่ client IP หนึ่งรายทำได้ใน window เดียวก่อนได้รับ <code>429</code>
+        ค่าเริ่มต้น <code>10000</code> สูงมากจนแทบไม่มีผลสำหรับการทดสอบในเครื่อง
         <div class="impact">
-          <span class="hi">Lower (e.g. 30–100):</span> triggers 429 quickly — good for observing error handling in JMeter reports.<br>
-          <span class="lo">Higher:</span> nearly impossible to hit — rate limiting is on but does not interfere.
+          <span class="hi">ต่ำ (เช่น 30–100):</span> เกิด 429 เร็ว — เหมาะสำหรับสังเกตพฤติกรรม error handling ใน JMeter report<br>
+          <span class="lo">สูง:</span> แทบไม่มีทางชน cap — rate limiting เปิดอยู่แต่ไม่รบกวนการทดสอบ
         </div>
       </td>
     </tr>
@@ -189,41 +190,41 @@
 </table>
 
 <!-- =========================================================== -->
-<h2>Concurrency</h2>
+<h2>การรองรับพร้อมกัน (Concurrency)</h2>
 <div class="note">
-  A hard cap on how many requests can be in-flight at the same time. When the cap is reached, any new incoming request immediately receives <code>503 Service Unavailable</code>.
-  This simulates a server that is genuinely too busy to queue more work.
+  กำหนดจำนวน request สูงสุดที่ประมวลผลพร้อมกันได้ในขณะเดียวกัน เมื่อถึงเพดาน request ใหม่ทุกอันจะได้รับ <code>503 Service Unavailable</code> ทันที
+  จำลองสภาวะที่เซิร์ฟเวอร์ยุ่งเกินไปจนไม่รับงานเพิ่ม
 </div>
 
 <table>
   <thead>
     <tr>
-      <th style="width:210px">Setting</th>
-      <th style="width:170px">Value</th>
-      <th>What it controls</th>
+      <th style="width:210px">การตั้งค่า</th>
+      <th style="width:170px">ค่า</th>
+      <th>ควบคุมอะไร</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>
-        <div class="field-name">Max Concurrent Requests</div>
+        <div class="field-name">คำขอพร้อมกันสูงสุด</div>
         <div class="field-env">MAX_CONCURRENT</div>
-        <div class="field-default">Default: 50</div>
+        <div class="field-default">ค่าเริ่มต้น: 50</div>
       </td>
       <td>
         <input type="number" id="cc-max" min="1" max="1000" step="1" value="50">
-        <div class="input-unit">simultaneous requests</div>
+        <div class="input-unit">คำขอพร้อมกัน</div>
       </td>
       <td>
-        Maximum number of requests being processed at the same time. Any request arriving while the cap is full gets <code>503</code> instantly.
-        The count drops as responses finish, so the limit is self-correcting.
+        จำนวน request สูงสุดที่ประมวลผลพร้อมกันในขณะใดขณะหนึ่ง request ที่เข้ามาขณะ cap เต็มจะได้รับ <code>503</code> ทันที
+        เมื่อ response เสร็จ ตัวนับจะลดลงเอง
         <div class="impact">
-          <span class="hi">Lower (e.g. 5–10):</span> produces 503s quickly when JMeter threads exceed the cap — good for testing error handling and retry logic.<br>
-          <span class="lo">Higher:</span> harder to saturate — useful for load-testing endpoints without introducing 503 noise.
+          <span class="hi">ต่ำ (เช่น 5–10):</span> เกิด 503 เร็วเมื่อ JMeter threads เกิน cap — เหมาะสำหรับทดสอบ error handling และ retry logic<br>
+          <span class="lo">สูง:</span> ทำให้ cap ยากขึ้นที่จะถึง — เหมาะสำหรับ load test โดยไม่ต้องการ 503 noise
         </div>
         <div class="warn">
-          Setting this below <strong>3</strong> may make this Config page unreachable while a load test is running.
-          The <code>/api/config</code> endpoint is always accessible and can be used to recover via curl.
+          ตั้งค่าต่ำกว่า <strong>3</strong> อาจทำให้หน้า Config นี้เข้าไม่ได้ขณะ load test รันอยู่
+          endpoint <code>/api/config</code> เข้าได้เสมอและสามารถใช้กู้คืนผ่าน curl ได้
         </div>
       </td>
     </tr>
@@ -231,115 +232,115 @@
 </table>
 
 <!-- =========================================================== -->
-<h2>Workload Endpoints</h2>
+<h2>Endpoint จำลองภาระงาน (Workload Endpoints)</h2>
 <div class="note">
-  These control the simulation behavior of <code>/slow</code>, <code>/busy</code>, <code>/cpu</code>, <code>/memory</code>, and <code>/io</code>.
-  Changes apply to the <em>next</em> request — no restart needed.
+  ควบคุมพฤติกรรมจำลองของ <code>/slow</code>, <code>/busy</code>, <code>/cpu</code>, <code>/memory</code>, และ <code>/io</code>
+  การเปลี่ยนแปลงมีผลกับ <em>คำขอถัดไป</em> ทันที ไม่ต้องรีสตาร์ท
 </div>
 
 <table>
   <thead>
     <tr>
-      <th style="width:210px">Setting</th>
-      <th style="width:170px">Value</th>
-      <th>What it controls</th>
+      <th style="width:210px">การตั้งค่า</th>
+      <th style="width:170px">ค่า</th>
+      <th>ควบคุมอะไร</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>
-        <div class="field-name">/slow — Delay</div>
+        <div class="field-name">/slow — หน่วงเวลา</div>
         <div class="field-env">SLOW_DELAY_MS</div>
-        <div class="field-default">Default: 200 ms</div>
+        <div class="field-default">ค่าเริ่มต้น: 200 ms</div>
       </td>
       <td>
         <input type="number" id="wl-slow" min="0" max="30000" step="50" value="200">
-        <div class="input-unit">milliseconds</div>
+        <div class="input-unit">มิลลิวินาที</div>
       </td>
       <td>
-        How long <code>GET /slow</code> waits before responding. Simulates a sluggish database call or I/O-bound operation.
-        The delay is async (non-blocking) so other concurrent requests are not affected.
+        เวลาที่ <code>GET /slow</code> รอก่อนตอบกลับ จำลองการเรียก database ที่ช้าหรือ I/O-bound operation
+        การหน่วงเวลาเป็น async (non-blocking) จึงไม่กระทบ request อื่นที่รันพร้อมกัน
         <div class="impact">
-          <span class="hi">Higher (e.g. 1000–2000 ms):</span> directly raises p95/p99 — easy to observe in JMeter's Aggregate Report.<br>
-          <span class="lo">0 ms:</span> /slow behaves like /fast — useful to isolate other bottlenecks.
+          <span class="hi">สูง (เช่น 1000–2000 ms):</span> เพิ่ม p95/p99 โดยตรง — สังเกตได้ชัดใน Aggregate Report ของ JMeter<br>
+          <span class="lo">0 ms:</span> /slow ตอบเร็วเหมือน /fast — ใช้เพื่อ isolate bottleneck อื่น
         </div>
       </td>
     </tr>
     <tr>
       <td>
-        <div class="field-name">/busy — Delay</div>
+        <div class="field-name">/busy — หน่วงเวลา</div>
         <div class="field-env">BUSY_DELAY_MS</div>
-        <div class="field-default">Default: 3000 ms</div>
+        <div class="field-default">ค่าเริ่มต้น: 3000 ms</div>
       </td>
       <td>
         <input type="number" id="wl-busy" min="0" max="60000" step="500" value="3000">
-        <div class="input-unit">milliseconds</div>
+        <div class="input-unit">มิลลิวินาที</div>
       </td>
       <td>
-        How long <code>GET /busy</code> waits before responding. Simulates a heavy background job (report generation, external API call).
-        Long delays cause requests to pile up — combine with a low <em>Max Concurrent</em> to produce sustained 503 pressure.
+        เวลาที่ <code>GET /busy</code> รอก่อนตอบกลับ จำลอง background job หนัก เช่น การสร้างรายงานหรือเรียก external API
+        การหน่วงเวลานานทำให้ request สะสม — ใช้ร่วมกับ Max Concurrent ต่ำเพื่อสร้างแรงกดดัน 503 อย่างต่อเนื่อง
         <div class="impact">
-          <span class="hi">Higher (e.g. 8000–15000 ms):</span> active requests fill the concurrency cap quickly, yielding 503s even with a few JMeter threads.<br>
-          <span class="lo">0 ms:</span> removes the bottleneck — useful when testing other parts of a flow.
+          <span class="hi">สูง (เช่น 8000–15000 ms):</span> request ที่ active เต็ม concurrency cap เร็ว ทำให้เกิด 503 แม้มี JMeter threads ไม่มาก<br>
+          <span class="lo">0 ms:</span> ลบ bottleneck นี้ — ใช้เมื่อต้องการทดสอบส่วนอื่น
         </div>
       </td>
     </tr>
     <tr>
       <td>
-        <div class="field-name">/cpu — Iterations</div>
+        <div class="field-name">/cpu — จำนวนรอบ</div>
         <div class="field-env">CPU_ITERATIONS</div>
-        <div class="field-default">Default: 10,000,000</div>
+        <div class="field-default">ค่าเริ่มต้น: 10,000,000</div>
       </td>
       <td>
         <input type="number" id="wl-cpu" min="0" max="200000000" step="1000000" value="10000000">
-        <div class="input-unit">loop iterations</div>
+        <div class="input-unit">รอบการวนซ้ำ</div>
       </td>
       <td>
-        Number of iterations in the synchronous CPU loop run by <code>GET /cpu</code>.
-        This <strong>blocks Node.js's event loop</strong> while running — all other in-flight requests stall until it completes.
-        At 10M iterations expect roughly 20–50 ms on modern hardware.
+        จำนวนรอบของ CPU loop แบบ synchronous ที่ <code>GET /cpu</code> รัน
+        สิ่งนี้ <strong>บล็อก event loop ของ Node.js</strong> ขณะรัน — request อื่นทั้งหมดหยุดรอจนกว่าจะเสร็จ
+        ที่ 10M รอบคาดว่าใช้เวลาประมาณ 20–50 ms บน hardware ทั่วไป
         <div class="impact">
-          <span class="hi">Higher (e.g. 50M–100M):</span> blocks the event loop for 100–500 ms — latency of <em>all endpoints</em> rises under concurrent /cpu load.<br>
-          <span class="lo">1000:</span> effectively instant — removes the CPU bottleneck without changing the route.
+          <span class="hi">สูง (เช่น 50M–100M):</span> บล็อก event loop 100–500 ms — latency ของ<em>ทุก endpoint</em> เพิ่มขึ้นขณะมี /cpu load พร้อมกัน<br>
+          <span class="lo">1000:</span> แทบทันที — ลบ CPU bottleneck โดยไม่ต้องเปลี่ยน route
         </div>
       </td>
     </tr>
     <tr>
       <td>
-        <div class="field-name">/memory — Array Size</div>
+        <div class="field-name">/memory — ขนาด Array</div>
         <div class="field-env">MEMORY_ARRAY_SIZE</div>
-        <div class="field-default">Default: 1,000,000</div>
+        <div class="field-default">ค่าเริ่มต้น: 1,000,000</div>
       </td>
       <td>
         <input type="number" id="wl-mem" min="0" max="20000000" step="500000" value="1000000">
-        <div class="input-unit">array elements</div>
+        <div class="input-unit">จำนวน element</div>
       </td>
       <td>
-        Number of elements allocated and filled during each <code>GET /memory</code> request.
-        The array is discarded after the response, creating garbage collection pressure under load.
-        At the default 1M elements of <code>"test"</code>, each request allocates roughly 4–8 MB.
+        จำนวน element ที่จัดสรรและเติมข้อมูลระหว่าง request แต่ละครั้งของ <code>GET /memory</code>
+        Array จะถูกทิ้งหลังส่ง response สร้างแรงกดดันต่อ garbage collector ภายใต้ load
+        ที่ค่าเริ่มต้น 1M elements แต่ละ request จัดสรรหน่วยความจำประมาณ 4–8 MB
         <div class="impact">
-          <span class="hi">Higher (e.g. 5M–10M):</span> 20–80 MB per request — GC pauses become visible and latency drifts upward under concurrent load.<br>
-          <span class="lo">1000:</span> trivial allocation — removes memory pressure for isolation testing.
+          <span class="hi">สูง (เช่น 5M–10M):</span> 20–80 MB ต่อ request — GC pause เริ่มเห็นได้ชัดและ latency ล่องลอยขึ้นภายใต้ load พร้อมกัน<br>
+          <span class="lo">1000:</span> จัดสรรน้อยมาก — ลบแรงกดดัน memory สำหรับการทดสอบแบบ isolation
         </div>
       </td>
     </tr>
     <tr>
       <td>
-        <div class="field-name">/io — File Size</div>
+        <div class="field-name">/io — ขนาดไฟล์</div>
         <div class="field-env">IO_FILE_SIZE_KB</div>
-        <div class="field-default">Default: 1024 KB</div>
+        <div class="field-default">ค่าเริ่มต้น: 1024 KB</div>
       </td>
       <td>
         <input type="number" id="wl-io" min="1" max="102400" step="512" value="1024">
-        <div class="input-unit">kilobytes</div>
+        <div class="input-unit">กิโลไบต์</div>
       </td>
       <td>
-        Size of the file written or read by <code>GET /io</code> (stored at <code>tmp/io-test.dat</code>).
-        I/O is async so it does not block the event loop, but disk throughput saturation adds latency under concurrent load.
+        ขนาดของไฟล์ที่ <code>GET /io</code> เขียนหรืออ่าน (เก็บที่ <code>tmp/io-test.dat</code>)
+        I/O เป็น async จึงไม่บล็อก event loop แต่การอิ่มตัวของ disk throughput เพิ่ม latency ภายใต้ load พร้อมกัน
         <div class="impact">
-          <span class="hi">Higher (e.g. 10 MB–50 MB):</span> I/O duration increases — disk saturation visible in JMeter when many threads hit /io simultaneously.<br>
-          <span class="lo">10 KB:</span> near-instant — removes I/O latency without disabling the route.
+          <span class="hi">สูง (เช่น 10 MB–50 MB):</span> ระยะเวลา I/O เพิ่มขึ้น — disk saturation เห็นได้ใน JMeter เมื่อหลาย thread กด /io พร้อมกัน<br>
+          <span class="lo">10 KB:</span> แทบทันที — ลบ I/O latency โดยไม่ปิด route
         </div>
       </td>
     </tr>
@@ -347,8 +348,8 @@
 </table>
 
 <div class="action-bar">
-  <button class="btn btn-primary"    onclick="applyChanges()">Apply Changes</button>
-  <button class="btn btn-secondary"  onclick="loadConfig()">Reload from Server</button>
+  <button class="btn btn-primary"    onclick="applyChanges()">บันทึกการเปลี่ยนแปลง</button>
+  <button class="btn btn-secondary"  onclick="loadConfig()">โหลดจากเซิร์ฟเวอร์</button>
   <span id="save-note"></span>
 </div>
 
@@ -375,7 +376,7 @@
 
     if (rl.enabled !== undefined) {
       document.getElementById("rl-enabled").checked = rl.enabled;
-      document.getElementById("rl-enabled-label").textContent = rl.enabled ? "On" : "Off";
+      document.getElementById("rl-enabled-label").textContent = rl.enabled ? "เปิด" : "ปิด";
     }
     if (rl.windowMs  !== undefined) document.getElementById("rl-window").value = rl.windowMs;
     if (rl.max       !== undefined) document.getElementById("rl-max").value    = rl.max;
@@ -413,7 +414,7 @@
       const data = await res.json();
       fillForm(data);
     } catch {
-      showToast("Could not load config from server", false);
+      showToast("ไม่สามารถโหลดค่าจากเซิร์ฟเวอร์ได้", false);
     }
   }
 
@@ -427,11 +428,11 @@
       const data = await res.json();
       if (data.ok) {
         fillForm(data.config);
-        showToast("Configuration applied", true);
-        document.getElementById("save-note").textContent = "Saved at " + new Date().toLocaleTimeString();
+        showToast("บันทึกการตั้งค่าแล้ว", true);
+        document.getElementById("save-note").textContent = "บันทึกแล้วเมื่อ " + new Date().toLocaleTimeString();
       }
     } catch {
-      showToast("Failed to apply — server unreachable", false);
+      showToast("ไม่สามารถบันทึกได้ — เซิร์ฟเวอร์ไม่ตอบสนอง", false);
     }
   }
 
@@ -448,13 +449,13 @@
       const data = await res.json();
       if (data.ok) {
         fillForm(data.config);
-        const label = name === "stress" ? "Stress mode applied" : "Reset to defaults";
+        const label = name === "stress" ? "เปิด Stress Mode แล้ว" : "รีเซ็ตเป็นค่าเริ่มต้นแล้ว";
         showToast(label, true);
-        document.getElementById("preset-note").textContent = label + " at " + new Date().toLocaleTimeString();
+        document.getElementById("preset-note").textContent = label + " เมื่อ " + new Date().toLocaleTimeString();
         document.getElementById("save-note").textContent = "";
       }
     } catch {
-      showToast("Failed to apply preset", false);
+      showToast("ไม่สามารถใช้ preset ได้", false);
     }
   }
 
@@ -467,7 +468,7 @@
   }
 
   document.getElementById("rl-enabled").addEventListener("change", function () {
-    document.getElementById("rl-enabled-label").textContent = this.checked ? "On" : "Off";
+    document.getElementById("rl-enabled-label").textContent = this.checked ? "เปิด" : "ปิด";
   });
 
   loadConfig();
@@ -479,10 +480,10 @@
       const res  = await fetch("/status", { cache: "no-store" });
       if (!res.ok) throw new Error();
       const data = await res.json();
-      statusEl.innerHTML  = '<span class="status-ok-light">Server is running</span>';
-      metaEl.textContent  = `PID: ${data.pid} | Uptime: ${data.uptimeSec}s | Active: ${data.activeRequests}`;
+      statusEl.innerHTML  = '<span class="status-ok-light">เซิร์ฟเวอร์ทำงานปกติ</span>';
+      metaEl.textContent  = `PID: ${data.pid} | เวลาทำงาน: ${data.uptimeSec}s | คำขอปัจจุบัน: ${data.activeRequests}`;
     } catch {
-      statusEl.innerHTML = '<span class="status-bad-light">Server is not reachable</span>';
+      statusEl.innerHTML = '<span class="status-bad-light">เซิร์ฟเวอร์ไม่ตอบสนอง</span>';
       metaEl.textContent = "";
     }
   }
