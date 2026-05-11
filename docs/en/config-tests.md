@@ -125,6 +125,50 @@ These tests verify the full end-to-end behavior: PATCH enables the limiter → r
 ```bash
 npm test                                          # all tests
 npm test -- tests/integration/config.test.js     # config tests only
+npm run test:coverage                             # with coverage report
 ```
 
 Total: **37 tests** across 7 describe blocks, completing in under 100 ms.
+
+---
+
+## CI/CD
+
+The workflow at `.github/workflows/ci.yml` runs automatically on every push and pull request to `main`.
+
+### What the pipeline does
+
+1. **Matrix build** — runs the full test suite against Node.js 20, 22, and 24 in parallel, catching regressions that are version-specific.
+2. **Dependency install** — uses `npm ci` (not `npm install`) so the lockfile is always respected and the build is reproducible.
+3. **Test run** — `npm test` executes every file under `tests/` via Vitest.
+4. **Coverage report** — `npm run test:coverage` runs once on Node 22 only (avoids redundant uploads); output goes to the job log.
+
+### Workflow file summary
+
+```yaml
+on:
+  push:    { branches: [main] }
+  pull_request: { branches: [main] }
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22, 24]
+    steps:
+      - checkout
+      - setup-node (with npm cache)
+      - npm ci
+      - npm test
+      - npm run test:coverage   # Node 22 only
+```
+
+### What a failure means
+
+| Failure point | Likely cause |
+|---------------|-------------|
+| `npm ci` fails | `package-lock.json` is out of sync — run `npm install` locally and commit the updated lockfile |
+| Tests fail on one Node version only | Code uses an API that changed between versions (e.g., `crypto`, `fs` behavior) |
+| Tests fail on all versions | A route, middleware, or validation rule was changed without updating the corresponding test |
+| Coverage step fails | A new endpoint was added but has no test coverage — Vitest will list the uncovered lines |
