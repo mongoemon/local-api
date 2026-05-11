@@ -51,6 +51,12 @@ export function createApp(config) {
     registers: [register]
   });
 
+  const activeRequestsGauge = new client.Gauge({
+    name: "http_active_requests",
+    help: "Number of HTTP requests currently being processed",
+    registers: [register]
+  });
+
   app.use((req, res, next) => {
     const start = Date.now();
     res.on("finish", () => {
@@ -70,7 +76,11 @@ export function createApp(config) {
       return res.status(503).send(config.concurrency.busyMessage);
     }
     activeRequests++;
-    res.on("finish", () => activeRequests--);
+    activeRequestsGauge.set(activeRequests);
+    res.on("finish", () => {
+      activeRequests--;
+      activeRequestsGauge.set(activeRequests);
+    });
     next();
   });
 

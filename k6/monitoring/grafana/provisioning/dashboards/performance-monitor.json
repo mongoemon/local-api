@@ -1,0 +1,861 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Real-time view combining k6 client-side metrics (InfluxDB) and Node.js server-side metrics (Prometheus) for root-cause analysis. High 'Waiting (TTFB)' = server slow. High 'Connecting' = network. Rising heap during soak = memory leak. Event loop lag >100ms = JS thread blocked. 503 errors = hit concurrency limit.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "title": "Current Status",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "Green = Prometheus can scrape /metrics. Red = API is down or unreachable.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            {
+              "options": {
+                "0": { "color": "red", "index": 0, "text": "OFFLINE" },
+                "1": { "color": "green", "index": 1, "text": "ONLINE" }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "up{job=\"local-api\"}",
+          "legendFormat": "API",
+          "refId": "A"
+        }
+      ],
+      "title": "App Status",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+      "description": "k6 virtual users currently active. 0 = no test running.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null },
+              { "color": "yellow", "value": 20 },
+              { "color": "red", "value": 50 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT last(\"value\") FROM \"vus\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Active VUs (k6)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "Server-side requests per second measured by Prometheus.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "sum(rate(http_request_duration_seconds_count{job=\"local-api\"}[30s]))",
+          "legendFormat": "req/s",
+          "refId": "A"
+        }
+      ],
+      "title": "Requests/sec",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+      "description": "95th percentile response time from k6's point of view (includes network). Green <500ms, Yellow <1s, Red >1s.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 500 },
+              { "color": "red", "value": 1000 }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT percentile(\"value\", 95) FROM \"http_req_duration\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "p95 Latency (k6)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+      "description": "Fraction of k6 requests that failed. Green <2%, Yellow <5%, Red ≥5%.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.02 },
+              { "color": "red", "value": 0.05 }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "id": 6,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT mean(\"value\") FROM \"http_req_failed\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Error Rate (k6)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "Node.js heap currently in use. Yellow >100 MB, Red >250 MB.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 104857600 },
+              { "color": "red", "value": 262144000 }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "id": 7,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "nodejs_heap_size_used_bytes{job=\"local-api\"}",
+          "legendFormat": "Heap",
+          "refId": "A"
+        }
+      ],
+      "title": "Heap Used",
+      "type": "stat"
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 10,
+      "title": "Load Generator (k6 — Client Side)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+      "description": "VU count (blue, left axis) vs requests/sec (orange, right axis). If VUs keep rising but req/s flattens → the server is saturated and can no longer accept more work.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 10, "lineWidth": 2 },
+          "min": 0,
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Req/s" },
+            "properties": [
+              { "id": "custom.axisPlacement", "value": "right" },
+              { "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } },
+              { "id": "unit", "value": "reqps" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "VUs" },
+            "properties": [
+              { "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "id": 11,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "alias": "VUs",
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT last(\"value\") FROM \"vus\" WHERE $timeFilter GROUP BY time($__interval) fill(previous)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "Req/s",
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT non_negative_derivative(sum(\"value\"), 1s) FROM \"http_reqs\" WHERE $timeFilter GROUP BY time($__interval) fill(0)",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Virtual Users & Throughput",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+      "description": "% of requests that returned an HTTP error from k6's perspective. Spikes pinpoint exactly when the server started dropping requests.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2 },
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 2 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "id": 12,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "alias": "Error %",
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT mean(\"value\") * 100 FROM \"http_req_failed\" WHERE $timeFilter GROUP BY time($__interval) fill(0)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Error Rate (k6)",
+      "type": "timeseries"
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 20,
+      "title": "Latency: Where Is Time Lost?",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+      "description": "p50 = typical user experience. p95 = slow users. p99 = worst case. If p99 spikes but p50 stays low → some requests hit a queue or GC pause. If all rise together → systematic server slowdown.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 5, "lineWidth": 2 },
+          "min": 0,
+          "unit": "ms"
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "p50" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "p95" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "p99" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+      "id": 21,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "alias": "p50",
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT percentile(\"value\", 50) FROM \"http_req_duration\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "p95",
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT percentile(\"value\", 95) FROM \"http_req_duration\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "p99",
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT percentile(\"value\", 99) FROM \"http_req_duration\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Response Time Percentiles (k6)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+      "description": "Stacked breakdown of where each millisecond goes per request:\n• blocked = DNS lookup + connection queue time (client-side)\n• connecting = TCP handshake time (network)\n• waiting = time-to-first-byte, i.e. server processing time\n• receiving = downloading the response body\n\nHigh 'waiting' = server is the bottleneck. High 'connecting' = network/infrastructure issue.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 50,
+            "lineWidth": 1,
+            "stacking": { "group": "A", "mode": "normal" }
+          },
+          "min": 0,
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
+      "id": 22,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "alias": "Blocked (DNS + queue)",
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT mean(\"value\") FROM \"http_req_blocked\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "Connecting (TCP)",
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT mean(\"value\") FROM \"http_req_connecting\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "Waiting (TTFB = server processing)",
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT mean(\"value\") FROM \"http_req_waiting\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "Receiving (body download)",
+          "datasource": { "type": "influxdb", "uid": "k6-influxdb" },
+          "query": "SELECT mean(\"value\") FROM \"http_req_receiving\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "D",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Latency Breakdown (k6)",
+      "type": "timeseries"
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "id": 30,
+      "title": "Application Health (Prometheus — Server Side)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "Server-side latency from Prometheus histogram. Compare with k6 times: (k6 duration − server duration) ≈ network + client overhead. If they match, the problem is in the server.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 5, "lineWidth": 2 },
+          "min": 0,
+          "unit": "ms"
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "p50" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "p95" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "p99" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 24 },
+      "id": 31,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{job=\"local-api\"}[30s])) by (le)) * 1000",
+          "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"local-api\"}[30s])) by (le)) * 1000",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job=\"local-api\"}[30s])) by (le)) * 1000",
+          "legendFormat": "p99",
+          "refId": "C"
+        }
+      ],
+      "title": "Server Response Time (Prometheus)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "p95 response time per route. Shows which endpoint is causing the slowness. /cpu and /memory are expected to be high by design.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 5, "lineWidth": 2 },
+          "min": 0,
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 24 },
+      "id": 32,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"local-api\"}[30s])) by (le, route)) * 1000",
+          "legendFormat": "{{route}}",
+          "refId": "A"
+        }
+      ],
+      "title": "p95 by Route (Prometheus)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "Request rate by HTTP status code. 503 = hit the max concurrency limit (default 50). 500 = application error. 2xx = healthy.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 10, "lineWidth": 2 },
+          "min": 0,
+          "unit": "reqps"
+        },
+        "overrides": [
+          { "matcher": { "id": "byFrameRefID", "options": "A" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byFrameRefID", "options": "B" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
+          { "matcher": { "id": "byFrameRefID", "options": "C" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 24 },
+      "id": 33,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "sum(rate(http_request_duration_seconds_count{job=\"local-api\",status=~\"2..\"}[30s])) by (status)",
+          "legendFormat": "2xx - {{status}}",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "sum(rate(http_request_duration_seconds_count{job=\"local-api\",status=~\"4..\"}[30s])) by (status)",
+          "legendFormat": "4xx - {{status}}",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "sum(rate(http_request_duration_seconds_count{job=\"local-api\",status=~\"5..\"}[30s])) by (status)",
+          "legendFormat": "5xx - {{status}}",
+          "refId": "C"
+        }
+      ],
+      "title": "HTTP Status Code Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "Requests currently being processed. Approaches maxConcurrent (default 50) → 503 errors start. Watch this alongside VU count.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2 },
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 30 },
+              { "color": "red", "value": 45 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 24 },
+      "id": 34,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "http_active_requests{job=\"local-api\"}",
+          "legendFormat": "Active Requests",
+          "refId": "A"
+        }
+      ],
+      "title": "Active Requests (Concurrency)",
+      "type": "timeseries"
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 },
+      "id": 40,
+      "title": "Node.js Runtime",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "Heap used vs heap total vs RSS. Heap used steadily rising during a soak test = memory leak. Heap used near heap total = V8 under GC pressure.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 10, "lineWidth": 2 },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Heap Used" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Heap Total" }, "properties": [{ "id": "color", "value": { "fixedColor": "light-blue", "mode": "fixed" } }, { "id": "custom.fillOpacity", "value": 0 }] },
+          { "matcher": { "id": "byName", "options": "RSS" }, "properties": [{ "id": "color", "value": { "fixedColor": "purple", "mode": "fixed" } }, { "id": "custom.fillOpacity", "value": 0 }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 33 },
+      "id": 41,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "nodejs_heap_size_used_bytes{job=\"local-api\"}",
+          "legendFormat": "Heap Used",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "nodejs_heap_size_total_bytes{job=\"local-api\"}",
+          "legendFormat": "Heap Total",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "process_resident_memory_bytes{job=\"local-api\"}",
+          "legendFormat": "RSS",
+          "refId": "C"
+        }
+      ],
+      "title": "Heap Memory",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "How long JS tasks wait in the event loop queue before running. >10ms = elevated load. >100ms = JS thread is blocked (e.g. heavy /cpu workload, synchronous I/O). Correlates directly with high p99 latency.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": { "fillOpacity": 10, "lineWidth": 2 },
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 10 },
+              { "color": "red", "value": 100 }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 33 },
+      "id": 42,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "nodejs_eventloop_lag_p50_seconds{job=\"local-api\"} * 1000",
+          "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "nodejs_eventloop_lag_p95_seconds{job=\"local-api\"} * 1000",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "nodejs_eventloop_lag_p99_seconds{job=\"local-api\"} * 1000",
+          "legendFormat": "p99",
+          "refId": "C"
+        }
+      ],
+      "title": "Event Loop Lag",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "CPU time consumed by the Node.js process. Near 100% = CPU-bound bottleneck. Expected when hitting the /cpu endpoint. Correlates with high event loop lag.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": { "fillOpacity": 20, "lineWidth": 2 },
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 33 },
+      "id": 43,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "rate(process_cpu_seconds_total{job=\"local-api\"}[30s]) * 100",
+          "legendFormat": "CPU %",
+          "refId": "A"
+        }
+      ],
+      "title": "CPU Usage",
+      "type": "timeseries"
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 41 },
+      "id": 50,
+      "title": "Garbage Collection",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "GC time spent per second by collection type. GC pauses the event loop — spikes here cause latency spikes. Major GC (full mark-and-sweep) is the most disruptive.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 10, "lineWidth": 2 },
+          "min": 0,
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 42 },
+      "id": 51,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "rate(nodejs_gc_duration_seconds_sum{job=\"local-api\"}[30s]) * 1000",
+          "legendFormat": "{{kind}}",
+          "refId": "A"
+        }
+      ],
+      "title": "GC Duration Rate (ms/s by type)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+      "description": "How many GC runs per second by type. Frequent major GC runs indicate memory pressure.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 5, "lineWidth": 2 },
+          "min": 0,
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 42 },
+      "id": 52,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "local-prometheus" },
+          "expr": "rate(nodejs_gc_duration_seconds_count{job=\"local-api\"}[30s])",
+          "legendFormat": "{{kind}}",
+          "refId": "A"
+        }
+      ],
+      "title": "GC Run Rate (collections/sec by type)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "tags": ["k6", "performance", "nodejs"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Performance Testing Monitor",
+  "uid": "perf-testing-monitor-v1",
+  "version": 1
+}

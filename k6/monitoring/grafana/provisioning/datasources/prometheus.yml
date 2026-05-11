@@ -1,0 +1,18 @@
+# Grafana auto-provisioning: Prometheus datasource
+#
+# Lets you query the API's own Prometheus metrics (heap, CPU, request counts)
+# alongside k6 test metrics in the same Grafana instance.
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: local-prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: false
+    editable: true
+    jsonData:
+      timeInterval: "5s"
+      httpMethod: POST

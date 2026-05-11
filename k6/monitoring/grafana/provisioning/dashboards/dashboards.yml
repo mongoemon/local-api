@@ -1,0 +1,26 @@
+# Grafana dashboard provisioning config
+#
+# Tells Grafana to load dashboard JSON files from this directory.
+# Any .json file in this folder becomes a dashboard automatically.
+#
+# HOW TO ADD THE OFFICIAL k6 DASHBOARD:
+#   1. Open Grafana at http://localhost:3000
+#   2. Click the "+" menu → Import
+#   3. Enter ID: 2587   then click "Load"
+#   4. Select datasource: "k6 InfluxDB"
+#   5. Click Import
+#
+# The dashboard ID 2587 is the official k6 Load Testing Results dashboard
+# maintained by Grafana Labs: https://grafana.com/grafana/dashboards/2587
+
+apiVersion: 1
+
+providers:
+  - name: k6-dashboards
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

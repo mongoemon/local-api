@@ -1,0 +1,21 @@
+# Grafana auto-provisioning: InfluxDB datasource
+#
+# This file is loaded automatically when Grafana starts.
+# It configures the InfluxDB connection so you don't have to add it manually.
+#
+# After starting the stack, the "k6 InfluxDB" datasource will appear in
+# Grafana → Connections → Data Sources.
+
+apiVersion: 1
+
+datasources:
+  - name: k6 InfluxDB
+    uid: k6-influxdb
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    database: k6
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: "5s"
