@@ -17,7 +17,8 @@ function createLimiter(config) {
   return rateLimit({
     windowMs: config.rateLimit.windowMs,
     max: config.rateLimit.max,
-    message: config.rateLimit.message
+    message: config.rateLimit.message,
+    validate: { creationStack: false }
   });
 }
 
