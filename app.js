@@ -8,6 +8,7 @@ import { createWorkloadRouter } from "./routes/workload.js";
 import { createAuthRouter } from "./routes/auth.js";
 import { createDataRouter } from "./routes/data.js";
 import { createSystemRouter } from "./routes/system.js";
+import { createConfigRouter } from "./routes/config-api.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -67,9 +68,15 @@ export function createApp(config) {
     next();
   });
 
-  if (config.rateLimit.enabled) {
-    app.use(createLimiter(config));
-  }
+  // Config API — mounted before rate limiter and concurrency so it is always reachable
+  let activeLimiter = createLimiter(config);
+  app.use(createConfigRouter(config, () => { activeLimiter = createLimiter(config); }));
+
+  // Rate limiter — re-checks config.rateLimit.enabled on every request so toggle takes effect immediately
+  app.use((req, res, next) => {
+    if (!config.rateLimit.enabled) return next();
+    return activeLimiter(req, res, next);
+  });
 
   app.use((_req, res, next) => {
     if (activeRequests >= config.concurrency.maxConcurrent) {
