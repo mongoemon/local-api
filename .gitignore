@@ -3,3 +3,5 @@ node_modules/
 tmp/
 *.jtl
 coverage/
+jmeter/results/*.csv
+jmeter/results/*.xml
